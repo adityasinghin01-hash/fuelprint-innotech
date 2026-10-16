@@ -1,0 +1,30 @@
+[
+  {
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "event_time_utc": "2026-10-22T10:20:00.000Z",
+    "exceptions": [],
+    "from_holder": null,
+    "id": "1da2b6b0-b17b-59a6-9ae7-57dabb3d6d93",
+    "recorded_utc": "2026-10-22T10:20:03.000Z",
+    "revision": 1,
+    "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+    "seal_state": "INTACT",
+    "specimen_id": "cd89da3d-8527-5de2-aab9-e5a62a173852",
+    "to_holder": "inspector_demo"
+  },
+  {
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "event_time_utc": "2026-10-22T10:24:00.000Z",
+    "exceptions": [],
+    "from_holder": "inspector_demo",
+    "id": "861a954f-b54f-57e3-b071-d432cb2ac455",
+    "recorded_utc": "2026-10-22T10:24:05.000Z",
+    "revision": 1,
+    "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+    "seal_state": "INTACT",
+    "specimen_id": "cd89da3d-8527-5de2-aab9-e5a62a173852",
+    "to_holder": "lab_demo"
+  }
+]

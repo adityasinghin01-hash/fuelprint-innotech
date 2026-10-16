@@ -1,0 +1,71 @@
+{
+  "algorithm_version": "FP-COMPAT-3-stub",
+  "candidates": [
+    {
+      "explanation_id": "S02",
+      "fit": 0.94,
+      "reason": null,
+      "sources": [
+        "S02"
+      ],
+      "status": "SURVIVES"
+    },
+    {
+      "explanation_id": "S01",
+      "fit": 1.07,
+      "reason": null,
+      "sources": [
+        "S01"
+      ],
+      "status": "SURVIVES"
+    },
+    {
+      "explanation_id": "S01+S02",
+      "fit": 0.91,
+      "reason": null,
+      "sources": [
+        "S01",
+        "S02"
+      ],
+      "status": "SURVIVES"
+    },
+    {
+      "explanation_id": "S03",
+      "fit": 9.8,
+      "reason": "RESIDUAL_ABOVE_CUTOFF",
+      "sources": [
+        "S03"
+      ],
+      "status": "REJECTED"
+    },
+    {
+      "explanation_id": "UNKNOWN",
+      "fit": null,
+      "reason": "UNREGISTERED_SOURCES_NOT_EXCLUDED",
+      "sources": [],
+      "status": "SURVIVES"
+    }
+  ],
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "exclusions": [
+    {
+      "reading_window": "a0643d34-e868-5908-a232-b4448fb25ecb",
+      "reason": "STALE"
+    }
+  ],
+  "explanation_text": "Box N2 saw a sustained SO2 rise. S01 and S02 sit on the same wind line upwind of N2, so both still fit. A reading closer to S02 at plume height would separate them.",
+  "id": "bd102e47-bb60-57cb-8588-8805263298d3",
+  "input_window_ids": [
+    "d6195dea-ba55-5267-a761-b7171356dfca"
+  ],
+  "limitations": [
+    "Synthetic model only, not field validated",
+    "Unregistered sources cannot be ruled out",
+    "Fit numbers are not probabilities"
+  ],
+  "outcome": "AMBIGUOUS_OR_OPTIONAL_MIXTURE",
+  "qualification": "SYNTHETIC_SCOPE_ONLY",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c"
+}

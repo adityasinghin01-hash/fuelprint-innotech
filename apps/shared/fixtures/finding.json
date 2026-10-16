@@ -1,0 +1,31 @@
+{
+  "alternatives": [
+    "Unregistered source upwind",
+    "S01 contribution not fully excluded under wind error"
+  ],
+  "case_id": "e41d26c7-0f56-5ed2-a868-ee218fbf95d6",
+  "cited_refs": [
+    {
+      "id": "15651e1c-9304-528d-9b06-2cc1214b58b7",
+      "revision": 1,
+      "type": "screening_record"
+    },
+    {
+      "id": "da2c4fa2-b92e-52a4-99ec-9ceec0fca194",
+      "revision": 1,
+      "type": "lab_result"
+    }
+  ],
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "f6404402-6e3d-5adf-b7c0-d2e3aab9d55d",
+  "legal_suitability": "NOT_ASSESSED",
+  "limitations": [
+    "Synthetic teaching data",
+    "The specimen result describes this material only",
+    "Legal suitability not assessed"
+  ],
+  "outcome": "SUPPORTED_WITHIN_SCOPE",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c"
+}

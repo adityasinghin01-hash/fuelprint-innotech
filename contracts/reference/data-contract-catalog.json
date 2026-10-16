@@ -1,0 +1,2863 @@
+{
+  "version": "FP-CONTRACT-3",
+  "status": "RESEARCH_DICTIONARY_NOT_EXECUTABLE_SCHEMA",
+  "primitives": {
+    "id": "UUIDv4 string; fixture display alias separate",
+    "hash": "lowercase SHA256 hex64",
+    "seq": "canonical decimal string0..2^63-1 on wire; SQLite integer",
+    "rev": "integer0..2^53-1",
+    "number": "finite IEEE754; no NaN/Infinity",
+    "utc": "RFC3339 UTC Z; no simulated time presented as physical UTC",
+    "quantity": "{value:number,unit:enum,uncertainty:number|null,uncertainty_basis:string|null}; null uncertainty means unusable for a required quantitative claim",
+    "pose": "{frame_id:id,east_m:number,north_m:number,up_m:number,horizontal_uncertainty_m:number|null,vertical_uncertainty_m:number|null}",
+    "time": "{clock_epoch:id,tick:rev|null,monotonic_ns:seq|null,capture_utc:utc|null,utc_uncertainty_ms:number|null,received_utc:utc}",
+    "ref": "{id:id,revision:rev}; immutable composite foreign key",
+    "blob_ref": "{sha256:hash,bytes:rev,media_type:string}",
+    "interval": "{start:time,end:time,valid_duration_s:number,excluded_reason_codes:string[]}",
+    "json": "strict versioned payload with referenced schema; not unrestricted scientific extra fields",
+    "string": "UTF8 string; reject lone surrogates; default max4096characters,display label128,reason256,max64reasons; global body bounds still apply",
+    "bytes64": "strict base64 string, decoded length and SHA256 checked; max64KiB raw frame",
+    "bool": "JSON boolean",
+    "velocity": "{frame_id:id,east_m_s:number,north_m_s:number,up_m_s:number}; magnitude bounded by vehicle profile"
+  },
+  "enums": {
+    "origin": [
+      "SYNTHETIC_TEACHING",
+      "SYNTHETIC_BLIND",
+      "PHYSICAL"
+    ],
+    "mode": [
+      "TEACHING",
+      "INVESTIGATION",
+      "PHYSICAL_CAMPAIGN"
+    ],
+    "lifecycle": [
+      "CREATED",
+      "READY",
+      "ACTIVE",
+      "PAUSED",
+      "COMPLETED",
+      "INTERRUPTED",
+      "CLOSED"
+    ],
+    "quality": [
+      "PENDING",
+      "VALID",
+      "LIMITED",
+      "REJECTED",
+      "INCONCLUSIVE"
+    ],
+    "interpretation": [
+      "INVALID",
+      "NO_SIGNAL",
+      "UNKNOWN_OR_MISMATCH",
+      "AMBIGUOUS_OR_OPTIONAL_MIXTURE",
+      "PROVISIONAL_SINGLE"
+    ],
+    "qualification": [
+      "MODEL_NOT_QUALIFIED",
+      "SYNTHETIC_SCOPE_ONLY",
+      "PHYSICAL_DOMAIN_QUALIFIED"
+    ],
+    "outcome": [
+      "SUPPORTED_WITHIN_SCOPE",
+      "REJECTED_FOR_NAMED_USE",
+      "INCONCLUSIVE"
+    ],
+    "command_state": [
+      "QUEUED",
+      "APPLIED",
+      "REJECTED",
+      "INTERRUPTED"
+    ],
+    "job_state": [
+      "PENDING",
+      "RUNNING",
+      "SUCCEEDED",
+      "FAILED_REQUIRES_REVIEW"
+    ],
+    "mission_stage": [
+      "PROPOSED",
+      "APPROVED",
+      "SETUP",
+      "BACKGROUND",
+      "TRAVEL",
+      "PURGE",
+      "SETTLE",
+      "COLLECT",
+      "RECOVER",
+      "RETURN",
+      "REVIEW",
+      "COMPLETED",
+      "INTERRUPTED"
+    ],
+    "use": [
+      "ONLINE_SCREENING",
+      "RETAINED_AEROSOL",
+      "MATERIAL_ANALYSIS",
+      "REDUCE_MEASUREMENT_UNCERTAINTY",
+      "SOURCE_DISCRIMINATION"
+    ],
+    "unit": [
+      "ppb_SO2",
+      "ppm_CO2",
+      "ug_m3",
+      "g_m3",
+      "g_s",
+      "m",
+      "m_s",
+      "deg_from_north",
+      "K",
+      "Pa",
+      "L_min",
+      "L",
+      "mg",
+      "ug",
+      "percent_w_w",
+      "W",
+      "Wh",
+      "s",
+      "V",
+      "ADC_count",
+      "relative_optical"
+    ],
+    "seal": [
+      "INTACT",
+      "BROKEN",
+      "MISSING",
+      "UNKNOWN"
+    ],
+    "verification": [
+      "PASS",
+      "FAIL",
+      "UNVERIFIED",
+      "NOT_APPLICABLE"
+    ],
+    "material": [
+      "SYNTHETIC_COAL_COKE_LIKE",
+      "SYNTHETIC_UNCLASSIFIED_AEROSOL",
+      "PHYSICAL_DECLARED_MATERIAL"
+    ]
+  },
+  "records": [
+    {
+      "record": "run",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "parent_run_id",
+          "type": "id",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "mode",
+          "type": "mode",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "type": "origin",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "clock_epoch",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "lifecycle",
+          "type": "lifecycle",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "profile_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "model_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "config_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "committed_tick",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "config_revision",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "run_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "scope",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "public_config",
+          "type": "json",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "sha256",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "changed_by",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "device",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "serial",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "profile_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "type": "origin",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "channel_ids",
+          "type": "id[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "provisioned_by",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "boot",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "device_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "boot_counter",
+          "type": "seq",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "mapping_revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "start_time",
+          "type": "time",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "clock_uncertainty_ms",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "record": "calibration",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "device_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "channel_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "profile_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "method_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "valid_from",
+          "type": "utc",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "valid_until",
+          "type": "utc",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "inputs",
+          "type": "blob_ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "result",
+          "type": "quality",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "method_profile",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "type": "origin",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "material",
+          "type": "material",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "analyte",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "channel_ids",
+          "type": "id[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "purpose",
+          "type": "use",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "flow_L_min",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "valid_collection_s",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "minimum_mass_mg",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "loq",
+          "type": "quantity",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "blank_limit",
+          "type": "quantity",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "duplicate_rpd_max",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "recovery_min_percent",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "recovery_max_percent",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "max_hold_s",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "readiness_rule",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "authority_basis",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "raw_frame",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "run_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "type": "origin",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "device_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "boot_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "sequence",
+          "type": "seq",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "time",
+          "type": "time",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "inlet_pose",
+          "type": "pose",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "calibration_refs",
+          "type": "ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "profile_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "raw",
+          "type": "blob_ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "quality_flags",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "channel_value",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "frame_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "channel_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "raw_value",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "value",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "unit",
+          "type": "unit",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "flow_L_min",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "saturation",
+          "type": "bool",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "recovery_required",
+          "type": "bool",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "quality_flags",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "uncertainty",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "covariance_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "record": "sequence_gap",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "device_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "boot_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "first_missing",
+          "type": "seq",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "last_missing",
+          "type": "seq",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "detected_at",
+          "type": "time",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "analysis",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "run_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "type": "origin",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "input_refs",
+          "type": "ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "input_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "model_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "covariance_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "window_ids",
+          "type": "id[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "fit_members",
+          "type": "fit_member[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "interpretation",
+          "type": "interpretation",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "qualification",
+          "type": "qualification",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "solver_failures",
+          "type": "json",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "proposal",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "analysis_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "action_id",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "purpose",
+          "type": "use",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "dependency_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "route",
+          "type": "pose[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "procedure",
+          "type": "procedure_stage[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "total_time_s",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "total_energy_Wh",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "conservative_score",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "rejected_reasons",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "mission",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "run_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "type": "origin",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "vehicle_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "proposal_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "scheduled_survey_id",
+          "type": "id",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "trigger_id",
+          "type": "id",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "stage",
+          "type": "mission_stage",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "method_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "channel_ids",
+          "type": "id[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "purpose",
+          "type": "use",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "dependency_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "approval",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "mission_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "actor_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "expires_at",
+          "type": "time",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "dependency_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "method_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "channel_ids",
+          "type": "id[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "purpose",
+          "type": "use",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "pairing",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "mission_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "vehicle_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "challenge_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "expires_utc",
+          "type": "utc",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "confirmed_by",
+          "type": "id",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "redeemed",
+          "type": "bool",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "lease",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "mission_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "vehicle_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "actor_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "expires_monotonic_ns",
+          "type": "seq",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "last_sequence",
+          "type": "seq",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revoked_reason",
+          "type": "string",
+          "required": true,
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "record": "attempt",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "mission_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "method_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "type": "origin",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "stage_intervals",
+          "type": "interval[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "actual_path",
+          "type": "blob_ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "valid_duration_s",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "valid_volume_L",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "media_id",
+          "type": "id",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "quality",
+          "type": "quality",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "reasons",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "screening_record",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "attempt_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "named_use",
+          "type": "use",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "channel_decisions",
+          "type": "channel_decision[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "input_refs",
+          "type": "ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "reviewer_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "quality",
+          "type": "quality",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "media",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "attempt_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "material",
+          "type": "material",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "container",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "seal_id",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "mass_mg",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "volume_L",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "method_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "hold_started",
+          "type": "time",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "blank_refs",
+          "type": "ref[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "case",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "run_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "type": "origin",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "purpose",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "screening_refs",
+          "type": "ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "lifecycle",
+          "type": "lifecycle",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "specimen",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "case_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "material",
+          "type": "material",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "method_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "container",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "seal_id",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "quantity",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "actual_collection_time",
+          "type": "time",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "collector_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "authority_basis",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "actual_material_blob",
+          "type": "blob_ref",
+          "required": true,
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "record": "custody_event",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "specimen_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "previous_event_id",
+          "type": "id",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "from_holder",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "to_holder",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "seal",
+          "type": "seal",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "conditions",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "event_time",
+          "type": "time",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "recorded_at",
+          "type": "utc",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "exceptions",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "lab_result",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "specimen_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "method_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "laboratory_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "scope_basis",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "analyte",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "raw_result",
+          "type": "quantity",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "blank_result",
+          "type": "quantity",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "corrected_result",
+          "type": "quantity",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "loq",
+          "type": "quantity",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "duplicate_rpd",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "recovery_percent",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "qc",
+          "type": "quality",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "raw_data",
+          "type": "blob_ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "custody_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "finding",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "case_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "outcome",
+          "type": "outcome",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "cited_refs",
+          "type": "ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "alternatives",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "author_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "legal_suitability",
+          "type": "verification",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "command",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "schema_version",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "command_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "idempotency_key",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "subject_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "expected_revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "scenario_revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "payload",
+          "type": "json",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "receipt",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "command_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "command_state",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "body_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "original_body",
+          "type": "blob_ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "effective_tick",
+          "type": "rev",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "committed_cursor",
+          "type": "seq",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "result_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "error_code",
+          "type": "string",
+          "required": true,
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "record": "event",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "cursor",
+          "type": "seq",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "run_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "aggregate_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "effective_tick",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "payload",
+          "type": "json",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "audience_scope",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "job",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "input_snapshot_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "input_refs",
+          "type": "ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "job_state",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "attempt_count",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "next_retry_utc",
+          "type": "utc",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "output_refs",
+          "type": "ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "error_code",
+          "type": "string",
+          "required": true,
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "record": "blob",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "sha256",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "bytes",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "media_type",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "relative_storage_path",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "durable",
+          "type": "bool",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "export",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "case_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "manifest",
+          "type": "blob_ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "signature",
+          "type": "blob_ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "signing_key_id",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "policy_id",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "members",
+          "type": "blob_ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "created_utc",
+          "type": "utc",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "trusted_time_anchor",
+          "type": "blob_ref",
+          "required": true,
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "record": "raw_chunk_entry",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "frame_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "raw_sha256",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "raw_bytes",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "raw_base64",
+          "type": "bytes64",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "verification_report",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "export_sha256",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "integrity",
+          "type": "verification",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "key_trust",
+          "type": "verification",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "lineage",
+          "type": "verification",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "trusted_time",
+          "type": "verification",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "custody",
+          "type": "verification",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "measurement",
+          "type": "verification",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "legal_suitability",
+          "type": "verification",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "reasons",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "verifier_version",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "session",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "actor_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "capabilities",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "scope_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "expires_utc",
+          "type": "utc",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revoked_utc",
+          "type": "utc",
+          "required": true,
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "record": "backup",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "snapshot",
+          "type": "blob_ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "referenced_blobs",
+          "type": "blob_ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "committed_cursor",
+          "type": "seq",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "private",
+          "type": "bool",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "restore_status",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "covariance",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "entry_ids",
+          "type": "id[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "units",
+          "type": "unit[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "matrix",
+          "type": "number[][]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "component_treatments",
+          "type": "covariance_component[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "domain_hash",
+          "type": "hash",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "window",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "device_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "channel_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "frame_ids",
+          "type": "id[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "interval",
+          "type": "interval",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "mean",
+          "type": "quantity",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "actual_path",
+          "type": "blob_ref",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "quality",
+          "type": "quality",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "method_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "channel_decision",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "channel_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "named_use",
+          "type": "use",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "quality",
+          "type": "quality",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "reason_codes",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "interval_refs",
+          "type": "ref[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "source_emission_fit",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "source_id",
+          "type": "id",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "SO2_g_s",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "CO2_g_s",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "fit_member",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "member_id",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "source_ids",
+          "type": "id[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "wind_direction_offset_deg",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "wind_speed_factor",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "effective_height_offset_m",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "source_emissions",
+          "type": "source_emission_fit[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "background_offsets",
+          "type": "quantity[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "normalized_sse",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "raw_sse",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "rank",
+          "type": "rev",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "rank_ratio",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "converged",
+          "type": "bool",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "admitted",
+          "type": "bool",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "failure_codes",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "procedure_stage",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "stage",
+          "type": "mission_stage",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "start",
+          "type": "time",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "end",
+          "type": "time",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "planned_duration_s",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "actual_duration_s",
+          "type": "number",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "energy_Wh",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "valid_volume_L",
+          "type": "number",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "route",
+          "type": "pose[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "prerequisites",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "failure_codes",
+          "type": "string[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "covariance_component",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "component_id",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "treatment",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "parameter_ref",
+          "type": "ref",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "bounds",
+          "type": "quantity[]",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "included_in_covariance",
+          "type": "bool",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "record": "laboratory_qc_input",
+      "unknown_fields": "REJECT",
+      "fields": [
+        {
+          "name": "blank",
+          "type": "quantity",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "duplicate",
+          "type": "quantity",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "spike_expected",
+          "type": "quantity",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "spike_recovered",
+          "type": "quantity",
+          "required": true,
+          "nullable": true
+        },
+        {
+          "name": "hold_interval",
+          "type": "interval",
+          "required": true,
+          "nullable": false
+        },
+        {
+          "name": "raw_data_refs",
+          "type": "blob_ref[]",
+          "required": true,
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "command": "create_run",
+      "role": "presenter",
+      "payload_spec": "preset_id:string mode:mode parent_run_id:id?",
+      "guard": "new UUID and private initial state",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "reset_run",
+      "role": "presenter",
+      "payload_spec": "preset_id:string mode:mode parent_run_id:id",
+      "guard": "new run; interrupt old mission and revoke leases",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "change_teaching_config",
+      "role": "presenter",
+      "payload_spec": "parameter:string value:number reason:string",
+      "guard": "TEACHING only; allowed parameter registry; invalidate dependencies",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "revise_placement",
+      "role": "analyst",
+      "payload_spec": "node_id:id inlet_pose:pose access_revision:rev",
+      "guard": "allowed mount/access, no obstacles; version and invalidate",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "propose_mission",
+      "role": "analyst",
+      "payload_spec": "trigger_id:id? proposal_id:id? scheduled_survey_id:id? action_id:string",
+      "guard": "exactly one observed proposal or independent scheduled-survey basis",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "approve_mission",
+      "role": "supervisor",
+      "payload_spec": "mission_id:id dependency_hash:hash method_id:id channel_ids:id[] intended_use:use expiry:time",
+      "guard": "current complete route/time/energy/access/measurement eligibility",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "create_pairing",
+      "role": "staff",
+      "payload_spec": "mission_id:id vehicle_id:id",
+      "guard": "approved mission and single-use120s challenge",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "confirm_pairing",
+      "role": "staff",
+      "payload_spec": "pairing_id:id",
+      "guard": "loopback/HTTPS staff confirmation and session rotation",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "acquire_lease",
+      "role": "field_operator_or_paired_visitor",
+      "payload_spec": "mission_id:id vehicle_id:id",
+      "guard": "only one active lease;2s expiry",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "release_lease",
+      "role": "lease_holder",
+      "payload_spec": "lease_id:id",
+      "guard": "record release and stop immediately",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "control_input",
+      "role": "lease_holder",
+      "payload_spec": "lease_id:id sequence:seq velocity_enu:velocity neutral:bool",
+      "guard": "owner and fresh sequence;10Hz;400ms stale;speed limits;stop by500ms target",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "start_capture",
+      "role": "field_operator",
+      "payload_spec": "mission_id:id method_id:id channel_ids:id[] intended_use:use",
+      "guard": "current approval/readiness; create new attempt, no overwrite",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "review_capture",
+      "role": "qc_reviewer",
+      "payload_spec": "attempt_id:id named_use:use channel_decisions:channel_decision[] reasons:string[]",
+      "guard": "cannot override actual failed mandatory method prerequisites",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "create_case",
+      "role": "case_reviewer",
+      "payload_spec": "screening_record_ids:id[] purpose:string",
+      "guard": "origin/domain compatible; rejected input retained with limitation",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "create_specimen",
+      "role": "inspector_demo",
+      "payload_spec": "case_id:id site_id:id material:material method_id:id container:string seal:string mass_mg:number authority_basis:string",
+      "guard": "exhibition synthetic role; actual material resolved by restricted adapter",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "append_custody",
+      "role": "current_custodian",
+      "payload_spec": "specimen_id:id to_holder:id seal:seal conditions:string event_time:time exceptions:string[]",
+      "guard": "current holder/revision or explicit exception; append only",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "request_lab",
+      "role": "lab_demo",
+      "payload_spec": "specimen_id:id method_id:id qc_inputs:laboratory_qc_input",
+      "guard": "actual material/method match; raw values and failed QC retained",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "revise_finding",
+      "role": "case_reviewer",
+      "payload_spec": "case_id:id outcome:outcome cited_record_revisions:ref[] alternatives:string[] limitations:string[]",
+      "guard": "no unsupported identity/fuel/legal promotion",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "seal_export",
+      "role": "exporter",
+      "payload_spec": "case_id:id case_revision:rev export_policy_id:string",
+      "guard": "immutable closed case; all bytes intact; strict capacity/trust policy",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    },
+    {
+      "command": "ingest_frames",
+      "role": "adapter_ingest",
+      "payload_spec": "device_id:id boot_id:id frames:raw_frame[]",
+      "guard": "provisioned profile/origin;100frames/1MiB; conflict quarantine",
+      "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+      "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED"
+    }
+  ],
+  "constraints": [
+    "Every field required; ? explicitly allows null, not omission. Default arrays max100items; raw frame batch100; fit_members max567(21supports*27members); inputrefs/windowentries max60; case lineage refs max500 within body limit; default strings4096chars/reasons256; nested covariance matrix max60x60 follows entry_ids and units.",
+    "FK identity and revision immutable; no evidence cascading delete; raw(device,boot,sequence) unique; actor/scope/key unique; active lease partial unique vehicle.",
+    "Global browser body64KiB; privileged frame batch1MiB/100frames; individual raw frame64KiB; archive expansion includes decoded raw totals.",
+    "Quantity unit must match channel/analyte field; independent origin compatibility checks; observed capture and received time both retained.",
+    "Scientific JSON substructures are specified in chapter07 and model register; next plan turns dictionary into executable schemas, not a new choice of model."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "created_by": "case_reviewer",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "e41d26c7-0f56-5ed2-a868-ee218fbf95d6",
+  "investigation_id": "220dcf8d-6c28-5658-a7ba-2efac8457436",
+  "purpose": "Follow-up of SO2 event at N2",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "screening_record_ids": [
+    "15651e1c-9304-528d-9b06-2cc1214b58b7",
+    "1e4ee17d-b938-54e6-91d4-64c163394b90"
+  ],
+  "state": "LAB"
+}

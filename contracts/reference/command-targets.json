@@ -1,0 +1,222 @@
+[
+  {
+    "command": "create_run",
+    "role": "presenter",
+    "payload_spec": "preset_id:string mode:mode parent_run_id:id?",
+    "guard": "new UUID and private initial state",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/create_run.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "reset_run",
+    "role": "presenter",
+    "payload_spec": "preset_id:string mode:mode parent_run_id:id",
+    "guard": "new run; interrupt old mission and revoke leases",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/reset_run.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "change_teaching_config",
+    "role": "presenter",
+    "payload_spec": "parameter:string value:number reason:string",
+    "guard": "TEACHING only; allowed parameter registry; invalidate dependencies",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/change_teaching_config.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "revise_placement",
+    "role": "analyst",
+    "payload_spec": "node_id:id inlet_pose:pose access_revision:rev",
+    "guard": "allowed mount/access, no obstacles; version and invalidate",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/revise_placement.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "propose_mission",
+    "role": "analyst",
+    "payload_spec": "trigger_id:id? proposal_id:id? scheduled_survey_id:id? action_id:string",
+    "guard": "exactly one observed proposal or independent scheduled-survey basis",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/propose_mission.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "approve_mission",
+    "role": "supervisor",
+    "payload_spec": "mission_id:id dependency_hash:hash method_id:id channel_ids:id[] intended_use:use expiry:time",
+    "guard": "current complete route/time/energy/access/measurement eligibility",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/approve_mission.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "create_pairing",
+    "role": "staff",
+    "payload_spec": "mission_id:id vehicle_id:id",
+    "guard": "approved mission and single-use120s challenge",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/create_pairing.schema.json",
+    "task": "W01",
+    "handler_task": "W19"
+  },
+  {
+    "command": "confirm_pairing",
+    "role": "staff",
+    "payload_spec": "pairing_id:id",
+    "guard": "loopback/HTTPS staff confirmation and session rotation",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/confirm_pairing.schema.json",
+    "task": "W01",
+    "handler_task": "W19"
+  },
+  {
+    "command": "acquire_lease",
+    "role": "field_operator_or_paired_visitor",
+    "payload_spec": "mission_id:id vehicle_id:id",
+    "guard": "only one active lease;2s expiry",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/acquire_lease.schema.json",
+    "task": "W01",
+    "handler_task": "W19"
+  },
+  {
+    "command": "release_lease",
+    "role": "lease_holder",
+    "payload_spec": "lease_id:id",
+    "guard": "record release and stop immediately",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/release_lease.schema.json",
+    "task": "W01",
+    "handler_task": "W19"
+  },
+  {
+    "command": "control_input",
+    "role": "lease_holder",
+    "payload_spec": "lease_id:id sequence:seq velocity_enu:velocity neutral:bool",
+    "guard": "owner and fresh sequence;10Hz;400ms stale;speed limits;stop by500ms target",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/control_input.schema.json",
+    "task": "W01",
+    "handler_task": "W19"
+  },
+  {
+    "command": "start_capture",
+    "role": "field_operator",
+    "payload_spec": "mission_id:id method_id:id channel_ids:id[] intended_use:use",
+    "guard": "current approval/readiness; create new attempt, no overwrite",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/start_capture.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "review_capture",
+    "role": "qc_reviewer",
+    "payload_spec": "attempt_id:id named_use:use channel_decisions:channel_decision[] reasons:string[]",
+    "guard": "cannot override actual failed mandatory method prerequisites",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/review_capture.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "create_case",
+    "role": "case_reviewer",
+    "payload_spec": "screening_record_ids:id[] purpose:string",
+    "guard": "origin/domain compatible; rejected input retained with limitation",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/create_case.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "create_specimen",
+    "role": "inspector_demo",
+    "payload_spec": "case_id:id site_id:id material:material method_id:id container:string seal:string mass_mg:number authority_basis:string",
+    "guard": "exhibition synthetic role; actual material resolved by restricted adapter",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/create_specimen.schema.json",
+    "task": "W01",
+    "handler_task": "W22"
+  },
+  {
+    "command": "append_custody",
+    "role": "current_custodian",
+    "payload_spec": "specimen_id:id to_holder:id seal:seal conditions:string event_time:time exceptions:string[]",
+    "guard": "current holder/revision or explicit exception; append only",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/append_custody.schema.json",
+    "task": "W01",
+    "handler_task": "W22"
+  },
+  {
+    "command": "request_lab",
+    "role": "lab_demo",
+    "payload_spec": "specimen_id:id method_id:id qc_inputs:laboratory_qc_input",
+    "guard": "actual material/method match; raw values and failed QC retained",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/request_lab.schema.json",
+    "task": "W01",
+    "handler_task": "W23"
+  },
+  {
+    "command": "revise_finding",
+    "role": "case_reviewer",
+    "payload_spec": "case_id:id outcome:outcome cited_record_revisions:ref[] alternatives:string[] limitations:string[]",
+    "guard": "no unsupported identity/fuel/legal promotion",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/revise_finding.schema.json",
+    "task": "W01",
+    "handler_task": "W03"
+  },
+  {
+    "command": "seal_export",
+    "role": "exporter",
+    "payload_spec": "case_id:id case_revision:rev export_policy_id:string",
+    "guard": "immutable closed case; all bytes intact; strict capacity/trust policy",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/seal_export.schema.json",
+    "task": "W01",
+    "handler_task": "W09"
+  },
+  {
+    "command": "ingest_frames",
+    "role": "adapter_ingest",
+    "payload_spec": "device_id:id boot_id:id frames:raw_frame[]",
+    "guard": "provisioned profile/origin;100frames/1MiB; conflict quarantine",
+    "receipt": "durable QUEUED then APPLIED or rejected/interrupted",
+    "status": "RESEARCH_CONTRACT_NOT_IMPLEMENTED",
+    "schema_path": "packages/contracts/schemas/commands/ingest_frames.schema.json",
+    "task": "W01",
+    "handler_task": "W16"
+  }
+]

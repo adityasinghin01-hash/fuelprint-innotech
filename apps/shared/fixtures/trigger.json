@@ -1,0 +1,17 @@
+{
+  "background_window_id": "a2affe79-7242-501c-a047-b7bed6b8263b",
+  "channel": "SO2_ppb",
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "81d3f02e-0579-55d5-980f-0bd10f4e2c5f",
+  "intervals": [
+    [
+      397.0,
+      412.0
+    ]
+  ],
+  "revision": 1,
+  "rule": "TEACH-DETECT-1",
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "sensor": "bd8d7561-fe95-5a5b-9105-e6d29b83bc2b"
+}

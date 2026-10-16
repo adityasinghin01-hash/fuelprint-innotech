@@ -1,0 +1,17 @@
+{
+  "channel": "SO2_ppb",
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "2da66f0d-12e5-54d8-affb-f8156ef9bc8e",
+  "origin": "SYNTHETIC_TEACHING",
+  "quality": [
+    "OK"
+  ],
+  "raw_value": 61.2,
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "sensor_or_vehicle_id": "bd8d7561-fe95-5a5b-9105-e6d29b83bc2b",
+  "sim_time_s": 412.0,
+  "unit": "ppb",
+  "value": 61.2
+}

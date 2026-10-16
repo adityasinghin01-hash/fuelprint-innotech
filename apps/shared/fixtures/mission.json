@@ -1,0 +1,36 @@
+{
+  "action_id": "A-AER-0-100",
+  "channel_ids": [
+    "SO2_ppb",
+    "CO2_ppm"
+  ],
+  "created_by": "supervisor",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "dependency_hash": "91047a1e4622a81cdf22efb48d6ed4d047b6836c393d3a9a1f058199ac90290a",
+  "expires_s": 712.0,
+  "id": "2089e69c-d071-5517-855e-24ad4fcc0610",
+  "method_id": "TEACH-NODE-ONLINE-2",
+  "proposal_id": "bf5a1ace-27a1-5b45-885c-81a4c294f801",
+  "revision": 2,
+  "route": [
+    {
+      "east": 0,
+      "north": 0,
+      "up": 2
+    },
+    {
+      "east": 0,
+      "north": 100,
+      "up": 35
+    }
+  ],
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "state": "APPROVED",
+  "survey_id": null,
+  "target": {
+    "east": 0,
+    "north": 100,
+    "up": 35
+  },
+  "vehicle_id": "9ad11ce0-f3b3-54f6-a41a-871f695c246f"
+}

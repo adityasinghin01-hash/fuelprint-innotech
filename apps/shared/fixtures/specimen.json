@@ -1,0 +1,16 @@
+{
+  "authority_basis": "INSPECTOR_DEMO",
+  "case_id": "e41d26c7-0f56-5ed2-a868-ee218fbf95d6",
+  "container": "JAR-0042",
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "current_holder": "lab_demo",
+  "id": "cd89da3d-8527-5de2-aab9-e5a62a173852",
+  "mass_mg": 100,
+  "material": "SYNTHETIC_COAL_COKE_LIKE",
+  "method_id": "TEACH-FUEL-S-1",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "seal_id": "SEAL-7781",
+  "site_id": "S02"
+}

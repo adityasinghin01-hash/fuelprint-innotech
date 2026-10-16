@@ -1,0 +1,63 @@
+{
+  "channels": [
+    {
+      "channel": "SO2_ppb",
+      "reasons": [],
+      "status": "VALID",
+      "valid_seconds": 30,
+      "volume_L": 0.25
+    },
+    {
+      "channel": "CO2_ppm",
+      "reasons": [],
+      "status": "VALID",
+      "valid_seconds": 30,
+      "volume_L": 0.15
+    }
+  ],
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "e7ae777e-18e2-5073-861f-5dc3ae42a062",
+  "method_id": "TEACH-NODE-ONLINE-2",
+  "mission_id": "2089e69c-d071-5517-855e-24ad4fcc0610",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "stages": [
+    {
+      "end_s": 550,
+      "stage": "SETUP",
+      "start_s": 520
+    },
+    {
+      "end_s": 580,
+      "stage": "BACKGROUND",
+      "start_s": 550
+    },
+    {
+      "end_s": 610,
+      "stage": "PURGE",
+      "start_s": 580
+    },
+    {
+      "end_s": 730,
+      "stage": "SETTLE",
+      "start_s": 610
+    },
+    {
+      "end_s": 760,
+      "stage": "COLLECT",
+      "start_s": 730
+    },
+    {
+      "end_s": 880,
+      "stage": "RECOVER",
+      "start_s": 760
+    },
+    {
+      "end_s": 910,
+      "stage": "REVIEW",
+      "start_s": 880
+    }
+  ],
+  "state": "COMPLETE"
+}

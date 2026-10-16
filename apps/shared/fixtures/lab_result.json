@@ -1,0 +1,27 @@
+{
+  "computed": {
+    "net_ug": 2000,
+    "percent_w_w": 2.0,
+    "recovery_pct": 90.0,
+    "rpd_pct": 9.5238
+  },
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "da2c4fa2-b92e-52a4-99ec-9ceec0fca194",
+  "method_id": "TEACH-FUEL-S-1",
+  "qc_reasons": [],
+  "qc_status": "PASS",
+  "raw": {
+    "blank_ug": 10,
+    "dup_a_pct": 2.0,
+    "dup_b_pct": 2.2,
+    "gross_ug": 2010,
+    "mass_mg": 100,
+    "spike_added_ug": 100,
+    "spike_recovered_ug": 90
+  },
+  "reporting": "REPORTED",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "specimen_id": "cd89da3d-8527-5de2-aab9-e5a62a173852"
+}

@@ -1,0 +1,14 @@
+{
+  "background_window_id": "a2affe79-7242-501c-a047-b7bed6b8263b",
+  "channel": "SO2_ppb",
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "end_s": 412.0,
+  "id": "d6195dea-ba55-5267-a761-b7171356dfca",
+  "mean_enhancement": 48.7,
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "start_s": 382.0,
+  "std_uncertainty": 6.1,
+  "valid_seconds": 30
+}

@@ -1,0 +1,19 @@
+{
+  "case_id": "e41d26c7-0f56-5ed2-a868-ee218fbf95d6",
+  "case_revision": 6,
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "b6c7b981-b512-5059-b6c1-127c28679cdf",
+  "manifest_sha256": "1e18c986fbea93aac8a896c5d9804c8563d32e649020601b9af215c292d24973",
+  "members": [
+    {
+      "length": 812,
+      "path": "payload/records/finding/f6404402-6e3d-5adf-b7c0-d2e3aab9d55d-r1.json",
+      "sha256": "8bf18252cb6dadd5f42fca108271e688696209cdb6fae22e32318b204e6eb37d"
+    }
+  ],
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "signature": null,
+  "state": "SEALED"
+}

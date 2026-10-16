@@ -1,0 +1,13 @@
+{
+  "code": "KQ7TXP",
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "expires_utc": "2026-10-22T10:02:00.000Z",
+  "id": "40e18404-ccf1-583b-b4b5-6543e23ba716",
+  "mission_id": "2089e69c-d071-5517-855e-24ad4fcc0610",
+  "phrase": "green river",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "state": "CONFIRMED",
+  "vehicle_id": "9ad11ce0-f3b3-54f6-a41a-871f695c246f"
+}

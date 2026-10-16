@@ -1,0 +1,74 @@
+[
+  {
+    "id": "TEACH-M1-ONLINE-1",
+    "origin": "SYNTHETIC_TEACHING",
+    "ready_fixture": true,
+    "valid_s": 30,
+    "SO2_flow_L_min": 0.5,
+    "CO2_flow_L_min": 0.3,
+    "SO2_ppb": 100,
+    "CO2_enhancement_ppm": 20,
+    "SO2_volume_L": 0.25,
+    "CO2_volume_L": 0.15
+  },
+  {
+    "id": "TEACH-NODE-ONLINE-2",
+    "origin": "SYNTHETIC_TEACHING",
+    "cold_warmup_s": 120,
+    "purge_s": 30,
+    "minimum_settle_s": 120,
+    "model_settle_error_max_percent": 5,
+    "collection_valid_s": 30,
+    "flow_tolerance_percent": 5,
+    "recovery_error_max_percent": 5
+  },
+  {
+    "id": "TEACH-AEROSOL-S-1",
+    "origin": "SYNTHETIC_TEACHING",
+    "size_class": "UNCLASSIFIED",
+    "flow_L_min": 2,
+    "valid_s": 600,
+    "oracle_efficiency": 1,
+    "analyte": "sulfur_mass",
+    "loq_ug": 0.1,
+    "blank_max_ug": 0.02,
+    "duplicate_RPD_max_percent": 20,
+    "recovery_percent": [
+      80,
+      120
+    ],
+    "hold_s": 300
+  },
+  {
+    "id": "TEACH-FUEL-S-1",
+    "origin": "SYNTHETIC_TEACHING",
+    "material": "SYNTHETIC_COAL_COKE_LIKE",
+    "minimum_mass_mg": 50,
+    "oracle_mass_mg": 100,
+    "analyte": "sulfur_mass_fraction",
+    "loq_percent_w_w": 0.01,
+    "blank_max_ug": 20,
+    "duplicate_RPD_max_percent": 20,
+    "recovery_percent": [
+      80,
+      120
+    ],
+    "hold_s": 300
+  },
+  {
+    "id": "PHYSICAL-GROUND-REFERENCE-PROTOCOL",
+    "origin": "PHYSICAL",
+    "enabled": false,
+    "reference": "Teledyne API N100 qualified access",
+    "optional_CO2": "LI-COR LI-850 with pump",
+    "SO2_enhancement_target_ppb": 25,
+    "expanded_differential_uncertainty_target_ppb": 10,
+    "method_release": "competent reviewer,actual instrument/calibration/site scope,confirmed uncertainty and recovery; teaching limits do not transfer"
+  },
+  {
+    "id": "PHYSICAL-RETAINED-REACTIVE-GAS",
+    "origin": "PHYSICAL",
+    "enabled": false,
+    "reason": "No qualified target/media recovery and holding method; no retained gas finding allowed"
+  }
+]

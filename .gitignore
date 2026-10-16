@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+dist/
+target/
+.idea/
+.vscode/
+*.log
+.env
+*.db
+*.db-wal
+*.db-shm
+data/runtime/
+server/config/stations.json
+keys/
+*.pem
+docs/plan/build/

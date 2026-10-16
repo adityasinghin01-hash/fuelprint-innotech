@@ -1,0 +1,15 @@
+{
+  "case_id": "e41d26c7-0f56-5ed2-a868-ee218fbf95d6",
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "decision": "CANDIDATE_SUPPORTED_SIMULATED",
+  "id": "8f6d9a75-83b9-58b7-8a70-37ccf2e7bd9b",
+  "notice": {
+    "area": "Estate block west",
+    "interval": "22 Oct, 01:00 to 03:00",
+    "status_text": "An air quality investigation is in progress in this area."
+  },
+  "rationale": "Valid screening and a passing synthetic lab result; alternatives remain.",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c"
+}

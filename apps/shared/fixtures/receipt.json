@@ -1,0 +1,14 @@
+{
+  "command_id": "5dcec16e-26a1-53a2-b7df-5d33bf7d0017",
+  "reason_code": null,
+  "reason_text": null,
+  "receipt_id": "f6daab76-0c8e-5530-bb1a-705ce70c5ea1",
+  "record_refs": [
+    {
+      "id": "2089e69c-d071-5517-855e-24ad4fcc0610",
+      "revision": 2,
+      "type": "mission"
+    }
+  ],
+  "status": "APPLIED"
+}

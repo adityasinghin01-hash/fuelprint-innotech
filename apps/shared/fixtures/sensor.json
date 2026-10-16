@@ -1,0 +1,82 @@
+[
+  {
+    "calibration_state": "VALID_SYNTHETIC",
+    "channels": [
+      "SO2_ppb",
+      "CO2_ppm",
+      "PM_ugm3"
+    ],
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "id": "f1a53398-d7a3-5e07-ab52-7e2d353bdcee",
+    "inlet": {
+      "east": -20,
+      "north": 60,
+      "up": 3
+    },
+    "label": "N1",
+    "revision": 1,
+    "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+    "status": "OK"
+  },
+  {
+    "calibration_state": "VALID_SYNTHETIC",
+    "channels": [
+      "SO2_ppb",
+      "CO2_ppm",
+      "PM_ugm3"
+    ],
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "id": "bd8d7561-fe95-5a5b-9105-e6d29b83bc2b",
+    "inlet": {
+      "east": 120,
+      "north": 100,
+      "up": 3
+    },
+    "label": "N2",
+    "revision": 1,
+    "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+    "status": "OK"
+  },
+  {
+    "calibration_state": "VALID_SYNTHETIC",
+    "channels": [
+      "SO2_ppb",
+      "CO2_ppm",
+      "PM_ugm3"
+    ],
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "id": "20c50ec4-491b-5978-99e8-12049099bac8",
+    "inlet": {
+      "east": 280,
+      "north": 140,
+      "up": 3
+    },
+    "label": "N3",
+    "revision": 1,
+    "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+    "status": "OK"
+  },
+  {
+    "calibration_state": "VALID_SYNTHETIC",
+    "channels": [
+      "SO2_ppb",
+      "CO2_ppm",
+      "PM_ugm3"
+    ],
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "id": "6e3ec5a3-734a-5092-8ed5-fef84c1d4901",
+    "inlet": {
+      "east": 400,
+      "north": -100,
+      "up": 3
+    },
+    "label": "N4",
+    "revision": 1,
+    "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+    "status": "OK"
+  }
+]

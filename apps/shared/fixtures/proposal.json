@@ -1,0 +1,55 @@
+{
+  "actions": [
+    {
+      "action_id": "A-AER-0-100",
+      "complete_minutes": 9.5,
+      "feasible": true,
+      "kind": "DISCRIMINATE",
+      "rejection_reason": null,
+      "score": 2.4,
+      "target": {
+        "east": 0,
+        "north": 100,
+        "up": 35
+      },
+      "vehicle": "DRONE"
+    },
+    {
+      "action_id": "A-GND-120-100",
+      "complete_minutes": 8.0,
+      "feasible": true,
+      "kind": "DISCRIMINATE",
+      "rejection_reason": null,
+      "score": 0.6,
+      "target": {
+        "east": 120,
+        "north": 100,
+        "up": 3
+      },
+      "vehicle": "DRONE"
+    },
+    {
+      "action_id": "A-GND-280-140",
+      "complete_minutes": null,
+      "feasible": false,
+      "kind": "DISCRIMINATE",
+      "rejection_reason": "UNREACHABLE",
+      "score": 0,
+      "target": {
+        "east": 280,
+        "north": 140,
+        "up": 3
+      },
+      "vehicle": "VAN"
+    }
+  ],
+  "analysis_id": "bd102e47-bb60-57cb-8588-8805263298d3",
+  "best_action_id": "A-AER-0-100",
+  "cheaper_action_id": "A-GND-120-100",
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "bf5a1ace-27a1-5b45-885c-81a4c294f801",
+  "result": "BEST_ACTION",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c"
+}

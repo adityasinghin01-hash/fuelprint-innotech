@@ -1,0 +1,53 @@
+{
+  "cursor": 1842,
+  "message_type": "tick",
+  "payload": {
+    "latest_readings": [
+      {
+        "channel": "SO2_ppb",
+        "quality": [
+          "OK"
+        ],
+        "sensor": "N2",
+        "sim_time_s": 412.0,
+        "value": 61.2
+      }
+    ],
+    "time_scale": 1,
+    "vehicles": [
+      {
+        "energy_wh": 51.3,
+        "inlet": {
+          "east": 12.4,
+          "north": 98.5,
+          "up": 34.6
+        },
+        "kind": "DRONE",
+        "label": "DRONE-1",
+        "lease_holder": "visitor-7f3a",
+        "pose": {
+          "east": 12.0,
+          "north": 98.5,
+          "up": 35.0,
+          "yaw_deg": 90
+        },
+        "stage": "OUTBOUND",
+        "vehicle_id": "9ad11ce0-f3b3-54f6-a41a-871f695c246f",
+        "velocity": {
+          "east": 1.2,
+          "north": 0,
+          "up": 0
+        }
+      }
+    ],
+    "wind": {
+      "from_deg": 270,
+      "speed_m_s": 3.0
+    }
+  },
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "schema_version": "fp/1",
+  "server_epoch": "e70aa455-c294-5eee-a767-7a1666ada463",
+  "server_time_utc": "2026-10-22T10:15:04.120Z",
+  "sim_time_s": 412.35
+}

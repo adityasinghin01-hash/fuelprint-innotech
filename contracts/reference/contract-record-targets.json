@@ -1,0 +1,2716 @@
+[
+  {
+    "record": "run",
+    "schema_path": "packages/contracts/schemas/records/run.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "parent_run_id",
+        "type": "id",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "mode",
+        "type": "mode",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "origin",
+        "type": "origin",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "clock_epoch",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "lifecycle",
+        "type": "lifecycle",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "profile_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "model_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "config_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "committed_tick",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "config_revision",
+    "schema_path": "packages/contracts/schemas/records/config_revision.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "run_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "scope",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "public_config",
+        "type": "json",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "sha256",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "changed_by",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "reason",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "device",
+    "schema_path": "packages/contracts/schemas/records/device.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "serial",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "profile_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "origin",
+        "type": "origin",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "channel_ids",
+        "type": "id[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "provisioned_by",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "boot",
+    "schema_path": "packages/contracts/schemas/records/boot.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "device_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "boot_counter",
+        "type": "seq",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "mapping_revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "start_time",
+        "type": "time",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "clock_uncertainty_ms",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "calibration",
+    "schema_path": "packages/contracts/schemas/records/calibration.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "device_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "channel_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "profile_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "method_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "valid_from",
+        "type": "utc",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "valid_until",
+        "type": "utc",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "inputs",
+        "type": "blob_ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "result",
+        "type": "quality",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "limitations",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "method_profile",
+    "schema_path": "packages/contracts/schemas/records/method_profile.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "origin",
+        "type": "origin",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "material",
+        "type": "material",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "analyte",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "channel_ids",
+        "type": "id[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "purpose",
+        "type": "use",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "flow_L_min",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "valid_collection_s",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "minimum_mass_mg",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "loq",
+        "type": "quantity",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "blank_limit",
+        "type": "quantity",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "duplicate_rpd_max",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "recovery_min_percent",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "recovery_max_percent",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "max_hold_s",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "readiness_rule",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "authority_basis",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "limitations",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "raw_frame",
+    "schema_path": "packages/contracts/schemas/records/raw_frame.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "run_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "origin",
+        "type": "origin",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "device_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "boot_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "sequence",
+        "type": "seq",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "time",
+        "type": "time",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "inlet_pose",
+        "type": "pose",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "calibration_refs",
+        "type": "ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "profile_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "raw",
+        "type": "blob_ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "quality_flags",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "channel_value",
+    "schema_path": "packages/contracts/schemas/records/channel_value.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "frame_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "channel_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "raw_value",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "value",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "unit",
+        "type": "unit",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "flow_L_min",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "saturation",
+        "type": "bool",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "recovery_required",
+        "type": "bool",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "quality_flags",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "uncertainty",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "covariance_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": true
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "sequence_gap",
+    "schema_path": "packages/contracts/schemas/records/sequence_gap.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "device_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "boot_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "first_missing",
+        "type": "seq",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "last_missing",
+        "type": "seq",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "detected_at",
+        "type": "time",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "reason",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "analysis",
+    "schema_path": "packages/contracts/schemas/records/analysis.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "run_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "origin",
+        "type": "origin",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "input_refs",
+        "type": "ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "input_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "model_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "covariance_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "window_ids",
+        "type": "id[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "fit_members",
+        "type": "fit_member[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "interpretation",
+        "type": "interpretation",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "qualification",
+        "type": "qualification",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "limitations",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "solver_failures",
+        "type": "json",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "proposal",
+    "schema_path": "packages/contracts/schemas/records/proposal.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "analysis_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "action_id",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "purpose",
+        "type": "use",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "dependency_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "route",
+        "type": "pose[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "procedure",
+        "type": "procedure_stage[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "total_time_s",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "total_energy_Wh",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "conservative_score",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "rejected_reasons",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "mission",
+    "schema_path": "packages/contracts/schemas/records/mission.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "run_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "origin",
+        "type": "origin",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "vehicle_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "proposal_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "scheduled_survey_id",
+        "type": "id",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "trigger_id",
+        "type": "id",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "stage",
+        "type": "mission_stage",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "method_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "channel_ids",
+        "type": "id[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "purpose",
+        "type": "use",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "dependency_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "approval",
+    "schema_path": "packages/contracts/schemas/records/approval.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "mission_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "actor_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "expires_at",
+        "type": "time",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "dependency_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "method_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "channel_ids",
+        "type": "id[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "purpose",
+        "type": "use",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "pairing",
+    "schema_path": "packages/contracts/schemas/records/pairing.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "mission_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "vehicle_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "challenge_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "expires_utc",
+        "type": "utc",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "confirmed_by",
+        "type": "id",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "redeemed",
+        "type": "bool",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "lease",
+    "schema_path": "packages/contracts/schemas/records/lease.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "mission_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "vehicle_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "actor_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "expires_monotonic_ns",
+        "type": "seq",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "last_sequence",
+        "type": "seq",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revoked_reason",
+        "type": "string",
+        "required": true,
+        "nullable": true
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "attempt",
+    "schema_path": "packages/contracts/schemas/records/attempt.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "mission_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "method_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "origin",
+        "type": "origin",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "stage_intervals",
+        "type": "interval[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "actual_path",
+        "type": "blob_ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "valid_duration_s",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "valid_volume_L",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "media_id",
+        "type": "id",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "quality",
+        "type": "quality",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "reasons",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "screening_record",
+    "schema_path": "packages/contracts/schemas/records/screening_record.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "attempt_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "named_use",
+        "type": "use",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "channel_decisions",
+        "type": "channel_decision[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "input_refs",
+        "type": "ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "reviewer_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "quality",
+        "type": "quality",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "limitations",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "media",
+    "schema_path": "packages/contracts/schemas/records/media.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "attempt_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "material",
+        "type": "material",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "container",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "seal_id",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "mass_mg",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "volume_L",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "method_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "hold_started",
+        "type": "time",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "blank_refs",
+        "type": "ref[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "case",
+    "schema_path": "packages/contracts/schemas/records/case.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "run_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "origin",
+        "type": "origin",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "purpose",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "screening_refs",
+        "type": "ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "lifecycle",
+        "type": "lifecycle",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "limitations",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "specimen",
+    "schema_path": "packages/contracts/schemas/records/specimen.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "case_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "site_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "material",
+        "type": "material",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "method_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "container",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "seal_id",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "quantity",
+        "type": "quantity",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "actual_collection_time",
+        "type": "time",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "collector_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "authority_basis",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "actual_material_blob",
+        "type": "blob_ref",
+        "required": true,
+        "nullable": true
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "custody_event",
+    "schema_path": "packages/contracts/schemas/records/custody_event.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "specimen_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "previous_event_id",
+        "type": "id",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "from_holder",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "to_holder",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "seal",
+        "type": "seal",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "conditions",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "event_time",
+        "type": "time",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "recorded_at",
+        "type": "utc",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "exceptions",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "lab_result",
+    "schema_path": "packages/contracts/schemas/records/lab_result.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "specimen_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "method_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "laboratory_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "scope_basis",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "analyte",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "raw_result",
+        "type": "quantity",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "blank_result",
+        "type": "quantity",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "corrected_result",
+        "type": "quantity",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "loq",
+        "type": "quantity",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "duplicate_rpd",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "recovery_percent",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "qc",
+        "type": "quality",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "raw_data",
+        "type": "blob_ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "custody_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "limitations",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "finding",
+    "schema_path": "packages/contracts/schemas/records/finding.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "case_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "outcome",
+        "type": "outcome",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "cited_refs",
+        "type": "ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "alternatives",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "limitations",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "author_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "legal_suitability",
+        "type": "verification",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "command",
+    "schema_path": "packages/contracts/schemas/records/command.schema.json",
+    "fields": [
+      {
+        "name": "schema_version",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "command_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "idempotency_key",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "subject_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "expected_revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "scenario_revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "receipt",
+    "schema_path": "packages/contracts/schemas/records/receipt.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "command_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "state",
+        "type": "command_state",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "body_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "original_body",
+        "type": "blob_ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "effective_tick",
+        "type": "rev",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "committed_cursor",
+        "type": "seq",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "result_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "error_code",
+        "type": "string",
+        "required": true,
+        "nullable": true
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "event",
+    "schema_path": "packages/contracts/schemas/records/event.schema.json",
+    "fields": [
+      {
+        "name": "cursor",
+        "type": "seq",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "run_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "aggregate_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "effective_tick",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "audience_scope",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "job",
+    "schema_path": "packages/contracts/schemas/records/job.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "input_snapshot_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "input_refs",
+        "type": "ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "state",
+        "type": "job_state",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "attempt_count",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "next_retry_utc",
+        "type": "utc",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "output_refs",
+        "type": "ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "error_code",
+        "type": "string",
+        "required": true,
+        "nullable": true
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "blob",
+    "schema_path": "packages/contracts/schemas/records/blob.schema.json",
+    "fields": [
+      {
+        "name": "sha256",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "bytes",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "media_type",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "relative_storage_path",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "durable",
+        "type": "bool",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "export",
+    "schema_path": "packages/contracts/schemas/records/export.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "case_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "manifest",
+        "type": "blob_ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "signature",
+        "type": "blob_ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "signing_key_id",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "policy_id",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "members",
+        "type": "blob_ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "created_utc",
+        "type": "utc",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "trusted_time_anchor",
+        "type": "blob_ref",
+        "required": true,
+        "nullable": true
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "raw_chunk_entry",
+    "schema_path": "packages/contracts/schemas/records/raw_chunk_entry.schema.json",
+    "fields": [
+      {
+        "name": "frame_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "raw_sha256",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "raw_bytes",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "raw_base64",
+        "type": "bytes64",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "verification_report",
+    "schema_path": "packages/contracts/schemas/records/verification_report.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "export_sha256",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "integrity",
+        "type": "verification",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "key_trust",
+        "type": "verification",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "lineage",
+        "type": "verification",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "trusted_time",
+        "type": "verification",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "custody",
+        "type": "verification",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "measurement",
+        "type": "verification",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "legal_suitability",
+        "type": "verification",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "reasons",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "verifier_version",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "session",
+    "schema_path": "packages/contracts/schemas/records/session.schema.json",
+    "fields": [
+      {
+        "name": "id_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "actor_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "capabilities",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "scope_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "expires_utc",
+        "type": "utc",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revoked_utc",
+        "type": "utc",
+        "required": true,
+        "nullable": true
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "backup",
+    "schema_path": "packages/contracts/schemas/records/backup.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "snapshot",
+        "type": "blob_ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "referenced_blobs",
+        "type": "blob_ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "committed_cursor",
+        "type": "seq",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "private",
+        "type": "bool",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "restore_status",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "covariance",
+    "schema_path": "packages/contracts/schemas/records/covariance.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "entry_ids",
+        "type": "id[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "units",
+        "type": "unit[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "matrix",
+        "type": "number[][]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "component_treatments",
+        "type": "covariance_component[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "domain_hash",
+        "type": "hash",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "limitations",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "window",
+    "schema_path": "packages/contracts/schemas/records/window.schema.json",
+    "fields": [
+      {
+        "name": "id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "revision",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "device_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "channel_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "frame_ids",
+        "type": "id[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "interval",
+        "type": "interval",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "mean",
+        "type": "quantity",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "actual_path",
+        "type": "blob_ref",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "quality",
+        "type": "quality",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "method_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "channel_decision",
+    "schema_path": "packages/contracts/schemas/records/channel_decision.schema.json",
+    "fields": [
+      {
+        "name": "channel_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "named_use",
+        "type": "use",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "quality",
+        "type": "quality",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "reason_codes",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "interval_refs",
+        "type": "ref[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "limitations",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "source_emission_fit",
+    "schema_path": "packages/contracts/schemas/records/source_emission_fit.schema.json",
+    "fields": [
+      {
+        "name": "source_id",
+        "type": "id",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "SO2_g_s",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "CO2_g_s",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "fit_member",
+    "schema_path": "packages/contracts/schemas/records/fit_member.schema.json",
+    "fields": [
+      {
+        "name": "member_id",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "source_ids",
+        "type": "id[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "wind_direction_offset_deg",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "wind_speed_factor",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "effective_height_offset_m",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "source_emissions",
+        "type": "source_emission_fit[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "background_offsets",
+        "type": "quantity[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "normalized_sse",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "raw_sse",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "rank",
+        "type": "rev",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "rank_ratio",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "converged",
+        "type": "bool",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "admitted",
+        "type": "bool",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "failure_codes",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "procedure_stage",
+    "schema_path": "packages/contracts/schemas/records/procedure_stage.schema.json",
+    "fields": [
+      {
+        "name": "stage",
+        "type": "mission_stage",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "start",
+        "type": "time",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "end",
+        "type": "time",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "planned_duration_s",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "actual_duration_s",
+        "type": "number",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "energy_Wh",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "valid_volume_L",
+        "type": "number",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "route",
+        "type": "pose[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "prerequisites",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "failure_codes",
+        "type": "string[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "covariance_component",
+    "schema_path": "packages/contracts/schemas/records/covariance_component.schema.json",
+    "fields": [
+      {
+        "name": "component_id",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "treatment",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "parameter_ref",
+        "type": "ref",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "bounds",
+        "type": "quantity[]",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "included_in_covariance",
+        "type": "bool",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  },
+  {
+    "record": "laboratory_qc_input",
+    "schema_path": "packages/contracts/schemas/records/laboratory_qc_input.schema.json",
+    "fields": [
+      {
+        "name": "blank",
+        "type": "quantity",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "duplicate",
+        "type": "quantity",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "spike_expected",
+        "type": "quantity",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "spike_recovered",
+        "type": "quantity",
+        "required": true,
+        "nullable": true
+      },
+      {
+        "name": "hold_interval",
+        "type": "interval",
+        "required": true,
+        "nullable": false
+      },
+      {
+        "name": "raw_data_refs",
+        "type": "blob_ref[]",
+        "required": true,
+        "nullable": false
+      }
+    ],
+    "owner": "O1",
+    "reviewer": "C1",
+    "task": "W01",
+    "status": "SCHEMA_TO_BE_IMPLEMENTED"
+  }
+]

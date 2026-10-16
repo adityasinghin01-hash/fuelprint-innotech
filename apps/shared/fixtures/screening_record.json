@@ -1,0 +1,36 @@
+[
+  {
+    "attempt_id": "e7ae777e-18e2-5073-861f-5dc3ae42a062",
+    "channel": "SO2_ppb",
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "decision": "VALID",
+    "id": "15651e1c-9304-528d-9b06-2cc1214b58b7",
+    "named_use": "SYNTHETIC_ONLINE_SCREENING",
+    "reasons": [],
+    "revision": 1,
+    "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+    "summary": {
+      "mean_enhancement_ppb": 112.4,
+      "valid_seconds": 30,
+      "volume_L": 0.25
+    }
+  },
+  {
+    "attempt_id": "e7ae777e-18e2-5073-861f-5dc3ae42a062",
+    "channel": "CO2_ppm",
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "decision": "VALID",
+    "id": "1e4ee17d-b938-54e6-91d4-64c163394b90",
+    "named_use": "SYNTHETIC_ONLINE_SCREENING",
+    "reasons": [],
+    "revision": 1,
+    "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+    "summary": {
+      "mean_enhancement_ppm": 21.0,
+      "valid_seconds": 30,
+      "volume_L": 0.15
+    }
+  }
+]

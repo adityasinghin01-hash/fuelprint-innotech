@@ -1,0 +1,11 @@
+{
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "mode": "BLIND",
+  "parent_run_id": null,
+  "preset_id": "SC1-NIGHT-PLUME",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "state": "RUNNING"
+}

@@ -1,0 +1,18 @@
+{
+  "axes": {
+    "custody_documentation": "PASS",
+    "integrity": "PASS",
+    "key_trust": "NOT_SIGNED",
+    "legal_suitability": "NOT_ASSESSED",
+    "lineage": "PASS",
+    "measurement_qualification": "SYNTHETIC_SCOPE_ONLY",
+    "trusted_time": "UNVERIFIED"
+  },
+  "created_by": "system",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "export_id": "b6c7b981-b512-5059-b6c1-127c28679cdf",
+  "id": "6bdae211-4063-507f-987c-dd59fc7c3b54",
+  "reasons": [],
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c"
+}

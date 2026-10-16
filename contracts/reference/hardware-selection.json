@@ -1,0 +1,222 @@
+[
+  {
+    "profile": "GROUND_REFERENCE",
+    "part": "Teledyne API N100 SO2 analyzer",
+    "quantity": 1,
+    "interface": "Qualified stationary inlet/reference access",
+    "selection_status": "RENTAL_OR_PARTNER_ACCESS_NOT_SECURED",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P0;P3"
+  },
+  {
+    "profile": "GROUND_REFERENCE_OPTION",
+    "part": "LI-COR LI-850 with pump",
+    "quantity": 1,
+    "interface": "CO2/H2O logger; separate reference power and time alignment",
+    "selection_status": "OPTIONAL_ACCESS_NOT_SECURED",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P0;P3"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Alphasense SO2-B4 standard + supplier-configured matched ISB",
+    "quantity": 1,
+    "interface": "buffered WE/AE; exact gain/zero ordered and inspected",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Vaisala GMP252 + flow-through adapter",
+    "quantity": 1,
+    "interface": "separate RS485 Modbus RTU",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Sensirion SPS30",
+    "quantity": 1,
+    "interface": "5V power;3.3V I2C",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "ESP32-S3-DevKitC-1-N8R8",
+    "quantity": 1,
+    "interface": "nativeUSB;selected pin map chapter04",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "TI ADS1220IPWR",
+    "quantity": 1,
+    "interface": "SPI;5V analog/3.3V digital;gain1/PGA bypass",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "TI REF5040AIDR",
+    "quantity": 1,
+    "interface": "4.096V ADC reference",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "KNF NMP015 KPDC-B 12V brushless",
+    "quantity": 2,
+    "interface": "12V constant supply;protected on/off",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Sensirion SFM5500-2slm",
+    "quantity": 2,
+    "interface": "separate isolated SHDLC/RS485",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "TI ISO1410DWR",
+    "quantity": 3,
+    "interface": "isolated RS485 transceiver;isolation not complete without separate field power",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Mean Well SD-15B-24",
+    "quantity": 3,
+    "interface": "each separate isolated instrument24V;derived isolated5V",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Mean Well SD-50B-24",
+    "quantity": 1,
+    "interface": "regulated protected24V from19–36V input",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "TI TPS2663 family protection",
+    "quantity": 3,
+    "interface": "actual selected suffix/OV tolerance release drawing,25.5V target",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Sensirion SHT45-AD1B",
+    "quantity": 1,
+    "interface": "3.3V I2C0x44;CRC",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Bosch BMP390",
+    "quantity": 1,
+    "interface": "3.3V I2C0x76 selected;board SDO selection",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Anemoment TriSonica Mini candidate",
+    "quantity": 1,
+    "interface": "local met interface/provider wiring to gateway;actual model quote required",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "CUSTOM_NODE",
+    "part": "Storage, protected rail regulators, enclosure, connectors, tubing and filters",
+    "quantity": 1,
+    "interface": "release drawing/method materials;not fabrication-approved",
+    "selection_status": "CONDITIONAL_ENGINEERING_SELECTION",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1;P2"
+  },
+  {
+    "profile": "OPTICAL_BENCH",
+    "part": "ESP32-DevKitC V4 / WROOM-32E + Sharp GP2Y1010AU0F support circuit",
+    "quantity": 1,
+    "interface": "protected5V/LED circuit/dividedADC;relative optical response",
+    "selection_status": "OPTIONAL_WITHIN_2000_INR_CEILING",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P1"
+  },
+  {
+    "profile": "AERIAL",
+    "part": "DJI Matrice350 RTK",
+    "quantity": 1,
+    "interface": "operator-supported aircraft;actual loaded mount/CG/return qualification",
+    "selection_status": "CONDITIONAL_NOT_PURCHASED",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P0;P6"
+  },
+  {
+    "profile": "AERIAL",
+    "part": "Soarability Sniffer4D Mini2 + M300/350 integration kit",
+    "quantity": 1,
+    "interface": "high-resolution SO2;optional externalCO2 only if exact loadout qualifies",
+    "selection_status": "EXACT_MODULE_LOADOUT_UNCONFIRMED",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P0;P6"
+  },
+  {
+    "profile": "AERIAL_FALLBACK_PRECEDENT",
+    "part": "DJI Matrice30 + Sniffer4D Mini2",
+    "quantity": 1,
+    "interface": "published2025AeroVolc precedent;not interchangeable certification",
+    "selection_status": "PUBLISHED_ADJACENT_PRECEDENT",
+    "price_inr": null,
+    "price_status": "NO_CURRENT_QUOTE",
+    "physical_gate": "P0;P6"
+  }
+]
