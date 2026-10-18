@@ -207,8 +207,9 @@ class SendAlertHandler implements CommandHandler {
         ObjectNode fields = notification(kind, eligible, text.text(), cause, recipients.size(), sent, failed, state,
                 null, mode);
         fields.put("wording_id", text.wordingId());
-        fields.put("text_source", text.source());
-        fields.put("fallback_reason", text.fallbackReason());
+        if (text.fallbackReason() != null) {
+            log.info("send_alert {}: the fixed template was used ({})", kind, text.fallbackReason());
+        }
         return save(result, fields).build();
     }
 
@@ -264,9 +265,6 @@ class SendAlertHandler implements CommandHandler {
     private static ObjectNode suppressed(String kind, List<String> areas, String text, Ref cause, int recipients,
                                          String reason, GatewayMode mode) {
         ObjectNode fields = notification(kind, areas, text, cause, recipients, 0, 0, "SUPPRESSED", reason, mode);
-        fields.putNull("wording_id");
-        fields.put("text_source", "TEMPLATE");
-        fields.putNull("fallback_reason");
         return fields;
     }
 

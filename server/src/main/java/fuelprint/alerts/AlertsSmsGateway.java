@@ -50,13 +50,20 @@ final class AlertsSmsGateway implements SmsGateway {
     private final ObjectMapper mapper;
     private final HttpClient client;
     private final long retryDelayMs;
+    private final Duration timeout;
 
     AlertsSmsGateway(SmsSettings settings, ObjectMapper mapper, long retryDelayMs) {
+        this(settings, mapper, retryDelayMs, TIMEOUT);
+    }
+
+    /** {@code timeout} is for tests; the server always uses {@link #TIMEOUT} (5 seconds). */
+    AlertsSmsGateway(SmsSettings settings, ObjectMapper mapper, long retryDelayMs, Duration timeout) {
         this.settings = settings;
         this.mapper = mapper;
         this.retryDelayMs = retryDelayMs;
+        this.timeout = timeout;
         // HTTP/1.1 only: the phone app is a small plain HTTP server, so no h2c upgrade attempt.
-        this.client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).connectTimeout(TIMEOUT).build();
+        this.client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).connectTimeout(timeout).build();
     }
 
     GatewayMode mode() {
@@ -104,7 +111,7 @@ final class AlertsSmsGateway implements SmsGateway {
         String credentials = settings.username() + ":" + settings.password();
         String basic = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
         return HttpRequest.newBuilder(settings.messageUri())
-                .timeout(TIMEOUT)
+                .timeout(timeout)
                 .header("Authorization", "Basic " + basic)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString(), StandardCharsets.UTF_8))
