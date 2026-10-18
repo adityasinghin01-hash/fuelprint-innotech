@@ -1,0 +1,7 @@
+{
+  "mode": "LOG_ONLY",
+  "gateway_url": "http://192.168.1.50:8080",
+  "username": "sms",
+  "password": "change-me",
+  "daily_cap": 80
+}
