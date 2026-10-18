@@ -180,6 +180,12 @@ abstract class AlertsFlow {
         return values;
     }
 
+    /** The sign-ups that are ACTIVE right now (earlier tests leave REMOVED and PURGED ones behind). */
+    List<StoredRecord> activeSubscriptions() {
+        return store.list("alert_subscription", null).stream()
+                .filter(record -> "ACTIVE".equals(record.body().path("state").asText())).toList();
+    }
+
     int contactRows() {
         return jdbc.queryForObject("SELECT COUNT(*) FROM alert_contact", Integer.class);
     }

@@ -84,7 +84,19 @@ class SubscribeAlertsHandler implements CommandHandler {
         }
 
         Instant now = clock.instant();
+        // The new sign-up is the first record of the receipt (screens read the first record_ref).
         HandlerResult.Builder result = HandlerResult.builder();
+        String id = Ids.newId();
+        ObjectNode fields = JsonNodeFactory.instance.objectNode();
+        fields.put("phone_masked", PhoneNumbers.mask(phone));
+        ArrayNode areaIds = fields.putArray("area_ids");
+        areas.forEach(areaIds::add);
+        fields.put("consent_text_version", CONSENT_TEXT_VERSION);
+        fields.put("consent_utc", AlertTime.utc(now));
+        fields.put("state", AlertRecords.ACTIVE);
+        fields.put("expires_utc", AlertTime.utc(AlertTime.endOfLocalDay(now)));
+        result.save(RecordChange.create(AlertRecords.SUBSCRIPTION, id, null, fields), "ALERT_SUBSCRIBED", null);
+
         String heldBy = contacts.subscriptionOf(phone).orElse(null);
         if (heldBy != null) {
             StoredRecord earlier = store.get(AlertRecords.SUBSCRIPTION, heldBy).orElse(null);
@@ -98,19 +110,7 @@ class SubscribeAlertsHandler implements CommandHandler {
                         "ALERT_SUBSCRIPTION_PURGED", null);
             }
         }
-
-        String id = Ids.newId();
-        ObjectNode fields = JsonNodeFactory.instance.objectNode();
-        fields.put("phone_masked", PhoneNumbers.mask(phone));
-        ArrayNode areaIds = fields.putArray("area_ids");
-        areas.forEach(areaIds::add);
-        fields.put("consent_text_version", CONSENT_TEXT_VERSION);
-        fields.put("consent_utc", AlertTime.utc(now));
-        fields.put("state", AlertRecords.ACTIVE);
-        fields.put("expires_utc", AlertTime.utc(AlertTime.endOfLocalDay(now)));
-
         contacts.insert(id, phone, session.sessionId(), AlertTime.utc(now));
-        result.save(RecordChange.create(AlertRecords.SUBSCRIPTION, id, null, fields), "ALERT_SUBSCRIBED", null);
         return result.build();
     }
 }
