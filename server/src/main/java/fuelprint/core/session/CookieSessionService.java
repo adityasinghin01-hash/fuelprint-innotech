@@ -6,6 +6,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Clock;
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
@@ -43,12 +46,12 @@ public class CookieSessionService implements SessionService {
     public static final String COOKIE = "fp_session";
     static final long STATION_MS = 12L * 3600_000;
     static final long VISITOR_MS = 2L * 3600_000;
-    static final long GUEST_MS = 12L * 3600_000;
     private static final Pattern LABEL = Pattern.compile("[a-z0-9][a-z0-9_@.-]{0,63}");
 
     private final JdbcTemplate jdbc;
     private final Clock clock;
     private final SecureRandom random = new SecureRandom();
+    private final ZoneId zone;
     private final Set<String> allowedOrigins;
     private final Map<String, Cached> cache = new ConcurrentHashMap<>();
 
@@ -56,9 +59,11 @@ public class CookieSessionService implements SessionService {
     }
 
     public CookieSessionService(JdbcTemplate jdbc, Clock clock,
-                                @Value("${fp.allowed-origins:}") List<String> allowedOrigins) {
+                                @Value("${fp.allowed-origins:}") List<String> allowedOrigins,
+                                @Value("${fp.local-zone:}") String localZone) {
         this.jdbc = jdbc;
         this.clock = clock;
+        this.zone = localZone == null || localZone.isBlank() ? ZoneId.systemDefault() : ZoneId.of(localZone.trim());
         this.allowedOrigins = allowedOrigins.stream().map(String::trim).filter(s -> !s.isEmpty())
                 .map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
     }
@@ -132,8 +137,18 @@ public class CookieSessionService implements SessionService {
     public Session createGuest() {
         String label = "guest-" + HexFormat.of().formatHex(randomBytes(2));
         Session session = Session.human(newToken(), label, Set.of(Role.GUEST));
-        save(session, "GUEST", null, GUEST_MS);
+        save(session, "GUEST", null, untilLocalMidnightMs());
         return session;
+    }
+
+    /**
+     * Milliseconds from now to the next local midnight ({@code fp.local-zone}, default the server's zone). A guest
+     * session, and so the sign-up it owns, ends when the event day ends: phone numbers are deleted at midnight too.
+     */
+    long untilLocalMidnightMs() {
+        ZonedDateTime now = ZonedDateTime.ofInstant(clock.instant(), zone);
+        ZonedDateTime midnight = now.toLocalDate().plusDays(1).atStartOfDay(zone);
+        return Math.max(1000, Duration.between(now, midnight).toMillis());
     }
 
     @Override
