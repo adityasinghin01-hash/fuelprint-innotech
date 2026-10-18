@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  *
  * <p>Run record fields: {@code preset_id}, {@code mode}, {@code state}, {@code parent_run_id} (AGREEMENT), plus
  * {@code seed}, {@code sim_time_s} (where the clock stood at this change) and {@code state_reason} (null,
- * {@code INTERRUPTED}, {@code RESET}, {@code REPLAY_LOOP}) added by the core.
+ * {@code INTERRUPTED}, {@code RESET}, {@code REPLAY_LOOP}, {@code WORLD_CAPACITY}) added by the core.
  */
 @Component
 public class Runs {

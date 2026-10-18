@@ -1,4 +1,4 @@
-# The FuelPrint agreement (fp/1, version 2)
+# The FuelPrint agreement (fp/1, version 2.1)
 
 This file is the contract between the parts of FuelPrint: the shared core, the science engine, the AI pieces, the alerts, Operations, Cases and Field. Every part builds against this file and nothing else, which is how the groups can work at the same time without waiting for each other.
 
@@ -14,6 +14,14 @@ FuelPrint is entered in **AI Solutions for Automation**, so version 2 makes the 
 - **Real data** (section 14): what is real, what is synthetic, and what each real dataset is used for.
 - New roles `automation` and `guest`; new commands and records marked **v2** in sections 5 and 6; `receipt` and `event` now carry `actor`; `analysis` gains the learned order; `mission` gains `pilot`; `board_decision.notice` gains `area_ids`.
 - Builders: Kiro builds the core, science, AI, alerts and Field code; Claude does the 3D look. Snowflake Cortex is no longer used.
+
+### What changed in version 2.1 (18 Oct 2026)
+
+- Field's queue, internal commands, pairing states and extra record fields are now written down.
+- Field shares recorded vehicle inlet positions with science through `InletHistory`. Unknown tracks stay unknown.
+- Science sends `WorldCapacityReached`; core sends `complete_run` automatically. The run completes, leases are revoked and the drone stops.
+- A planner that uses its 2 s budget returns `PENDING`: "still working it out", with no recommended mission.
+- `Detector.windows()` supplies completed windows for core to save with any trigger. The start-up phone purge can use `expired_only`.
 
 Exact numbers that this file does not repeat live in `contracts/reference/`:
 
@@ -75,6 +83,7 @@ Everything runs from one laptop (the host) at one address, for example `http://1
 | `POST /api/session/station` | Laptop login with a station PIN, sets a cookie |
 | `POST /api/session/join` | Phone redeems a pairing code, sets a visitor cookie |
 | `POST /api/session/guest` | **v2.** Phone opening `/alerts/` gets a guest cookie (no PIN, rate limited) |
+| `GET /api/field/queue` | Public queue: `run_id`, `entries[]` (`mission_id`, position within that mission, `visitor` label), `your_position` (null if not queued), `lease_holder`. Visitor labels only, no session cookies or phone numbers |
 | `WS /ws/live?run_id=&after=` | Server pushes `tick` and `event` messages |
 | `WS /ws/pilot` | Phone or keyboard sends joystick input |
 
@@ -184,6 +193,7 @@ D = needed for the department round. F = finale. **v2** = new or changed in vers
 | `create_run` | presenter | `preset_id`, `mode` (BLIND or TEACHING) | makes a new run, never reuses one | core | D |
 | `pause_run` / `resume_run` | presenter | `run_id` | run is RUNNING or PAUSED | core | D |
 | `reset_run` | presenter | `preset_id`, `mode` | new run; old missions interrupted, leases revoked | core | D |
+| `complete_run` | automation only | `run_id`, `reason` (WORLD_CAPACITY) | run is RUNNING or PAUSED; saves COMPLETED and publishes `RunEnded(runId, COMPLETED)` after commit | core | D |
 | `change_automation` **v2** | presenter | `setting`, `value` | setting is in the `automation_settings` list | core | D |
 | `open_investigation` **v2** | automation | `trigger_id` | one open investigation per run; a later trigger is attached to it | ops | D |
 | `schedule_survey` | analyst | `action_id`, `reason`, `anomaly_id` (optional, v2) | lets a mission happen without an alarm | ops | D |
@@ -193,15 +203,21 @@ D = needed for the department round. F = finale. **v2** = new or changed in vers
 | `reject_mission` | supervisor (human only) | `mission_id`, `reason` | mission is PROPOSED | ops | D |
 | `expire_mission` **v2** | automation | `mission_id`, `reason` (NEEDS_NEW_APPROVAL, TIMED_OUT) | mission APPROVED and not started | ops | D |
 | `create_pairing` | field_operator | `mission_id`, `vehicle_id` | mission APPROVED; code lives 120 s | field | D |
-| `confirm_pairing` | field_operator | `pairing_id` | phone has redeemed the code | field | D |
+| `redeem_pairing` (internal, through session join) | visitor | `pairing_id`, `code` | code matches; pairing CREATED and not expired; saves REDEEMED and the visitor label | field | D |
+| `confirm_pairing` | field_operator | `pairing_id` | pairing REDEEMED and not expired; saves CONFIRMED and adds the visitor to the queue | field | D |
+| `expire_pairing` (internal) | automation only | `pairing_id` | pairing CREATED or REDEEMED and expiry time reached; saves EXPIRED | field | D |
 | `acquire_lease` | visitor or field_operator | `mission_id`, `vehicle_id` | no other person holds a lease; an autopilot lease is handed over only when the mission is not COLLECTING | field | D |
 | `release_lease` | lease holder | `lease_id` | holder matches | field | D |
+| `end_lease` (internal) | automation only | `lease_id`, `reason` (EXPIRED) | lease exists and is ACTIVE; saves EXPIRED and clears the active mission's pilot. Field's timer sends it when input expires | field | D |
+| `advance_mission` (internal) | automation only | `mission_id`, `from_state`, `to_state` | current state matches; only LEASED to OUTBOUND (drone not landed), OUTBOUND to AT_TARGET (within 5 m and height band), RETURNING to COMPLETE (landed at depot; releases lease) | field | D |
+| `interrupt_field` (internal) | automation only | `run_id`, `reason` (optional, default RUN_ENDED) | valid run ID; after `RunEnded`, interrupts open missions and COLLECTING attempts, revokes ACTIVE leases and expires CREATED or REDEEMED pairings. Drone stops before this command | field | D |
 | `take_over` | supervisor or field_operator | `vehicle_id` | revokes any visitor or autopilot lease, vehicle stops first | field | D |
 | `control_input` | lease holder | sent on `/ws/pilot`, see section 7 | fresh sequence, lease active | field | D |
 | `start_autopilot` **v2** | supervisor, field_operator or automation | `mission_id`, `vehicle_id` | mission APPROVED or later and not COMPLETE; no person holds the lease; automation only if `auto_autopilot` is on and no pilot for `autopilot_wait_s` | field | D |
 | `stop_autopilot` **v2** | supervisor or field_operator | `vehicle_id` | autopilot active; vehicle stops first | field | D |
 | `return_to_depot` **v2** | automation, supervisor or field_operator | `vehicle_id`, `reason` (BATTERY_RESERVE, MISSION_DONE, OPERATOR) | vehicle away from depot | field | D |
 | `start_capture` **v2** | field_operator or automation | `mission_id`, `method_id`, `channel_ids` | vehicle at target, approval current; automation only if `auto_capture` is on | field | D |
+| `update_attempt` (internal) | automation only | `attempt_id` | attempt COLLECTING and its capture is running; saves stages, checks channels after COLLECT, then saves COMPLETE (a usable channel) or FAILED after REVIEW | field | D |
 | `review_capture` | qc_reviewer (human only) | `attempt_id`, `channel_decisions[]` | cannot pass a channel that failed a rule | field | D |
 | `create_case` | case_reviewer | `screening_record_ids[]`, `purpose` | records exist; rejected ones kept with their limits | cases | D |
 | `create_specimen` | inspector_demo | `case_id`, `site_id`, `material`, `method_id`, `container`, `seal_id`, `mass_mg` | case in INTAKE or later; mass at least 50 mg | cases | D |
@@ -218,7 +234,7 @@ D = needed for the department round. F = finale. **v2** = new or changed in vers
 | `subscribe_alerts` **v2** | guest or visitor | `phone_number`, `area_ids[]`, `consent` (must be `true`), `consent_text_version` | valid Indian mobile number; at most 1 active sign-up per number | alerts | D |
 | `unsubscribe_alerts` **v2** | guest or visitor (own sign-up), presenter (any) | `subscription_id` | sign-up ACTIVE | alerts | D |
 | `send_alert` **v2** | automation or presenter | `kind`, `area_ids[]`, `cause` ref | `auto_alerts` on (for automation); rate limit and daily cap (section 13) | alerts | D |
-| `purge_subscriptions` **v2** | presenter or automation | none | deletes every phone number; automation runs it at local midnight and at start-up for expired sign-ups | alerts | D |
+| `purge_subscriptions` **v2** | presenter or automation | `expired_only` (optional boolean, default false) | false deletes every phone number; true deletes only expired sign-ups' numbers. Automation uses false at local midnight and true at start-up | alerts | D |
 | `change_teaching_config` | presenter | `parameter`, `value`, `reason` | TEACHING mode only; allowed list | science + ops | F |
 | `revise_placement` | analyst | `node_id`, `inlet_pose` | allowed mount, not inside a building | ops | F |
 | `ingest_frames` | bench adapter | `device_id`, `boot_id`, `frames[]` | provisioned device; max 100 frames | core | F |
@@ -237,12 +253,12 @@ Every record has `id`, `run_id` (null for records not tied to a run), `revision`
 | `anomaly` **v2** | `sensor`, `channel`, `start_s`, `end_s`, `observed_mean`, `expected_low`, `expected_high`, `model_version_id`, `state` (OPEN, CLOSED), `suggestion` (SCHEDULE_SURVEY or null) | ai | D |
 | `investigation` | `trigger_id` or `survey_id`, `state` (OPEN, ANALYSED, MISSION_PROPOSED, MISSION_APPROVED, EVIDENCE_BACK, CLOSED), `analysis_ids[]`, `warned_area_ids[]` (v2) | ops | D |
 | `analysis` **v2** | `input_window_ids[]`, `outcome`, `qualification`, `candidates[]`, `exclusions[]`, `limitations[]`, `explanation_text`, `algorithm_version`, plus `learned_order[]` (each: `explanation_id`, `rank`, `order_score`), `learned_status` (OK, MODEL_MISSING, NOT_APPLICABLE, FAILED), `learned_model_version_id`, `history_counts` (source label to number of earlier runs where it survived) | science (physics part), ai (learned part, saved by ops through `run_analysis`) | D |
-| `proposal` | `analysis_id`, `actions[]` (each: `action_id`, `kind`, `vehicle`, `target`, `score`, `complete_minutes`, `feasible`, `rejection_reason`), `result` (BEST_ACTION or NO_USEFUL_MEASUREMENT), `best_action_id`, `cheaper_action_id` | science | D |
+| `proposal` | `analysis_id`, `actions[]` (each: `action_id`, `kind`, `vehicle`, `target`, `score`, `complete_minutes`, `feasible`, `rejection_reason`), `result` (BEST_ACTION, NO_USEFUL_MEASUREMENT or PENDING), `best_action_id`, `cheaper_action_id` | science | D |
 | `mission` **v2** | `proposal_id` or `survey_id`, `action_id`, `vehicle_id`, `target`, `route[]`, `method_id`, `channel_ids[]`, `dependency_hash`, `state`, `expires_s`, `pilot` (NONE, VISITOR, OPERATOR, AUTOPILOT) | ops creates, field moves | D |
-| `pairing` | `mission_id`, `vehicle_id`, `code` (6 characters), `phrase` (2 words), `expires_utc`, `state` | field | D |
-| `lease` **v2** | `vehicle_id`, `holder_session` (`autopilot` for the autopilot), `state` (ACTIVE, RELEASED, REVOKED, EXPIRED), `expires_utc`, `last_sequence` | field | D |
-| `attempt` | `mission_id`, `method_id`, `stages[]` (stage, start_s, end_s), `channels[]` (channel, valid_seconds, volume_L, status, reasons[]), `state` | field | D |
-| `screening_record` | `attempt_id`, `channel`, `named_use`, `decision` (VALID, LIMITED, REJECTED), `reasons[]`, `summary` | field | D |
+| `pairing` | `mission_id`, `vehicle_id`, `code` (6 characters), `phrase` (2 words), `expires_utc`, `redeemed_by`, `confirmed_by` (actor labels, null until set), `state` (CREATED, REDEEMED, CONFIRMED, EXPIRED) | field | D |
+| `lease` **v2** | `mission_id`, `vehicle_id`, `holder_session` (actor label, `autopilot` for the autopilot), `holder_kind` (VISITOR, OPERATOR, AUTOPILOT), `purpose` (MISSION or RETURN), `state` (ACTIVE, RELEASED, REVOKED, EXPIRED), `expires_utc` (null for autopilot), `last_sequence`, `ended_reason` | field | D |
+| `attempt` | `mission_id`, `method_id`, `stages[]` (stage, start_s, end_s), `channels[]` (channel, valid_seconds, volume_L, status, reasons[], `checked_by` (CAPTURE_RULES or FIELD, null before check), `mean_enhancement`, `mean_enhancement_note` (reason when unknown)), `state` | field | D |
+| `screening_record` | `attempt_id`, `mission_id`, `channel`, `named_use`, `decision` (VALID, LIMITED, REJECTED), `reasons[]`, `summary` (`valid_seconds`, `volume_L`, `mean_enhancement_<unit>`, `automatic_status`, `reviewed_by`) | field | D |
 | `case` | `investigation_id`, `screening_record_ids[]`, `purpose`, `state` (DRAFT, INTAKE, SPECIMEN, LAB, FINDING, SEALED) | cases | D |
 | `specimen` | `case_id`, `site_id`, `material`, `method_id`, `container`, `seal_id`, `mass_mg`, `authority_basis` (always INSPECTOR_DEMO), `current_holder` | cases | D |
 | `custody_event` | `specimen_id`, `from_holder`, `to_holder`, `seal_state` (INTACT, BROKEN, MISSING), `event_time_utc`, `recorded_utc`, `exceptions[]` | cases | D |
@@ -258,6 +274,8 @@ Every record has `id`, `run_id` (null for records not tied to a run), `revision`
 | `automation_settings` **v2** | `auto_propose`, `auto_autopilot`, `autopilot_wait_s`, `auto_capture`, `auto_seal`, `auto_alerts`, `auto_retrain` (all on by default; wait 60 s) | core | D |
 | `event` **v2** | `cursor`, `event_type`, `record_type`, `record_id`, `revision`, `sim_time_s`, `wall_utc`, `actor` | core | D |
 | `receipt` **v2** | see section 3 (now with `actor` and `automatic`) | core | D |
+
+`proposal.result = PENDING` means the planner used its 2 s budget. `best_action_id` and `cheaper_action_id` are null; nothing is recommended. Operations shows "still working it out" and must not propose a mission from that proposal.
 
 ### Analysis outcomes (science sets them, nobody overrides them)
 
@@ -298,7 +316,12 @@ Sent on `/ws/pilot` about 10 times a second:
 ## 8. State machines
 
 ```
-run:          CREATED -> RUNNING <-> PAUSED -> COMPLETED | ABORTED   (reset makes a NEW run)
+run:          CREATED -> RUNNING <-> PAUSED ; RUNNING or PAUSED -> COMPLETED | ABORTED
+              capacity used up -> complete_run (automation, WORLD_CAPACITY) -> COMPLETED
+              (reset makes a NEW run; RunEnded(COMPLETED) stops the drone and revokes leases)
+pairing:      CREATED -> REDEEMED -> CONFIRMED ; CREATED or REDEEMED -> EXPIRED
+              code lives 120 wall seconds; redemption and confirmation refuse expired codes
+              confirmation adds the visitor to the mission queue; run end expires unconfirmed codes
 mission:      PROPOSED -> APPROVED -> LEASED -> OUTBOUND -> AT_TARGET -> COLLECTING
               -> RETURNING -> COMPLETE
               any state before COMPLETE -> INTERRUPTED | EXPIRED ; PROPOSED -> REJECTED
@@ -314,7 +337,7 @@ subscription: ACTIVE -> REMOVED | PURGED
 
 ## 9. Interfaces (Java)
 
-These live in `server/src/main/java/fuelprint/api/`. The core ships simple stub versions of every one (returning fixture-shaped answers, `@Profile("stub")`), so every group can build before the real parts are finished.
+These live in `server/src/main/java/fuelprint/api/`. The core ships simple stub versions of the science, ai and alerts services below (returning fixture-shaped answers, `@Profile("stub")`), so every group can build before the real parts are finished.
 
 ```java
 // science implements these
@@ -323,10 +346,22 @@ public interface ObservationProvider {
     ReadingBatch observe(double simTimeS, List<InletPose> inlets);
 }
 public interface WorldClock   { void step(double dtS); WindNow wind(); }
-public interface Detector     { Optional<Trigger> evaluate(DetectorInput input); }
+public interface Detector {
+    default List<Window> windows(DetectorInput input) { return List.of(); }
+    Optional<Trigger> evaluate(DetectorInput input);
+}
 public interface Ranker       { Analysis analyze(AnalysisInput input); }
 public interface Planner      { Proposal plan(Analysis analysis, PlanContext context); }
 public interface CaptureRules { ChannelVerdict judge(CaptureInput input); }
+
+// field implements this; science's ranker reads vehicle inlet tracks through it
+public record InletSample(double simTimeS, Enu inlet) {}
+public interface InletHistory {
+    Optional<List<InletSample>> track(String runId, String sensorOrVehicleId, double startS, double endS);
+}
+
+// science publishes this Spring event; core listens through the api type
+public record WorldCapacityReached(String runId, String reason, double simTimeS, int puffCount) {}
 
 // ai implements these (v2). They only receive public data.
 // LearnedOrder carries learned_order, learned_status, the model version id and history_counts
@@ -341,6 +376,12 @@ public interface SmsGateway { SendResult send(String phoneE164, String text); }
 ```
 
 The input and output types of these interfaces (`DetectorInput`, `AnalysisInput`, `PlanContext`, `CaptureInput`, `SendResult` and the rest) are defined in `fuelprint.api` by the core; the implementing package asks Aditya Singh for any change.
+
+`Detector.windows(input)` returns windows completed by now. Once per simulated second, core calls it before `evaluate(input)` and saves those windows in the same transaction as any trigger, so the trigger can cite them.
+
+`InletHistory` returns recorded samples oldest first, covering the requested window with any needed boundary samples. An empty Optional means unknown; a present list has at least one sample. Science never guesses a vehicle's position when its track is unknown.
+
+When science publishes `WorldCapacityReached`, core submits `complete_run` through `AutomationBus`, with `run_id` and reason WORLD_CAPACITY. After commit, core publishes `RunEnded(runId, COMPLETED)`. Field stops the drone and revokes its leases.
 
 The core also gives every package `AutomationBus.submit(commandType, payload)`, which sends a command as the `automation` actor through the normal command bus. Event listeners never save records directly; they submit a command.
 

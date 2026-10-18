@@ -1,4 +1,4 @@
-# Core API for the other server packages (version 2, 18 Oct 2026)
+# Core API for the other server packages (version 2.1, 18 Oct 2026)
 
 AGREEMENT.md fixes what crosses the network. This file fixes the Java hooks between the core and the other server packages (science, field, alerts, ops, cases), so several jobs can build at the same time and still fit. Only Aditya Singh (through Claude) changes it. The interfaces named here live in `fuelprint.api` (built in P1/P1b); the implementations named "core" live in `fuelprint.core` (built in P3).
 
@@ -26,6 +26,7 @@ public interface SessionService {
 - `Session` has `sessionId`, `actorLabel` (for example `supervisor@laptop-1`, `visitor-7f3a`, `guest-21c9`), `roles`.
 - Core owns `POST /api/session/station` and `POST /api/session/guest`. Field owns `POST /api/session/join` (pairing) and calls `createVisitor`.
 - Guests get only the role `guest`; visitors get `visitor` (which also allows alerts sign-up).
+- Tests that send commands log in with a real `fp_session` cookie from `CookieSessionService` (see `CommandControllerTest`). The old header test session is gone.
 
 ## 3. The world loop (core runs it, P3)
 
@@ -35,7 +36,7 @@ Core runs one loop thread at 20 Hz (dt 0.05 s of simulation time, times the time
 2. Every `WorldStepListener.onStep(simTimeS, dtS)` (field moves vehicles here).
 3. `ObservationProvider.observe(simTimeS, inlets)` (science), where `inlets` = the four fixed sensors plus every `VehicleSource.vehicles()` inlet.
 4. Every `ObservationListener.onObservation(simTimeS, batch)` (field feeds capture stages here).
-5. Once per simulated second: core saves `reading` records for that second (one transaction, events published after commit), then calls `Detector.evaluate` (science) and saves any `window` and `trigger` records it returns the same way, with actor `automation`.
+5. Once per simulated second: core saves `reading` records for that second (one transaction, events published after commit), then calls `Detector.windows(input)` for completed windows, followed by `Detector.evaluate(input)` (science). Core saves those windows in the same transaction as any trigger, with actor `automation`, so a trigger can cite them. The default `windows(input)` returns an empty list.
 6. 10 times per wall second: core builds and broadcasts the `tick` (wind from `WorldClock.wind()`, `time_scale`, vehicles from `VehicleSource`, latest readings).
 
 ```java
@@ -51,6 +52,17 @@ public interface ClockControl {                                                 
 
 `VehicleState` has the tick vehicle fields of AGREEMENT section 3 (`vehicle_id`, `label`, `kind`, `pose`, `velocity`, `inlet`, `energy_wh`, `stage`, `lease_holder`, `pilot`).
 
+Field implements `InletHistory`; science's ranker reads recorded vehicle inlet tracks through it:
+
+```java
+public record InletSample(double simTimeS, Enu inlet) {}
+public interface InletHistory {
+    Optional<List<InletSample>> track(String runId, String sensorOrVehicleId, double startS, double endS);
+}
+```
+
+Samples are oldest first and cover the requested window, including needed boundary samples. An empty Optional means unknown; a present list is nonempty. No guessed vehicle position is used when history is missing.
+
 ## 4. Runs and scenarios (P3 core, science implements the setup)
 
 ```java
@@ -64,6 +76,7 @@ public record RunContext(String runId, String presetId, String mode, long seed) 
 - Core handles `create_run`, `pause_run`, `resume_run`, `reset_run` and calls `WorldSetup.startRun` / `stopRun`.
 - Spring events after commit: `RunStarted(runId, presetId, mode)`, `RunPaused(runId)`, `RunResumed(runId)`, `RunEnded(runId, reason)` with reason COMPLETED, ABORTED, RESET or INTERRUPTED.
 - On start-up after a crash, core marks the previous RUNNING run INTERRUPTED and publishes `RunEnded(..., INTERRUPTED)`; field revokes leases and interrupts missions on that event.
+- Science publishes `fuelprint.api.WorldCapacityReached(runId, reason, simTimeS, puffCount)` when world capacity is used up. Core listens and submits `complete_run` through `AutomationBus`, with payload `run_id` and `reason: WORLD_CAPACITY`. Only automation may send it, and only for a RUNNING or PAUSED run. It saves COMPLETED; the existing run lifecycle then stops the world and publishes `RunEnded(runId, COMPLETED)` after commit, so field stops the drone and revokes leases. The normal bus supplies revision checks, idempotency and an `automatic: true` receipt.
 
 ## 5. Automation settings (core, P3)
 
@@ -84,7 +97,7 @@ With `--fp.mode=replay`, the core replays `server/src/main/resources/replay/SC*.
 
 ## 8. Stubs (core, P3)
 
-`@Profile("stub")` versions of every interface in `fuelprint.api`, returning fixture-shaped answers from `apps/shared/fixtures/`. Default profile until join day. Real implementations use `@Profile("!stub")`.
+The default profile is `stub`, with `@Profile("stub")` service implementations returning fixture-shaped answers from `apps/shared/fixtures/`. Real beans use `@Profile("!stub")`. Tests that need real beans use `@ActiveProfiles("real")`.
 
 ## 9. Package rules
 
