@@ -20,7 +20,8 @@ import fuelprint.field.geo.Vec3;
 public final class Autopilot {
 
     static final double WAYPOINT_REACHED_M = 0.3;
-    static final double HOLD_TOLERANCE_M = 0.02;
+    /** Within this of the last point the autopilot asks for zero and comes to a full stop (stopping takes under 0.25 m). */
+    static final double HOLD_TOLERANCE_M = 0.3;
 
     private final PathPlanner planner;
     private final double maxSpeed;

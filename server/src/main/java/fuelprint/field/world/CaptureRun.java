@@ -54,6 +54,7 @@ final class CaptureRun {
     private Phase phase = Phase.SETUP;
     private double phaseStart;
     private boolean collectEnded;
+    private boolean extended;
 
     private final Map<String, Integer> lastSecond = new HashMap<>();
     private final Map<String, List<Reading>> readings = new LinkedHashMap<>();
@@ -160,6 +161,7 @@ final class CaptureRun {
             stageTimes.get(stageTimes.size() - 1)[1] = end;
             phase = Phase.values()[phase.ordinal() + 1];
             phaseStart = end;
+            extended = false;
             if (phase != Phase.DONE) {
                 stagePhases.add(phase);
                 stageTimes.add(new double[] {end, Double.NaN});
@@ -178,7 +180,7 @@ final class CaptureRun {
             case SETTLE -> extendable(t, procedure.minimumSettleS(), NOT_SETTLED);
             case COLLECT -> {
                 boolean all = counters.values().stream().allMatch(c -> c.done);
-                if (all && !counters.isEmpty()) {
+                if (all && !counters.isEmpty() && t >= lastCollectSecond + 1 - eps) {
                     yield Math.max(phaseStart, lastCollectSecond + 1.0);
                 }
                 yield t >= phaseStart + COLLECT_MAX_S - eps ? phaseStart + COLLECT_MAX_S : null;
@@ -202,9 +204,11 @@ final class CaptureRun {
         }
         boolean waiting = latest.values().stream().anyMatch(r -> r.quality().contains(flag));
         if (waiting) {
+            extended = true;
             return null;
         }
-        return Math.max(phaseStart + minimum, Math.ceil(t - 1e-6));
+        // Not extended: exactly the minimum. Extended: the whole second the flag cleared.
+        return extended ? Math.max(phaseStart + minimum, Math.floor(t + 1e-6)) : phaseStart + minimum;
     }
 
     AttemptSnapshot snapshot() {

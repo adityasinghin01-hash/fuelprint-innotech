@@ -268,9 +268,22 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
                 payload.put("resume", true);
                 submitOnce("resume:" + mission.id() + ":" + pilotEpisode, "start_autopilot", payload, null);
             }
-        } else if (noPilotS >= waitS) {
+        } else if (noPilotS >= waitS && notFlownYet(mission)) {
             submitOnce("auto:" + mission.id() + ":" + pilotEpisode, "start_autopilot", payload,
                     () -> ports.isOn(AutomationSettings.AUTO_AUTOPILOT));
+        }
+    }
+
+    /** APPROVED, or LEASED with the drone still on the pad: nobody has flown this mission yet. */
+    private boolean notFlownYet(MissionView mission) {
+        return MissionView.APPROVED.equals(mission.state())
+                || MissionView.LEASED.equals(mission.state()) && landed();
+    }
+
+    /** True if the automatic (not resume) autopilot start may still happen for {@code mission}. */
+    public boolean awaitingFirstPilot(MissionView mission) {
+        synchronized (lock) {
+            return notFlownYet(mission);
         }
     }
 
@@ -374,7 +387,8 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
         List<Runnable> todo;
         synchronized (lock) {
             deadMan(now);
-            if (lease != null && lease.person() && !lease.ending && now >= lease.expiresMono) {
+            if (lease != null && lease.person() && now >= lease.expiresMono) {
+                // Also when already "ending" (frozen by a handler): the record must still end; a duplicate is refused.
                 lease.ending = true;
                 lease.wanted = Vec3.ZERO;
                 drone.brake();
@@ -724,6 +738,13 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
         synchronized (lock) {
             return capture != null && capture.attemptId.equals(attemptId)
                     ? Optional.of(capture.snapshot()) : Optional.empty();
+        }
+    }
+
+    /** The running capture, if any. */
+    public Optional<AttemptSnapshot> captureSnapshot() {
+        synchronized (lock) {
+            return capture == null ? Optional.empty() : Optional.of(capture.snapshot());
         }
     }
 

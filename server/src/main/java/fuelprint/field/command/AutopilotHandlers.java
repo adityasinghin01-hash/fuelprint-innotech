@@ -97,6 +97,11 @@ public final class AutopilotHandlers {
                     if (!ports.isOn(AutomationSettings.AUTO_AUTOPILOT)) {
                         return reject("AUTOMATION_OFF", "The automatic autopilot is switched off.");
                     }
+                    MissionView pending = MissionView.of(mission).orElse(null);
+                    if (pending == null || !world.awaitingFirstPilot(pending)) {
+                        return reject("ALREADY_FLOWN", "The automatic start is only for a mission nobody has flown "
+                                + "yet; a person can start the autopilot.");
+                    }
                     if (idle < ports.autopilotWaitS()) {
                         return reject("NOT_YET", "The autopilot waits " + ports.autopilotWaitS()
                                 + " s for a person to fly first.");
