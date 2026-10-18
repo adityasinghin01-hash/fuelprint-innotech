@@ -9,7 +9,7 @@ PORT="$(free_port)"
 DATA="$(mktemp -d "${TMPDIR:-/tmp}/fp-e2e-XXXXXX")"
 LOG="$DATA/server.log"
 say "fake server for the end-to-end test on port $PORT"
-(cd "$SERVER" && java -jar "$JAR" --fp.mode=replay --fp.replay.speed="${FP_E2E_SPEED:-20}" --fp.data-dir="$DATA" \
+(cd "$SERVER" && exec java -jar "$JAR" --fp.mode=replay --fp.replay.speed="${FP_E2E_SPEED:-20}" --fp.data-dir="$DATA" \
   --server.port="$PORT" --server.address=127.0.0.1 > "$LOG" 2>&1) &
 PID=$!
 cleanup() {

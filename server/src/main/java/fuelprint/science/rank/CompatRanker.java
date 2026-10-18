@@ -192,8 +192,13 @@ public final class CompatRanker {
             fitting.add(0, "BACKGROUND");
         }
         switch (outcome) {
-            case PROVISIONAL_SINGLE -> b.append(singles.get(0)).append(" alone explains the readings within the "
-                    + "cutoff; no other registered factory or pair does. ");
+            case PROVISIONAL_SINGLE -> {
+                b.append(singles.get(0)).append(" is the single-source explanation retained after the "
+                        + "simpler-source rule. ");
+                if (candidates.stream().anyMatch(c -> c.reason().startsWith("NOT_NEEDED"))) {
+                    b.append("Optional mixtures that also fit are listed in the limitations. ");
+                }
+            }
             case AMBIGUOUS_OR_OPTIONAL_MIXTURE -> b.append("More than one explanation still fits: ")
                     .append(String.join(", ", fitting)).append(". ");
             case UNKNOWN_OR_MISMATCH -> b.append("None of the registered factories, alone or in pairs, explains "

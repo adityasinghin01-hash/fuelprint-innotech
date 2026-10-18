@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import fuelprint.api.WindNow;
 import fuelprint.api.WorldClock;
+import fuelprint.api.WorldCapacityReached;
 import fuelprint.science.truth.EmissionPlan;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Profile;

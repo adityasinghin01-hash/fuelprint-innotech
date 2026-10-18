@@ -21,13 +21,13 @@ final class Inlet {
     java.util.List<fuelprint.api.Reading> cached = java.util.List.of();
 
     Inlet(String id, String label, long seed, double so2Ambient, double co2Ambient, double timeS,
-          NoiseSettings n, double t90So2, double t90Co2) {
+          NoiseSettings n) {
         this.id = id;
         this.label = label;
         this.fixed = label != null && label.matches("N[0-9]+");
         this.rng = new SplittableRandom(seed);
-        this.so2 = new GasChannel(0.5, t90So2, GasChannel.CHAMBER_T90_S, n.so2Sd(), n.rho(), so2Ambient, rng);
-        this.co2 = new GasChannel(0.3, t90Co2, GasChannel.CHAMBER_T90_S, n.co2Sd(), n.rho(), co2Ambient, rng);
+        this.so2 = GasSettings.SO2.channel(n.so2Sd(), n.rho(), so2Ambient, rng);
+        this.co2 = GasSettings.CO2.channel(n.co2Sd(), n.rho(), co2Ambient, rng);
         this.pmNoise = new Ar1(0.8, 3.0, rng);
         this.lastTimeS = timeS;
         this.lastSecond = (long) Math.floor(timeS + 1e-9) - 1;

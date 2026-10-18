@@ -3,6 +3,7 @@ package fuelprint.science.rank;
 import fuelprint.api.Analysis;
 import fuelprint.api.AnalysisInput;
 import fuelprint.api.Ranker;
+import fuelprint.api.InletHistory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -16,8 +17,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * The real {@link Ranker} bean (FP-COMPAT-3). Inlet history comes from any {@link InletTrack.Source} beans other
- * packages register (for vehicle windows), then from the fixed nodes of the world registry. The latest fit
+ * The real {@link Ranker} bean (FP-COMPAT-3). Fixed nodes come from the world registry, followed by optional
+ * {@link InletHistory} beans for vehicle windows. The latest fit
  * snapshots are kept in memory for the planner.
  */
 @Component
@@ -37,15 +38,17 @@ public class ScienceRanker implements Ranker {
             });
 
     @Autowired
-    public ScienceRanker(ObjectProvider<InletTrack.Source> extraInlets) {
+    public ScienceRanker(ObjectProvider<InletHistory> histories, ObjectProvider<InletTrack.Source> fixedInlets) {
         this(new CompatRanker(new FitEngine(WorldProfile.load(), ResponseModel.TEACHING), Cutoff.load()),
-                extraInlets.orderedStream().toList());
+                java.util.stream.Stream.concat(fixedInlets.orderedStream(),
+                        histories.orderedStream().map(InletTrack::history)).toList());
     }
 
     public ScienceRanker(CompatRanker ranker, List<InletTrack.Source> extraInlets) {
         this.ranker = ranker;
-        List<InletTrack.Source> all = new ArrayList<>(extraInlets);
+        List<InletTrack.Source> all = new ArrayList<>();
         all.add(InletTrack.fixedNodes(ranker.engine().world()));
+        all.addAll(extraInlets);
         this.inlets = InletTrack.firstOf(all);
     }
 

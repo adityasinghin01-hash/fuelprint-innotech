@@ -26,8 +26,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.context.annotation.Import;
+import fuelprint.api.WorldStepListener;
 
 /** The world loop with the stub science, driven step by step. */
+@Import(WorldLoopTest.Transition.class)
 class WorldLoopTest extends CoreSpringTest {
 
     static final Session PRESENTER = Session.station("s-world-test", "laptop-2", Set.of(Role.PRESENTER));
@@ -38,9 +41,23 @@ class WorldLoopTest extends CoreSpringTest {
     @Autowired EventLog events;
     @Autowired StubVehicles vehicles;
     @Autowired JdbcTemplate jdbc;
+    @Autowired Transition transition;
+
+    static class Transition implements WorldStepListener {
+        Runnable action;
+        @Override
+        public void onStep(double time, double dt) {
+            if (action != null) {
+                Runnable next = action;
+                action = null;
+                next.run();
+            }
+        }
+    }
 
     @AfterEach
     void standStill() {
+        transition.action = null;
         vehicles.setVelocity(null);
         world.releaseTimeScale("test");
         world.stopThread();
@@ -133,6 +150,40 @@ class WorldLoopTest extends CoreSpringTest {
         steps(1);
         assertThat(world.timeScale()).isEqualTo(1);
         assertThat(world.simTimeS()).isEqualTo(16.05);
+    }
+
+    @Test
+    void releasingSpeedUpDuringAStepStopsTheExtraStepsImmediately() {
+        freshRun("SC1-NIGHT-PLUME");
+        world.requestTimeScale("test", 15);
+        transition.action = () -> world.releaseTimeScale("test");
+        steps(1);
+        assertThat(world.simTimeS()).isEqualTo(0.05);
+        assertThat(world.timeScale()).isEqualTo(1);
+    }
+
+    @Test
+    void movementStartingDuringAStepStopsTheExtraStepsImmediately() {
+        freshRun("SC1-NIGHT-PLUME");
+        world.requestTimeScale("test", 15);
+        transition.action = () -> vehicles.setVelocity(new Velocity(1, 0, 0));
+        steps(1);
+        assertThat(world.simTimeS()).isEqualTo(0.05);
+        assertThat(world.timeScale()).isEqualTo(1);
+    }
+
+    @Test
+    void fastClockStillRecordsAtExactConsecutiveSimulatedSeconds() {
+        String runId = freshRun("SC1-NIGHT-PLUME");
+        world.requestTimeScale("test", 15);
+        steps(40); // 2 wall seconds, 30 simulation seconds
+        String sensor = store.list("sensor", runId).get(0).id();
+        List<Double> times = store.list("reading", runId).stream()
+                .filter(r -> sensor.equals(r.body().path("sensor_or_vehicle_id").asText())
+                        && "SO2_ppb".equals(r.body().path("channel").asText()))
+                .map(r -> r.body().path("sim_time_s").asDouble()).toList();
+        assertThat(times).containsExactlyElementsOf(java.util.stream.IntStream.rangeClosed(1, 30)
+                .mapToObj(i -> (double) i).toList());
     }
 
     @Test

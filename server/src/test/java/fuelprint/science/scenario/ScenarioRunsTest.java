@@ -199,7 +199,7 @@ class ScenarioRunsTest {
         w.step(1.0);
         assertThat(w.capacityReached()).isTrue();
         assertThat(events).hasSize(1);
-        fuelprint.science.world.WorldCapacityReached e = (fuelprint.science.world.WorldCapacityReached) events.get(0);
+        fuelprint.api.WorldCapacityReached e = (fuelprint.api.WorldCapacityReached) events.get(0);
         assertThat(e.reason()).isEqualTo("PUFF_CAP");
         assertThat(e.runId()).isEqualTo("run-x");
         assertThat(e.puffCount()).isEqualTo(10);

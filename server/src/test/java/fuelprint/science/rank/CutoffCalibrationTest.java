@@ -36,6 +36,17 @@ class CutoffCalibrationTest {
             assertThat(n.path("rank_rule").asText()).isEqualTo("min(m, ceil(0.95 (m + 1)))");
             assertThat(n.path("domain").asText()).isNotBlank();
             assertThat(n.path("generator").asText()).isNotBlank();
+            assertThat(n.path("wind_direction_sd_deg").asDouble())
+                    .isEqualTo((double) CalibrationRunner.describe(c, engine).get("wind_direction_sd_deg"));
+        }
+    }
+
+    @Test
+    void directionDriftMustBeFiniteAndNonnegative() {
+        FitEngine engine = new FitEngine(WorldProfile.load(), ResponseModel.TEACHING);
+        for (double sd : new double[]{-1, Double.NaN, Double.POSITIVE_INFINITY}) {
+            assertThatThrownBy(() -> CalibrationRunner.compute(engine, sd))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 

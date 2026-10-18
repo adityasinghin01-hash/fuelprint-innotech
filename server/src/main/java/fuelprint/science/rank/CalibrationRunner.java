@@ -30,8 +30,8 @@ import java.util.SplittableRandom;
  * true-support minimum normalised SSE over the 27 nuisance members. The cutoff is the statistic of rank
  * min(m, ceil(0.95 (m + 1))) among the m sorted values.
  * <p>
- * Run from {@code server/}: {@code ./mvnw -q compile dependency:build-classpath -Dmdep.outputFile=target/cp.txt}
- * then {@code java -cp target/classes:$(cat target/cp.txt) fuelprint.science.rank.CalibrationRunner}. The test
+ * Run from {@code server/}: {@code ./mvnw -q -o compile dependency:build-classpath -Dmdep.outputFile=target/cp.txt}
+ * then run the main with arguments {@code [output.json] [direction_stationary_sd_deg] [derivation.json]}. The test
  * {@code CutoffCalibrationTest} recomputes the value and checks the stored file matches.
  */
 public final class CalibrationRunner {
@@ -44,6 +44,7 @@ public final class CalibrationRunner {
     private static final double[][] AERIAL_POINTS = {{0, 100, 35}, {120, 100, 35}};
     /** Slow wind drift around the one reported wind (time scale about 200 s): the analysis sees one WindNow. */
     private static final double MEANDER_RHO = 0.995;
+    // Declared teaching assumption; 15-minute station averages cannot identify 1 Hz turbulence.
     private static final double MEANDER_DIR_SD_DEG = 0.5;
     private static final double MEANDER_SPEED_SD = 0.01;
     private static final double SO2_MIN_G_S = 0.25;
@@ -61,6 +62,13 @@ public final class CalibrationRunner {
     }
 
     public static Computation compute(FitEngine engine) {
+        return compute(engine, MEANDER_DIR_SD_DEG);
+    }
+
+    /** Offline sensitivity calibration; SD is the stationary direction offset, not the 1 Hz innovation. */
+    public static Computation compute(FitEngine engine, double directionSdDeg) {
+        if (!Double.isFinite(directionSdDeg) || directionSdDeg < 0)
+            throw new IllegalArgumentException("Direction SD must be finite and nonnegative");
         WorldProfile world = engine.world();
         List<Explanation> supports = Explanation.enumerate(world.sources().stream()
                 .map(WorldProfile.Source::id).toList()).stream().filter(e -> !e.sources().isEmpty()).toList();
@@ -69,7 +77,7 @@ public final class CalibrationRunner {
         while (episodes.size() < EPISODES && attempts < MAX_ATTEMPTS) {
             long seed = SEED_BASE + attempts;
             attempts++;
-            Generated g = generate(engine, supports, seed);
+            Generated g = generate(engine, supports, seed, directionSdDeg);
             boolean eligible = g.entries.stream()
                     .anyMatch(e -> e.value() >= Math.max(e.gas().floor(), 3 * e.sigma()));
             if (!eligible) {
@@ -92,7 +100,7 @@ public final class CalibrationRunner {
     private record Generated(Explanation truth, WindNow wind, List<WindowSelection.Entry> entries) {
     }
 
-    private static Generated generate(FitEngine engine, List<Explanation> supports, long seed) {
+    private static Generated generate(FitEngine engine, List<Explanation> supports, long seed, double directionSdDeg) {
         WorldProfile world = engine.world();
         SplittableRandom rnd = new SplittableRandom(seed);
         Explanation truth = supports.get(rnd.nextInt(supports.size()));
@@ -114,9 +122,9 @@ public final class CalibrationRunner {
         double start = T0 - 60;
         double[] dir = new double[seconds];
         double[] speed = new double[seconds];
-        double dSd = MEANDER_DIR_SD_DEG * Math.sqrt(1 - MEANDER_RHO * MEANDER_RHO);
+        double dSd = directionSdDeg * Math.sqrt(1 - MEANDER_RHO * MEANDER_RHO);
         double sSd = MEANDER_SPEED_SD * Math.sqrt(1 - MEANDER_RHO * MEANDER_RHO);
-        double d = MEANDER_DIR_SD_DEG * rnd.nextGaussian();
+        double d = directionSdDeg * rnd.nextGaussian();
         double v = MEANDER_SPEED_SD * rnd.nextGaussian();
         for (int i = 0; i < seconds; i++) {
             d = MEANDER_RHO * d + dSd * rnd.nextGaussian();
@@ -206,6 +214,10 @@ public final class CalibrationRunner {
 
     /** The JSON written to {@code science/rank/cutoff.json}: the value and how it was made. */
     public static Map<String, Object> describe(Computation c, FitEngine engine) {
+        return describe(c, engine, MEANDER_DIR_SD_DEG);
+    }
+
+    public static Map<String, Object> describe(Computation c, FitEngine engine, double directionSdDeg) {
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("cutoff", c.cutoff());
         out.put("episodes", c.episodes().size());
@@ -223,10 +235,11 @@ public final class CalibrationRunner {
                 + "nodes N1-N4 with 6 windows each per gas, and in half the episodes one aerial window at "
                 + "(0,100,35) or (120,100,35); eligible only if some window is above its floor");
         out.put("generator", String.format(Locale.ROOT, "1 Hz quasi-steady plume under slow AR(1) wind drift around "
-                + "the reported wind (rho %.3f, direction sd %.1f deg, speed sd %.0f%%), AR(1) instrument noise and "
+                + "the reported wind (rho %.3f, direction sd %.15g deg, speed sd %.0f%%), AR(1) instrument noise and "
                 + "drifting common background from world-profile.json, minus a plume-free background window",
-                MEANDER_RHO, MEANDER_DIR_SD_DEG, 100 * MEANDER_SPEED_SD));
+                MEANDER_RHO, directionSdDeg, 100 * MEANDER_SPEED_SD));
         double[] s = c.episodes().stream().mapToDouble(Episode::statistic).sorted().toArray();
+        out.put("wind_direction_sd_deg", directionSdDeg);
         out.put("statistic_min", s[0]);
         out.put("statistic_median", s[s.length / 2]);
         out.put("statistic_max", s[s.length - 1]);
@@ -236,10 +249,15 @@ public final class CalibrationRunner {
 
     public static void main(String[] args) throws IOException {
         FitEngine engine = new FitEngine(WorldProfile.load(), ResponseModel.TEACHING);
-        Computation c = compute(engine);
+        double directionSdDeg = args.length > 1 ? Double.parseDouble(args[1]) : MEANDER_DIR_SD_DEG;
+        Computation c = compute(engine, directionSdDeg);
         Path out = Path.of(args.length > 0 ? args[0] : DEFAULT_OUTPUT);
         Files.createDirectories(out.toAbsolutePath().getParent());
-        new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValue(out.toFile(), describe(c, engine));
+        Map<String, Object> description = describe(c, engine, directionSdDeg);
+        if (args.length > 2) {
+            description.put("wind_drift_derivation", new ObjectMapper().readTree(Path.of(args[2]).toFile()));
+        }
+        new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValue(out.toFile(), description);
         System.out.println("FP-COMPAT-3 cutoff " + c.cutoff() + " from " + c.episodes().size()
                 + " episodes, rank " + c.rank() + ", written to " + out);
     }
