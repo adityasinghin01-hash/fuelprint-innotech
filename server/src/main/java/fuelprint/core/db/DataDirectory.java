@@ -60,7 +60,7 @@ public class DataDirectory {
     }
 
     /** Walks up from the working directory to the folder that holds {@code contracts/AGREEMENT.md}. */
-    static Path findRepoRoot(Path start) {
+    public static Path findRepoRoot(Path start) {
         for (Path dir = start.toAbsolutePath(); dir != null; dir = dir.getParent()) {
             if (Files.isRegularFile(dir.resolve("contracts").resolve("AGREEMENT.md"))
                     && Files.isDirectory(dir.resolve("server"))) {

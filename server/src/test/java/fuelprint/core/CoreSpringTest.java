@@ -20,10 +20,15 @@ import org.springframework.test.context.DynamicPropertySource;
 public abstract class CoreSpringTest {
 
     protected static final Path DATA_DIR = TempFolders.create("fp-core-test-");
+    /** Where tests put fake built apps ({@code fp.apps-dir}). */
+    protected static final Path APPS_DIR = DATA_DIR.resolve("apps");
 
     @DynamicPropertySource
     static void dataDir(DynamicPropertyRegistry registry) {
         registry.add("fp.data-dir", DATA_DIR::toString);
+        // Tests drive the world loop by hand (WorldLoop.wallStep) instead of the 20 Hz thread.
+        registry.add("fp.loop.auto", () -> "false");
+        registry.add("fp.apps-dir", APPS_DIR::toString);
     }
 
     /** Temporary folders deleted when the test JVM exits. */

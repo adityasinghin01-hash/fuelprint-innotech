@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import fuelprint.api.ServerMode;
 import fuelprint.core.Ids;
 import org.springframework.stereotype.Component;
 
@@ -16,14 +17,20 @@ import org.springframework.stereotype.Component;
  * after the current command has finished, never inside the caller's transaction. Do not wait for the
  * returned future on the command thread (the future refuses it); chain with {@code thenAccept} instead.
  * Automation never retries a rejected command in a loop: look at the receipt and stop that step.
+ * In fake replay mode submissions are refused with {@link #REPLAY_MODE} unless {@code fp.replay.automation=live}.
  */
 @Component
 public class AutomationBus {
 
-    private final CommandBus bus;
+    /** Reason code of a submission refused because fake replay mode plays recorded automatic steps. */
+    public static final String REPLAY_MODE = "REPLAY_MODE";
 
-    public AutomationBus(CommandBus bus) {
+    private final CommandBus bus;
+    private final ServerMode mode;
+
+    public AutomationBus(CommandBus bus, ServerMode mode) {
         this.bus = bus;
+        this.mode = mode;
     }
 
     /** Queues {@code commandType} with {@code payload}, no run and no expected revision. */
@@ -44,6 +51,11 @@ public class AutomationBus {
                                              Long expectedRevision) {
         ObjectNode body = payload == null ? JsonNodeFactory.instance.objectNode() : payload;
         Command command = new Command(Command.SCHEMA_VERSION, Ids.newId(), commandType, runId, expectedRevision, body);
+        if (!mode.automationActive()) {
+            // Not stored: the recording already holds this step. See ServerMode.automationActive().
+            return CompletableFuture.completedFuture(CommandBus.unsaved(command.commandId(), Session.automation(),
+                    REPLAY_MODE, "Fake replay mode: automatic steps come from the recording."));
+        }
         return bus.enqueue(command, Session.automation());
     }
 }
