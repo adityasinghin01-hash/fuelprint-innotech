@@ -121,6 +121,11 @@ public class FieldTestConfig {
             return Optional.ofNullable(tokenByActor.get(actor));
         }
 
+        /** The session registered under cookie value {@code token}. */
+        public Session resolveToken(String token) {
+            return byToken.get(token);
+        }
+
         @Override
         public Optional<Session> resolve(HttpServletRequest request) {
             Cookie[] cookies = request.getCookies();
