@@ -16,6 +16,7 @@ class RecordStoreTest extends CoreSpringTest {
 
     @Autowired RecordStore store;
     @Autowired JdbcTemplate jdbc;
+    @Autowired EventLog events;
 
     static String uuid() {
         return UUID.randomUUID().toString();
@@ -108,13 +109,24 @@ class RecordStoreTest extends CoreSpringTest {
     @Test
     void theDatabaseRefusesToUpdateOrDeleteSavedRows() {
         String id = uuid();
-        store.save(RecordChange.create("sample", id, null, fields("x")), "t", null);
+        StoredRecord saved = store.save(RecordChange.create("sample", id, null, fields("x")), "t", null);
+        EventRow event = events.append("SAMPLE_SAVED", saved, null, "t", null);
+        String commandId = uuid();
+        jdbc.update("INSERT INTO commands (command_id, command_type, actor, automatic, payload, request_digest, status, "
+                + "receipt_json, received_utc) VALUES (?, 't', 'tester', 0, '{}', 'd', 'REJECTED', '{}', 'now')", commandId);
+
         assertThatThrownBy(() -> jdbc.update("UPDATE records SET body = '{}' WHERE id = ?", id))
                 .hasMessageContaining("append-only");
         assertThatThrownBy(() -> jdbc.update("DELETE FROM records WHERE id = ?", id))
                 .hasMessageContaining("append-only");
-        assertThatThrownBy(() -> jdbc.update("UPDATE events SET actor = 'x'")).hasMessageContaining("append-only");
-        assertThatThrownBy(() -> jdbc.update("DELETE FROM commands")).hasMessageContaining("append-only");
+        assertThatThrownBy(() -> jdbc.update("UPDATE events SET actor = 'x' WHERE cursor = ?", event.cursor()))
+                .hasMessageContaining("append-only");
+        assertThatThrownBy(() -> jdbc.update("DELETE FROM events WHERE cursor = ?", event.cursor()))
+                .hasMessageContaining("append-only");
+        assertThatThrownBy(() -> jdbc.update("UPDATE commands SET status = 'APPLIED' WHERE command_id = ?", commandId))
+                .hasMessageContaining("append-only");
+        assertThatThrownBy(() -> jdbc.update("DELETE FROM commands WHERE command_id = ?", commandId))
+                .hasMessageContaining("append-only");
     }
 
     @Test
