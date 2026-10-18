@@ -25,7 +25,7 @@ import fuelprint.field.profile.WorldProfile;
  * is the science engine's, and this is how its readings report it.
  *
  * <p>One reading per channel per simulated second is kept. A second is valid when the channel reading has a
- * value and only the {@code OK} flag, its branch flow reading (if sent) is OK and within the method's
+ * finite value and only the {@code OK} flag, its branch flow reading is present, OK and within the method's
  * tolerance, and the drone is in position. A gap or fault ends a run of valid seconds; two runs are never
  * glued together. Readings taken out of position get the extra flag {@value #OUT_OF_POSITION}.
  * Not thread-safe; the world guards it.
@@ -113,6 +113,13 @@ final class CaptureRun {
             if (second <= lastSecond.get(channel) || reading.simTimeS() < phaseStart - 1e-6 && phase == Phase.SETUP) {
                 continue;
             }
+            Counter counter = counters.get(channel);
+            if (phase == Phase.COLLECT && lastSecond.get(channel) != Integer.MIN_VALUE
+                    && second > lastSecond.get(channel) + 1 && !counter.done) {
+                counter.run = 0;
+                counter.runValues.clear();
+                counter.badFlags.add("MISSING_SECOND");
+            }
             lastSecond.put(channel, second);
             Reading flow = flowOf(droneReadings, channel).orElse(null);
             Reading kept = inPosition ? reading : flagged(reading, OUT_OF_POSITION);
@@ -122,7 +129,6 @@ final class CaptureRun {
             }
             latest.put(channel, reading);
             boolean valid = valid(kept, flow, channel);
-            Counter counter = counters.get(channel);
             if (phase == Phase.BACKGROUND && valid) {
                 counter.background.add(kept.value());
             }
@@ -254,17 +260,20 @@ final class CaptureRun {
 
     private List<String> problems(Reading reading, Reading flow, String channel) {
         List<String> out = new ArrayList<>();
-        if (reading.value() == null) {
+        if (reading.value() == null || !Double.isFinite(reading.value())) {
             out.add("NO_VALUE");
         }
         reading.quality().stream().filter(q -> !"OK".equals(q)).forEach(out::add);
         if (reading.quality().isEmpty()) {
             out.add("NO_QUALITY");
         }
-        if (flow != null) {
+        if (flow == null) {
+            out.add("FLOW_UNKNOWN");
+        } else {
             flow.quality().stream().filter(q -> !"OK".equals(q)).forEach(out::add);
             Optional<Double> nominal = method.flowFor(channel);
-            if (flow.value() == null) {
+            if (flow.quality().isEmpty()) out.add("FLOW_QUALITY_UNKNOWN");
+            if (flow.value() == null || !Double.isFinite(flow.value())) {
                 out.add("FLOW_UNKNOWN");
             } else if (nominal.isPresent()
                     && Math.abs(flow.value() - nominal.get()) > nominal.get() * method.flowTolerancePercent() / 100.0) {

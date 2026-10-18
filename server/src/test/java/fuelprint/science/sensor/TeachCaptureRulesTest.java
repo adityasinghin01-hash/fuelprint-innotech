@@ -53,6 +53,31 @@ class TeachCaptureRulesTest {
     }
 
     @Test
+    void missingFlowCannotQualifyThirtyNormalLookingGasReadings() {
+        var rs = readings("SO2_ppb", "SO2_flow_L_min", 0.5, 150, -1).stream()
+                .filter(r -> !r.channel().contains("flow")).toList();
+        var verdict = judge("SO2_ppb", stages(120), rs);
+        assertThat(verdict.status()).isEqualTo(ChannelStatus.REJECTED);
+        assertThat(verdict.validSeconds()).isZero();
+        assertThat(verdict.volumeL()).isNull();
+        assertThat(verdict.reasons()).contains("FLOW_UNKNOWN");
+    }
+
+    @Test
+    void invalidFlowQualityAndNonfiniteReadingsCannotPass() {
+        for (String mode : List.of("STALE_FLOW", "NAN_FLOW", "NAN_GAS")) {
+            List<Reading> rs = new ArrayList<>();
+            for (int t = 150; t < 180; t++) {
+                rs.add(r("SO2_ppb", t, mode.equals("NAN_GAS") ? Double.NaN : 40.0, "OK"));
+                rs.add(r("SO2_flow_L_min", t, mode.equals("NAN_FLOW") ? Double.NaN : 0.5,
+                        mode.equals("STALE_FLOW") ? "STALE" : "OK"));
+            }
+            assertThat(judge("SO2_ppb", stages(120), rs).status()).as(mode)
+                    .isEqualTo(ChannelStatus.REJECTED);
+        }
+    }
+
+    @Test
     void aCleanCollectionIsValidWith30SecondsAndTheActualVolume() {
         ChannelVerdict so2 = judge("SO2_ppb", stages(120), readings("SO2_ppb", "SO2_flow_L_min", 0.5, 150, -1));
         assertThat(so2.status()).isEqualTo(ChannelStatus.VALID);

@@ -80,7 +80,8 @@ public class TeachCaptureRules implements CaptureRules {
             }
             if (channel.equals(r.channel())) {
                 seen[k] = true;
-                boolean q = r.value() != null && r.quality().size() == 1 && "OK".equals(r.quality().get(0));
+                boolean q = r.value() != null && Double.isFinite(r.value())
+                        && r.quality().size() == 1 && "OK".equals(r.quality().get(0));
                 if (!q) {
                     bad[k] = true;
                     for (String f : r.quality()) {
@@ -94,9 +95,18 @@ public class TeachCaptureRules implements CaptureRules {
                         bad[k] = true;
                     }
                 }
-            } else if (flowChannel.equals(r.channel()) && r.value() != null) {
+            } else if (flowChannel.equals(r.channel())) {
+                if (r.value() == null || !Double.isFinite(r.value())) {
+                    bad[k] = true;
+                    if (!otherFlags.contains("FLOW_UNKNOWN")) otherFlags.add("FLOW_UNKNOWN");
+                    continue;
+                }
                 flowSum[k] += r.value();
                 flowN[k]++;
+                if (r.quality().size() != 1 || !"OK".equals(r.quality().get(0))) {
+                    bad[k] = true;
+                    if (!otherFlags.contains("FLOW_QUALITY_INVALID")) otherFlags.add("FLOW_QUALITY_INVALID");
+                }
                 if (Math.abs(r.value() - targetFlow) > MAX_ERROR * targetFlow + 1e-12) {
                     bad[k] = true;
                     if (r.value() <= 0) {
@@ -111,7 +121,10 @@ public class TeachCaptureRules implements CaptureRules {
         int bestStart = 0;
         int run = 0;
         for (int k = 0; k < ok.length; k++) {
-            ok[k] = seen[k] && !bad[k];
+            ok[k] = seen[k] && flowN[k] > 0 && !bad[k];
+            if (seen[k] && flowN[k] == 0 && !otherFlags.contains("FLOW_UNKNOWN")) {
+                otherFlags.add("FLOW_UNKNOWN");
+            }
             if (ok[k]) {
                 run++;
                 if (run > best) {
@@ -134,7 +147,7 @@ public class TeachCaptureRules implements CaptureRules {
                 v += flowSum[k] / flowN[k] / 60.0; // L per second
             }
             volume = haveFlow ? v : null;
-        } else if (bins > 0) {
+        } else if (bins > 0 && java.util.Arrays.stream(flowN).anyMatch(n -> n > 0)) {
             volume = 0.0;
         }
         boolean someBad = false;

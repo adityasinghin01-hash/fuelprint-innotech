@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * The real {@link Planner} bean (FP-PLAN-INTERVAL-1). Uses the immutable fit snapshot the ranker kept for the
- * analysis. A proposal whose {@code result} is null is pending (the 2 s wall budget ran out): it carries no best or
+ * analysis. A proposal whose {@code result} is PENDING means the 2 s wall budget ran out: it carries no best or
  * cheaper action and must not be shown as a recommendation.
  */
 @Component

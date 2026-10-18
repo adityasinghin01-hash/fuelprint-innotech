@@ -57,7 +57,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * The world loop of CORE-API section 3, on its own thread at 20 wall steps per second. While the loaded run is
- * RUNNING, each step (dt = 0.05 s x time scale of simulation time):
+ * RUNNING, each wall step repeats the following 0.05 s scientific step once or fifteen times:
  * <ol>
  *   <li>{@link WorldClock#step}</li>
  *   <li>every {@link WorldStepListener#onStep}</li>
@@ -204,13 +204,24 @@ public class WorldLoop implements RunDriver, ClockControl {
         List<VehicleState> vehicles = vehicles();
         double scale = computeScale(vehicles);
         effectiveScale = scale;
-        double dt = profile.dtS() * scale;
+        // Speed-up repeats the same scientific step; it must not skip the 1 Hz observations
+        // or change the line/chamber integration used at normal speed.
+        for (int step = 0; step < (int) scale && running && loaded != null; step++) {
+            if (step > 0 && computeScale(vehicles()) != scale) {
+                break; // a listener ended capture or started movement during the preceding step
+            }
+            advanceScience(profile.dtS());
+        }
+        effectiveScale = computeScale(vehicles());
+    }
+
+    private void advanceScience(double dt) {
         WorldClock clock = clocks.getObject();
         clock.step(dt);
         simTimeS = Math.round((simTimeS + dt) * 1e6) / 1e6;
         double now = simTimeS;
         stepListeners.orderedStream().forEach(listener -> guarded("WorldStepListener", () -> listener.onStep(now, dt)));
-        vehicles = vehicles();
+        List<VehicleState> vehicles = vehicles();
         lastVehicles = vehicles;
 
         List<InletPose> inlets = new ArrayList<>(fixedInlets);

@@ -21,7 +21,7 @@ public final class WorldProfile {
     public record Node(String id, double east, double north, double inletHeight) {
     }
 
-    public static final String RESOURCE = "/science/world/world-profile.json";
+    public static final String RESOURCE = "/reference/world-profile.json";
 
     private final List<Source> sources;
     private final List<Node> nodes;
@@ -62,7 +62,7 @@ public final class WorldProfile {
         this.livePuffCap = root.get("clock").get("live_puff_cap").asInt();
     }
 
-    /** Loads the copy under {@code src/main/resources/science/world}. */
+    /** Loads the shared classpath copy of the contract reference profile. */
     public static WorldProfile load() {
         try (InputStream in = WorldProfile.class.getResourceAsStream(RESOURCE)) {
             if (in == null) {

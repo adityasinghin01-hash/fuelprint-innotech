@@ -1,6 +1,5 @@
 package fuelprint.science.detect;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -18,6 +17,9 @@ import fuelprint.api.Interval;
 import fuelprint.api.Reading;
 import fuelprint.api.Trigger;
 import fuelprint.api.Window;
+import fuelprint.science.rank.Gas;
+import fuelprint.science.rank.NoiseModel;
+import fuelprint.science.rank.WorldProfile;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +39,9 @@ import org.springframework.stereotype.Component;
  * <p>The background is refreshed at most every 30 s from a quiet window (it may not sit more than one SD above
  * the current background), so a rising plume cannot be absorbed into it. Seconds are read at whole simulation
  * seconds; the detector keeps its own history, so the core may hand it only the newest readings.
+ * Ranking receives separate non-overlapping 30-second means of valid data after a background is available;
+ * these are not conditioned on the alarm threshold. Their uncertainty uses the declared synthetic AR(1)
+ * electrical allocation. Shared-background covariance is still a limitation of the current ranker.
  */
 @Component
 @Profile("!stub")
@@ -50,6 +55,7 @@ public class TeachDetector implements Detector {
     public static final double UNCERTAINTY_FACTOR = 3.0;
 
     private static final double SECOND_TOLERANCE = 1e-6;
+    private static final double WINDOW_UNCERTAINTY = NoiseModel.enhancementStd(WorldProfile.load(), Gas.SO2);
 
     private static final class Background {
         final double mean;
@@ -84,19 +90,40 @@ public class TeachDetector implements Detector {
         long runStart;
         double runSum;
         boolean triggered;
+        int averagingCount;
+        double averagingSum;
+        Background averagingBackground;
     }
 
     private String runId;
+    private DetectorInput pendingInput;
+    private DetectionResult pendingEvaluation;
     private final Map<String, SensorState> sensors = new LinkedHashMap<>();
 
     /** Forgets everything (a new run). */
     public synchronized void reset() {
         runId = null;
+        pendingInput = null;
+        pendingEvaluation = null;
         sensors.clear();
     }
 
     @Override
-    public Optional<Trigger> evaluate(DetectorInput input) {
+    public synchronized List<Window> windows(DetectorInput input) {
+        if (input.equals(pendingInput)) return List.of();
+        pendingEvaluation = evaluateDetailed(input);
+        pendingInput = input;
+        return pendingEvaluation.windows();
+    }
+
+    @Override
+    public synchronized Optional<Trigger> evaluate(DetectorInput input) {
+        if (input.equals(pendingInput) && pendingEvaluation != null) {
+            DetectionResult result = pendingEvaluation;
+            pendingEvaluation = null;
+            return result.firstTrigger();
+        }
+        pendingEvaluation = null;
         return evaluateDetailed(input).firstTrigger();
     }
 
@@ -166,10 +193,13 @@ public class TeachDetector implements Detector {
         st.runSum = 0;
         st.triggered = false;
         st.buffer.clear();
+        st.averagingCount = 0;
+        st.averagingSum = 0;
+        st.averagingBackground = null;
     }
 
     private static boolean valid(Reading r) {
-        return r.value() != null && !r.value().isNaN() && r.quality().size() == 1 && "OK".equals(r.quality().get(0));
+        return r.value() != null && Double.isFinite(r.value()) && r.quality().size() == 1 && "OK".equals(r.quality().get(0));
     }
 
     private void process(Reading r, long s, SensorState st, List<Trigger> triggers, List<Window> windows) {
@@ -188,6 +218,21 @@ public class TeachDetector implements Detector {
         }
         Background bg = st.background;
         if (bg != null) {
+            // One-second readings are right endpoints: samples 31..60 cover (30,60].
+            // Average all valid values, independently of the 15-second alarm streak.
+            if (st.averagingCount == 0) st.averagingBackground = bg;
+            st.averagingCount++;
+            st.averagingSum += v;
+            if (st.averagingCount == BACKGROUND_SECONDS) {
+                Background reference = st.averagingBackground;
+                windows.add(new Window(newWindowId(),
+                        r.sensorOrVehicleId(), CHANNEL, s - BACKGROUND_SECONDS, s, BACKGROUND_SECONDS,
+                        st.averagingSum / BACKGROUND_SECONDS - reference.mean, WINDOW_UNCERTAINTY,
+                        reference.windowId));
+                st.averagingCount = 0;
+                st.averagingSum = 0;
+                st.averagingBackground = null;
+            }
             double e = v - bg.mean;
             if (e >= bg.threshold()) {
                 if (st.count == 0) {
@@ -201,8 +246,6 @@ public class TeachDetector implements Detector {
                     String sensorId = r.sensorOrVehicleId();
                     triggers.add(new Trigger(CHANNEL, sensorId, List.of(new Interval(st.runStart, s)),
                             bg.windowId, Trigger.TEACH_DETECT_1));
-                    windows.add(new Window(windowId(sensorId, "ENH", st.runStart, s), sensorId, CHANNEL,
-                            st.runStart, s, st.count, st.runSum / st.count, bg.uncertainty(), bg.windowId));
                 }
             } else {
                 st.count = 0;
@@ -249,16 +292,15 @@ public class TeachDetector implements Detector {
             st.lastRefreshEnd = s; // looks like a rise, not a background: keep the old one
             return;
         }
-        String id = windowId(sensorId, "BG", s - (BACKGROUND_SECONDS - 1), s);
-        st.background = new Background(mean, sd, s - (BACKGROUND_SECONDS - 1), s, id);
+        String id = newWindowId();
+        st.background = new Background(mean, sd, s - BACKGROUND_SECONDS, s, id);
         st.lastRefreshEnd = s;
-        windows.add(new Window(id, sensorId, CHANNEL, s - (BACKGROUND_SECONDS - 1), s, BACKGROUND_SECONDS, null,
-                sd * Math.sqrt(1.0 + 1.0 / BACKGROUND_SECONDS), null));
+        windows.add(new Window(id, sensorId, CHANNEL, s - BACKGROUND_SECONDS, s, BACKGROUND_SECONDS, null,
+                WINDOW_UNCERTAINTY / Math.sqrt(2), null));
     }
 
-    private String windowId(String sensorId, String kind, long start, long end) {
-        String key = runId + "|" + sensorId + "|" + CHANNEL + "|" + kind + "|" + start + "|" + end;
-        return UUID.nameUUIDFromBytes(key.getBytes(StandardCharsets.UTF_8)).toString();
+    private static String newWindowId() {
+        return UUID.randomUUID().toString();
     }
 
     /** Visible for tests: the background mean now for a sensor, if any. */

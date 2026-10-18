@@ -1,6 +1,7 @@
 package fuelprint.science.rank;
 
 import fuelprint.api.Enu;
+import fuelprint.api.InletHistory;
 import fuelprint.api.Window;
 
 import java.util.Comparator;
@@ -64,6 +65,15 @@ public record InletTrack(List<Sample> samples) {
     public static Source fixedNodes(WorldProfile world) {
         Map<String, Enu> nodes = world.nodeInlets();
         return (runId, window) -> Optional.ofNullable(nodes.get(window.sensorOrVehicleId())).map(InletTrack::fixed);
+    }
+
+    /** Adapter for the public field history API. Missing (or empty) history remains unknown. */
+    public static Source history(InletHistory history) {
+        return (runId, window) -> history.track(runId, window.sensorOrVehicleId(),
+                        Math.max(0, window.startS() - ResponseModel.TEACHING.prehistoryS()), window.endS())
+                .filter(samples -> !samples.isEmpty())
+                .map(samples -> new InletTrack(samples.stream()
+                        .map(sample -> new Sample(sample.simTimeS(), sample.inlet())).toList()));
     }
 
     /** Known window id to fixed inlet position (tests, calibration, hovering vehicle captures). */

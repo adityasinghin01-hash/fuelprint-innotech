@@ -1,0 +1,77 @@
+{
+  "wind_drift_derivation": {
+    "script": "tools/science/wind_drift.py",
+    "station": "CPCB Murthal, Sonipat; OpenAQ location 6951",
+    "data_period": "2025-10-01 through 2026-09-30 (IST)",
+    "observed_first": "2025-10-08T01:00:00+05:30",
+    "observed_last": "2026-09-26T10:30:00+05:30",
+    "filters": "Both endpoints: wind_speed 2..5 m/s, wind_direction 240..300 deg; exactly 900 s apart",
+    "hours_ist": "20:00..05:59",
+    "minimum_night_pairs": 100,
+    "paired_wind_timestamps": 19303,
+    "eligible_all_hour_pairs": 2692,
+    "eligible_night_pairs": 906,
+    "selected_pairs": 906,
+    "direction_change_rms_15min_deg": 8.394321033118999,
+    "generator_rho_per_second": 0.995,
+    "direction_stationary_sd_deg": 5.968552045403114,
+    "direction_innovation_sd_per_second_deg": 0.5961086686577275,
+    "mapping": "sigma = RMS15 / sqrt(2*(1-rho^900)); innovation_sd = sigma*sqrt(1-rho^2)",
+    "assumptions": "15-minute reports treated as point samples of a stationary 1 Hz AR(1) offset; rho=0.995 retained from teaching generator, not estimated; no sub-minute validation; station averaging unresolved; sector filtering truncates large turns",
+    "speed_source": "Open-Meteo hourly 10 m wind speed, held over containing UTC hour; regional proxy",
+    "speed_proxy_file": "open-meteo_wind10m_20250930-20261012_utc.json",
+    "speed_proxy_assumption": "Regional hourly 10 m wind speed selects the regime; station speed 2..5 m/s is NOT established; no sub-hour speed interpolation",
+    "native_cpcb": {
+      "paired_wind_timestamps": 19303,
+      "speed_min_m_s": 0.0,
+      "speed_max_m_s": 0.99,
+      "scenario_timestamps": 0,
+      "status": "Too few eligible 15-minute wind pairs"
+    },
+    "files_read": 325,
+    "conflicting_parameter_timestamps_excluded": 0
+  },
+  "real_drift_trial": {
+    "wind_direction_sd_deg": 5.968552045403114,
+    "cutoff": 1245.7714621568186,
+    "episodes": 60,
+    "rank": 58,
+    "attempts": 99,
+    "statistics_sha256": "66e93f8207638738d6bf499225a4b58945a5806a55742b99ec9060cc11fa1cd8",
+    "sc1_cases": {
+      "n2_alone": [
+        "S01",
+        "S02"
+      ],
+      "n2_plus_drone": [
+        "S01",
+        "S02"
+      ],
+      "cutoff": 1245.7714621568186
+    },
+    "test_counts": {
+      "tests": 35,
+      "failures": 6,
+      "errors": 0
+    },
+    "failed_tests": [
+      "fuelprint.science.rank.ScienceRankerHistoryTest.apiHistorySuppliesTheDroneWindowAfterTheFixedNodes",
+      "fuelprint.science.plan.IntervalPlannerTest.bestActionIsTheOneThatSeparatesTheSurvivors",
+      "fuelprint.science.plan.IntervalPlannerTest.singleSurvivorLeavesNothingToSeparate",
+      "fuelprint.science.plan.IntervalPlannerTest.springBeansWorkTogetherThroughTheHeldSnapshot",
+      "fuelprint.science.rank.CompatRankerTest.addingTheAerialWindowLeavesOnlyS02",
+      "fuelprint.science.rank.CompatRankerTest.explanationTextIsDeterministicAndIndependentOfWindowOrder"
+    ]
+  },
+  "teaching_sc1_cases": {
+    "n2_alone": [
+      "S01",
+      "S02"
+    ],
+    "n2_plus_drone": [
+      "S02"
+    ],
+    "cutoff": 7.095634863439867
+  },
+  "interpretation": "REJECTED DERIVATION: 15-minute averaged station reports cannot establish a per-second stationary direction SD. AR(1) rho and point-sample interpretation were assumptions. Retained only as historical diagnostic; not used by the runtime cutoff."
+}

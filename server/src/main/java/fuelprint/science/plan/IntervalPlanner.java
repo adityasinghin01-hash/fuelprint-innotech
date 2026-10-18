@@ -166,7 +166,7 @@ public final class IntervalPlanner {
         }
         if (pending || nanoClock.getAsLong() > deadline) {
             return new Result(Status.PENDING_BUDGET_EXCEEDED,
-                    new Proposal(context.analysisId(), actions, null, null, null), energies);
+                    new Proposal(context.analysisId(), actions, ProposalResult.PENDING, null, null), energies);
         }
         Selection sel = select(scored);
         if (sel.bestActionId() == null) {

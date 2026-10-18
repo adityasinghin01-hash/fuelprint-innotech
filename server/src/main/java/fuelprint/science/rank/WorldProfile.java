@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public final class WorldProfile {
 
-    public static final String RESOURCE = "science/rank/world-profile.json";
+    public static final String RESOURCE = "reference/world-profile.json";
 
     /** A registered source: position and effective release height, roof and footprint for safety checks. */
     public record Source(String id, double east, double north, double heightM, double roofM,

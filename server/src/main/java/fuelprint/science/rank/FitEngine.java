@@ -97,7 +97,7 @@ public final class FitEngine {
         double h = s.heightM() + member.heightShiftM();
         double from = wind.fromDeg() + member.directionShiftDeg();
         double speed = wind.speedMS() * member.speedFactor();
-        return response.windowMean(track, startS, endS,
+        return response.windowMean(gas, track, startS, endS,
                 (Enu p) -> kernel.unit(gas, s.east(), s.north(), h, p, from, speed));
     }
 

@@ -43,9 +43,6 @@ public class SensorField implements ObservationProvider, CollectionHook {
     static final double G_CO2_LOADING = 0.5;
     static final double PM_BASE = 30.0;
 
-    private static final double T90_SO2 = 60.0;
-    private static final double T90_CO2 = 30.0;
-
     private final ScienceWorld world;
     private final BackgroundProfile background;
 
@@ -133,7 +130,7 @@ public class SensorField implements ObservationProvider, CollectionHook {
             amb = ambientNow(w, simTimeS, p);
             long inletSeed = seed * 1_000_003L + p.label().hashCode() * 7919L + p.sensorOrVehicleId().hashCode();
             in = new Inlet(p.sensorOrVehicleId(), p.label(), inletSeed, amb[0], amb[1], simTimeS,
-                    new Inlet.NoiseSettings(0.8, 5.0, 2.0), T90_SO2, T90_CO2);
+                    new Inlet.NoiseSettings(0.8, 5.0, 2.0));
             in.lastSecond = second;
             inlets.put(p.sensorOrVehicleId(), in);
             in.pmRaw = pmRaw(in, amb[2]);

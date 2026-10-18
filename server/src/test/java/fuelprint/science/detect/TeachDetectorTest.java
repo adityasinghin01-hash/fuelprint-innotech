@@ -60,6 +60,29 @@ class TeachDetectorTest {
     }
 
     @Test
+    void coreReceivesEachCompletedWindowOnceBeforeItsTrigger() {
+        List<String> delivered = new ArrayList<>();
+        List<Trigger> seen = new ArrayList<>();
+        for (int second = 0; second < 90; second++) {
+            DetectorInput input = new DetectorInput(RUN, second,
+                    List.of(so2(N2, second, second < 40 ? 5.0 : 80.0)), List.of(), new WindNow(270, 3));
+            for (Window window : detector.windows(input)) {
+                assertThat(window.endS()).isLessThanOrEqualTo(second);
+                assertThat(delivered).doesNotContain(window.id());
+                delivered.add(window.id());
+            }
+            assertThat(detector.windows(input)).isEmpty();
+            detector.evaluate(input).ifPresent(trigger -> {
+                assertThat(delivered).contains(trigger.backgroundWindowId());
+                seen.add(trigger);
+            });
+            assertThat(detector.evaluate(input)).isEmpty();
+        }
+        assertThat(seen).hasSize(1);
+        assertThat(delivered).hasSize(3);
+    }
+
+    @Test
     void withoutABackgroundTheAnswerIsBackgroundRequired() {
         DetectionResult r = seconds(20, 80.0);
         assertThat(r.status()).isEqualTo(DetectionStatus.BACKGROUND_REQUIRED);
@@ -94,15 +117,17 @@ class TeachDetectorTest {
         assertThat(trig.intervals().get(0).startS()).isEqualTo(40.0);
         assertThat(trig.intervals().get(0).endS()).isEqualTo(54.0);
         assertThat(trig.backgroundWindowId()).isNotNull();
-        // the windows the core saves include the background the trigger cites, and the 15 s enhancement
+        // Alarm timing is independent of the complete windows used for ranking.
         assertThat(windows).extracting(Window::id).contains(trig.backgroundWindowId());
         Window bg = windows.stream().filter(w -> w.id().equals(trig.backgroundWindowId())).findFirst().orElseThrow();
         assertThat(bg.validSeconds()).isEqualTo(30.0);
-        assertThat(bg.endS() - bg.startS()).isEqualTo(29.0);
+        assertThat(bg.endS() - bg.startS()).isEqualTo(30.0);
+        assertThat(windows).noneMatch(w -> w.meanEnhancement() != null);
+        seconds(5, 80.0);
         Window enh = windows.stream().filter(w -> trig.backgroundWindowId().equals(w.backgroundWindowId()))
                 .findFirst().orElseThrow();
-        assertThat(enh.validSeconds()).isEqualTo(15.0);
-        assertThat(enh.meanEnhancement()).isBetween(70.0, 80.0);
+        assertThat(enh.validSeconds()).isEqualTo(30.0);
+        assertThat(enh.meanEnhancement()).isBetween(45.0, 55.0);
         assertThat(enh.stdUncertainty()).isNotNull();
         // it fires once per episode, not every second
         seconds(30, 80.0);

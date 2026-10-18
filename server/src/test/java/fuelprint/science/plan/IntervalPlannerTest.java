@@ -164,7 +164,7 @@ class IntervalPlannerTest {
         IntervalPlanner.Result result = slow.plan(r.analysis(), context(WIND, vehicles(64.0, 64.0)),
                 Optional.of(r.snapshot()));
         assertThat(result.status()).isEqualTo(IntervalPlanner.Status.PENDING_BUDGET_EXCEEDED);
-        assertThat(result.proposal().result()).isNull();
+        assertThat(result.proposal().result()).isEqualTo(ProposalResult.PENDING);
         assertThat(result.proposal().bestActionId()).isNull();
         assertThat(result.proposal().cheaperActionId()).isNull();
     }

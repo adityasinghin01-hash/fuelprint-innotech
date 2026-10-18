@@ -122,11 +122,9 @@ class CompatRankerTest {
         Analysis second = k.ranker().analyze(new AnalysisInput("run-1", "inv-1", 600, shuffled,
                 KernelWindows.WIND), k.inlets()).analysis();
         assertThat(second).isEqualTo(first);
-        assertThat(first.explanationText()).isEqualTo(
-                "The smoke-spread check used 14 windows from DRONE, N2, with the wind from 270 degrees at 3.0 m/s. "
-                        + "S02 alone explains the readings within the cutoff; no other registered factory or pair "
-                        + "does. 21 explanations were set aside (cutoff 7.096). An unregistered source is never "
-                        + "ruled out. This holds only inside the synthetic teaching model.");
+        assertThat(first.candidates()).anyMatch(c -> c.reason().startsWith("NOT_NEEDED"));
+        assertThat(first.explanationText()).contains("S02", "simpler-source rule", "Optional mixtures")
+                .doesNotContain("no other registered factory or pair does");
     }
 
     @Test
@@ -176,7 +174,7 @@ class CompatRankerTest {
         Enu b = new Enu(0, 100, 3);
         InletTrack moving = new InletTrack(List.of(new InletTrack.Sample(0, b), new InletTrack.Sample(100, b),
                 new InletTrack.Sample(110, a)));
-        double viaTrack = ResponseModel.TEACHING.windowMean(moving, 300, 330,
+        double viaTrack = ResponseModel.TEACHING.windowMean(Gas.SO2, moving, 300, 330,
                 p -> k.engine.kernel().unit(Gas.SO2, s02.east(), s02.north(), s02.heightM(), p, 270, 3));
         double hovering = k.engine.kernel().unit(Gas.SO2, s02.east(), s02.north(), s02.heightM(), a, 270, 3);
         double before = k.engine.kernel().unit(Gas.SO2, s02.east(), s02.north(), s02.heightM(), b, 270, 3);
