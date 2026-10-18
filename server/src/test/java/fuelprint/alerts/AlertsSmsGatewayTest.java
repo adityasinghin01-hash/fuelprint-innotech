@@ -174,6 +174,12 @@ class AlertsSmsGatewayTest {
         assertThat(result.status()).isEqualTo(SendStatus.FAILED);
         assertThat(result.attempts()).isEqualTo(3);
         assertThat(result.failureReason()).isEqualTo("TIMEOUT");
+        // The mock records a request only once it has read it; on a busy machine the third
+        // read can land just after send() gives up, so wait briefly instead of racing it.
+        long deadline = System.nanoTime() + Duration.ofSeconds(3).toNanos();
+        while (server.requests.size() < 3 && System.nanoTime() < deadline) {
+            Thread.onSpinWait();
+        }
         assertThat(server.requests).hasSize(3);
     }
 
