@@ -1,0 +1,15 @@
+{
+  "note": "Example only. Copy to server/config/stations.json (never committed) and change every PIN before the stall.",
+  "stations": [
+    {"station_id": "laptop-1", "name": "Operations laptop 1", "pin": "1111",
+     "roles": ["analyst", "supervisor", "presenter"]},
+    {"station_id": "laptop-2", "name": "Field laptop 2 (host)", "pin": "2222",
+     "roles": ["field_operator", "qc_reviewer", "presenter"]},
+    {"station_id": "laptop-3", "name": "Cases laptop 3 (lab)", "pin": "3333",
+     "roles": ["case_reviewer", "lab_demo"]},
+    {"station_id": "laptop-4", "name": "Cases laptop 4 (inspector and vault)", "pin": "4444",
+     "roles": ["case_reviewer", "inspector_demo", "exporter"]},
+    {"station_id": "laptop-5", "name": "Operations laptop 5 (board, AI and automation)", "pin": "5555",
+     "roles": ["board", "presenter", "analyst"]}
+  ]
+}

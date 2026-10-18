@@ -4,6 +4,7 @@ import fuelprint.core.CoreSpringTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -14,6 +15,7 @@ import java.nio.file.Path;
  * LOG_ONLY gateway with the default cap, and no midnight timer.
  */
 @SpringBootTest
+@ActiveProfiles("real")
 @AutoConfigureMockMvc
 @Import(AlertsTestConfig.class)
 abstract class AlertsSpringTest extends AlertsFlow {

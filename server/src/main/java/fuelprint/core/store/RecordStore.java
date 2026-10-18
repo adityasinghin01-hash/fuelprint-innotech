@@ -60,6 +60,33 @@ public class RecordStore implements StoreView {
                 rowMapper, type, runId);
     }
 
+    @Override
+    public List<StoredRecord> listAll(String type) {
+        return jdbc.query("SELECT " + COLUMNS + " FROM latest_records WHERE type = ? ORDER BY first_row_id", rowMapper, type);
+    }
+
+    /**
+     * The latest revision of every record in run {@code runId} (or, for null, every record not tied to a run),
+     * oldest record first, leaving out the types in {@code excludedTypes}.
+     */
+    public List<StoredRecord> listRun(String runId, java.util.Collection<String> excludedTypes) {
+        StringBuilder sql = new StringBuilder("SELECT " + COLUMNS + " FROM latest_records WHERE run_id IS ?");
+        List<Object> args = new java.util.ArrayList<>();
+        args.add(runId);
+        for (String excluded : excludedTypes) {
+            sql.append(" AND type <> ?");
+            args.add(excluded);
+        }
+        sql.append(" ORDER BY first_row_id");
+        return jdbc.query(sql.toString(), rowMapper, args.toArray());
+    }
+
+    /** The newest {@code limit} records of {@code type} in run {@code runId}, newest first (all revision 1 rows). */
+    public List<StoredRecord> newest(String type, String runId, int limit) {
+        return jdbc.query("SELECT " + COLUMNS + " FROM records WHERE type = ? AND run_id IS ? ORDER BY row_id DESC LIMIT ?",
+                rowMapper, type, runId, limit);
+    }
+
     /** Every revision of one record, oldest first. */
     public List<StoredRecord> revisions(String type, String id) {
         return jdbc.query("SELECT " + COLUMNS + " FROM records WHERE type = ? AND id = ? ORDER BY revision",

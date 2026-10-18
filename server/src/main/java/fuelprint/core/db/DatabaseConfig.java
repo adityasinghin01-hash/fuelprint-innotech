@@ -13,7 +13,7 @@ import org.sqlite.SQLiteDataSource;
 
 /**
  * SQLite connection setup. Every connection the pool opens gets WAL journaling,
- * {@code synchronous=FULL} and {@code foreign_keys=ON}: the SQLite driver applies these
+ * {@code synchronous=FULL}, {@code foreign_keys=ON} and {@code secure_delete=ON}: the SQLite driver applies these
  * pragmas when it opens the connection.
  */
 @Configuration
@@ -39,6 +39,8 @@ public class DatabaseConfig {
         sqlite.setJournalMode(SQLiteConfig.JournalMode.WAL);
         sqlite.setSynchronous(SQLiteConfig.SynchronousMode.FULL);
         sqlite.enforceForeignKeys(true);
+        // Deleted content (the midnight purge of phone numbers) is overwritten with zeros, not left in free pages.
+        sqlite.setPragma(SQLiteConfig.Pragma.SECURE_DELETE, "ON");
         sqlite.setBusyTimeout(BUSY_TIMEOUT_MS);
         // Take the write lock at BEGIN, so a transaction never fails half-way on lock upgrade.
         sqlite.setTransactionMode(SQLiteConfig.TransactionMode.IMMEDIATE);

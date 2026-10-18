@@ -12,7 +12,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fuelprint.core.command.TestHeaderSessionService;
+import fuelprint.core.command.Session;
+import fuelprint.core.session.CookieSessionService;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -27,6 +29,7 @@ class PrivacyTest extends AlertsSpringTest {
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
+    @Autowired CookieSessionService sessions;
 
     private static final List<String> NUMBERS = List.of(NUMBER_A, NUMBER_B, NUMBER_C, NUMBER_D);
 
@@ -37,9 +40,9 @@ class PrivacyTest extends AlertsSpringTest {
                 "+91 " + national.substring(0, 5) + "-" + national.substring(5), national.substring(0, 5) + " " + national.substring(5));
     }
 
-    private JsonNode postCommand(String command, String body, String actor, String roles) throws Exception {
+    private JsonNode postCommand(String command, String body, Session session) throws Exception {
         String reply = mvc.perform(post("/api/commands").contentType(MediaType.APPLICATION_JSON).content(body)
-                        .header(TestHeaderSessionService.ACTOR, actor).header(TestHeaderSessionService.ROLES, roles))
+                        .cookie(new Cookie(CookieSessionService.COOKIE, session.sessionId())))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         assertNoNumber("API response to " + command, reply);
         return mapper.readTree(reply);
@@ -97,14 +100,15 @@ class PrivacyTest extends AlertsSpringTest {
         String subscribeBody = "{\"schema_version\":\"fp/1\",\"command_id\":\"" + uuid() + "\",\"command_type\":\"subscribe_alerts\","
                 + "\"run_id\":null,\"expected_revision\":null,\"payload\":{\"phone_number\":\"" + NUMBER_A
                 + "\",\"area_ids\":[\"AREA-E\",\"AREA-N\"],\"consent\":true,\"consent_text_version\":\"FP-CONSENT-1\"}}";
-        JsonNode receipt = postCommand("subscribe_alerts", subscribeBody, "guest-21c9", "guest");
+        Session guest = sessions.createGuest();
+        JsonNode receipt = postCommand("subscribe_alerts", subscribeBody, guest);
         assertThat(receipt.path("status").asText()).isEqualTo("APPLIED");
-        assertThat(receipt.path("actor").asText()).isEqualTo("guest-21c9");
+        assertThat(receipt.path("actor").asText()).isEqualTo(guest.actorLabel());
         String idA = receipt.path("record_refs").get(0).path("id").asText();
 
         String refusedBody = subscribeBody.replace(NUMBER_A, NUMBER_C).replace("\"consent\":true", "\"consent\":false")
                 .replace(subscribeBody.substring(subscribeBody.indexOf("\"command_id\":\"") + 14, subscribeBody.indexOf("\"command_id\":\"") + 50), uuid());
-        JsonNode refused = postCommand("subscribe_alerts", refusedBody, "guest-77aa", "guest");
+        JsonNode refused = postCommand("subscribe_alerts", refusedBody, sessions.createGuest());
         assertThat(refused.path("status").asText()).isEqualTo("REJECTED");
         assertThat(refused.path("reason_code").asText()).isEqualTo("CONSENT_REQUIRED");
 
