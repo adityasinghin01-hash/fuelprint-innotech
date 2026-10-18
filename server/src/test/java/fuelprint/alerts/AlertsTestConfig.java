@@ -227,6 +227,7 @@ class AlertsTestConfig {
     }
 
     @Bean
+    @Primary
     FakeAutomationSettings fakeAutomationSettings() {
         return new FakeAutomationSettings();
     }
