@@ -1,11 +1,23 @@
 #!/usr/bin/env bash
-# Runs every test in the repository. P1: the server tests. P3 adds the apps.
-set -euo pipefail
+# Runs every test: the Java server tests, every app's type check and Vitest tests, and the headless end-to-end test
+# against a fake-mode server. Usage: tools/test-all.sh [--no-e2e]
+. "$(dirname "$0")/lib.sh"
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+E2E=1
+[ "${1:-}" = "--no-e2e" ] && E2E=0
 
-echo "== server tests"
-cd "$ROOT/server"
-./mvnw -q test
+say "server tests"
+(cd "$SERVER" && ./mvnw -q package)
 
-echo "== all tests passed"
+if [ -f "$APPS/package.json" ]; then
+  install_apps
+  say "screen type checks"
+  (cd "$APPS" && npm run typecheck --silent)
+  say "screen tests"
+  (cd "$APPS" && npm test --silent)
+  if [ "$E2E" = 1 ]; then
+    "$ROOT/tools/test-e2e.sh"
+  fi
+fi
+
+say "all tests passed"
