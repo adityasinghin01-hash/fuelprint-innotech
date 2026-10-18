@@ -263,6 +263,7 @@ public class LiveHub {
         private final List<Outgoing> buffered = new ArrayList<>();
         private final AtomicReference<String> pendingTick = new AtomicReference<>();
         private final AtomicBoolean draining = new AtomicBoolean();
+        private int liveQueued;
         private boolean live;
         private long liveFrom;
         private volatile boolean closed;
@@ -293,9 +294,10 @@ public class LiveHub {
             drain();
         }
 
+        /** Hello and catch-up replay: not counted against the live limit (replay is bounded by kept_events). */
         void offerDirect(String text) {
             synchronized (this) {
-                enqueue(text);
+                queue.addLast(text);
             }
             drain();
         }
@@ -327,15 +329,17 @@ public class LiveHub {
 
         /** Caller holds the monitor. */
         private void enqueue(String text) {
-            if (queue.size() >= maxQueuedEvents) {
+            if (liveQueued >= maxQueuedEvents) {
                 log.warn("Live client is too slow ({} events waiting); closing it so it catches up on reconnect",
                         queue.size());
                 queue.clear();
+                liveQueued = 0;
                 closed = true;
                 senders.execute(() -> close(new CloseStatus(4008, "too slow; reconnect with after=")));
                 return;
             }
             queue.addLast(text);
+            liveQueued++;
         }
 
         private void drain() {
@@ -352,21 +356,25 @@ public class LiveHub {
         private void sendAll() {
             try {
                 while (!closed) {
+                    // The newest tick goes first, then one queued message: a client with a long event backlog still
+                    // sees the world move (events are never dropped, only superseded ticks are).
+                    String tick = pendingTick.getAndSet(null);
                     String next;
-                    boolean tick = false;
                     synchronized (this) {
                         next = queue.pollFirst();
+                        if (next != null && liveQueued > 0) {
+                            liveQueued--;
+                        }
                     }
-                    if (next == null) {
-                        next = pendingTick.getAndSet(null);
-                        tick = next != null;
-                    }
-                    if (next == null) {
+                    if (tick == null && next == null) {
                         break;
                     }
-                    session.sendMessage(new TextMessage(next));
-                    if (tick) {
+                    if (tick != null) {
+                        session.sendMessage(new TextMessage(tick));
                         ticksSent.incrementAndGet();
+                    }
+                    if (next != null) {
+                        session.sendMessage(new TextMessage(next));
                     }
                 }
             } catch (IOException | RuntimeException e) {

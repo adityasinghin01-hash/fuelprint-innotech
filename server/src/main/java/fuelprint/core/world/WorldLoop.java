@@ -394,7 +394,7 @@ public class WorldLoop implements RunDriver, ClockControl {
         List<String> missing = needed.entrySet().stream().filter(e -> !e.getValue()).map(Map.Entry::getKey).toList();
         return missing.isEmpty() ? Optional.empty()
                 : Optional.of("The world cannot run yet: no " + String.join(", ", missing)
-                + " is installed. Start with the stub profile (tools/start-real.sh before join day uses stubs too).");
+                + " is installed. Until join day use the stub profile (the default) or fake mode (tools/start-fake.sh).");
     }
 
     @Override
