@@ -43,7 +43,7 @@ public class CommandLog {
         jdbc.update("INSERT INTO commands (command_id, command_type, actor, automatic, run_id, expected_revision, "
                         + "payload, request_digest, status, reason_code, receipt_json, received_utc) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                command.commandId(), command.commandType(), session.actor(), session.isAutomation() ? 1 : 0,
+                command.commandId(), command.commandType(), session.actorLabel(), session.isAutomation() ? 1 : 0,
                 command.runId(), command.expectedRevision(), write(digest.storedPayload()), digest.digest(),
                 receipt.status().name(), receipt.reasonCode(), write(receipt), WallTime.now(clock));
     }

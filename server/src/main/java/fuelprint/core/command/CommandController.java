@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import fuelprint.api.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * {@code POST /api/commands}: one command in, one receipt out (AGREEMENT section 3).
  *
- * <p>The sender comes only from the session ({@link SessionResolver}), never from the body or a header.
+ * <p>The sender comes only from the session ({@link SessionService#resolve}, the {@code fp_session}
+ * cookie; P3 provides the bean), never from the body or a header. With no {@code SessionService} bean every
+ * request is anonymous.
  * Fields like {@code actor} or {@code automatic} in the body are ignored, and no request can ever become
  * the {@code automation} actor.
  *
@@ -39,12 +42,12 @@ public class CommandController {
     private static final Logger log = LoggerFactory.getLogger(CommandController.class);
 
     private final CommandBus bus;
-    private final ObjectProvider<SessionResolver> resolvers;
+    private final ObjectProvider<SessionService> sessions;
     private final ObjectReader reader;
 
-    public CommandController(CommandBus bus, ObjectProvider<SessionResolver> resolvers, ObjectMapper mapper) {
+    public CommandController(CommandBus bus, ObjectProvider<SessionService> sessions, ObjectMapper mapper) {
         this.bus = bus;
-        this.resolvers = resolvers;
+        this.sessions = sessions;
         this.reader = mapper.reader().with(StreamReadFeature.STRICT_DUPLICATE_DETECTION);
     }
 
@@ -64,24 +67,24 @@ public class CommandController {
         return ResponseEntity.status(status).body(receipt);
     }
 
-    /** The first resolver's answer; anonymous if none answers or one fails. Never the automation session. */
+    /** The session service's answer; anonymous if there is none, it finds nothing or it fails. Never automation. */
     Session resolveSession(HttpServletRequest request) {
-        List<SessionResolver> ordered = resolvers.orderedStream().toList();
-        for (SessionResolver resolver : ordered) {
-            Optional<Session> found;
-            try {
-                found = resolver.resolve(request);
-            } catch (RuntimeException e) {
-                log.warn("Session resolver {} refused the request ({}); treating it as anonymous",
-                        resolver.getClass().getSimpleName(), e.getClass().getSimpleName());
-                return Session.anonymous();
-            }
-            if (found != null && found.isPresent()) {
-                Session session = found.get();
-                return session.isAutomation() ? Session.anonymous() : session;
-            }
+        SessionService service = sessions.getIfAvailable();
+        if (service == null) {
+            return Session.anonymous();
         }
-        return Session.anonymous();
+        Optional<Session> found;
+        try {
+            found = service.resolve(request);
+        } catch (RuntimeException e) {
+            log.warn("The session service refused the request ({}); treating it as anonymous",
+                    e.getClass().getSimpleName());
+            return Session.anonymous();
+        }
+        if (found == null || found.isEmpty() || found.get().isAutomation()) {
+            return Session.anonymous();
+        }
+        return found.get();
     }
 
     private Command parse(byte[] body) throws Unreadable {
