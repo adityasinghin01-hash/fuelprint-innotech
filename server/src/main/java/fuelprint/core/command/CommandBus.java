@@ -158,22 +158,31 @@ public class CommandBus {
         }
         // Receipt first, then the broadcast event (AGREEMENT section 3).
         future.complete(decision.receipt());
-        if (decision.committed() != null) {
-            publishAfterCommit(decision.committed());
-        }
+        publishAfterCommit(decision);
     }
 
     /**
-     * After commit: one {@link RecordSaved} per saved record in cursor order (CORE-API section 1), then the
-     * {@link CommandCommitted} for the whole command. A failing listener never undoes the commit.
+     * After commit: one {@link RecordSaved} per saved record in cursor order (CORE-API section 1), then
+     * {@link EventsCommitted} (the live socket), then the {@link CommandCommitted} for the whole command.
+     * A failing listener never undoes the commit.
      */
-    private void publishAfterCommit(CommandCommitted committed) {
-        Receipt receipt = committed.receipt();
-        for (EventRow event : committed.events()) {
-            publish(new RecordSaved(event.recordType(), event.recordId(), event.revision(), event.runId(),
-                    receipt.actor(), receipt.automatic()), committed.commandId());
+    private void publishAfterCommit(Decision decision) {
+        if (decision.committed() == null) {
+            return;
         }
-        publish(committed, committed.commandId());
+        publishEvents(decision.saved(), decision.committed().commandId());
+        publish(decision.committed(), decision.committed().commandId());
+    }
+
+    private void publishEvents(List<CommittedEvent> saved, String commandId) {
+        for (CommittedEvent committed : saved) {
+            EventRow event = committed.event();
+            publish(new RecordSaved(event.recordType(), event.recordId(), event.revision(), event.runId(),
+                    event.actor(), committed.automatic()), commandId);
+        }
+        if (!saved.isEmpty()) {
+            publish(new EventsCommitted(saved), commandId);
+        }
     }
 
     private void publish(Object event, String commandId) {
@@ -184,8 +193,11 @@ public class CommandBus {
         }
     }
 
-    /** The receipt and, if something was stored, the event to publish after commit. */
-    private record Decision(Receipt receipt, CommandCommitted committed) {
+    /** The receipt and, if something was stored, what to publish after commit. */
+    private record Decision(Receipt receipt, CommandCommitted committed, List<CommittedEvent> saved) {
+        Decision(Receipt receipt, CommandCommitted committed) {
+            this(receipt, committed, List.of());
+        }
     }
 
     /** Thrown inside the transaction to roll it back and store a rejection instead. */
@@ -206,25 +218,26 @@ public class CommandBus {
         CommandHandler handler = registry.find(command.commandType()).orElse(null);
         Set<String> privateFields = handler == null ? Set.of() : handler.privatePayloadFields();
         RequestDigest.Result digest = digests.of(command, privateFields, handler == null);
+        String actor = handler == null ? session.actorLabel() : session.actorFor(handler.allowedRoles());
 
         var existing = commandLog.find(command.commandId());
         if (existing.isPresent()) {
-            return new Decision(replay(existing.get(), digest, command, session), null);
+            return new Decision(replay(existing.get(), digest, command, session, actor), null);
         }
         if (handler == null) {
-            return storeRejection(command, session, digest, Rejection.invalid(
+            return storeRejection(command, session, actor, digest, Rejection.invalid(
                     "The server does not know the command '" + command.commandType() + "'."));
         }
         Rejection roleProblem = roleProblem(command, session, handler);
         if (roleProblem != null) {
-            return storeRejection(command, session, digest, roleProblem);
+            return storeRejection(command, session, actor, digest, roleProblem);
         }
         try {
-            return transactions.execute(status -> apply(command, session, handler, digest));
+            return transactions.execute(status -> apply(command, session, actor, handler, digest));
         } catch (Refused refused) {
-            return storeRejection(command, session, digest, refused.rejection);
+            return storeRejection(command, session, actor, digest, refused.rejection);
         } catch (StaleRevisionException stale) {
-            return storeRejection(command, session, digest, Rejection.staleRevision(staleText(stale.key(),
+            return storeRejection(command, session, actor, digest, Rejection.staleRevision(staleText(stale.key(),
                     stale.expected(), stale.actual())));
         }
     }
@@ -252,7 +265,7 @@ public class CommandBus {
     }
 
     private Receipt replay(CommandLog.StoredCommand stored, RequestDigest.Result digest, Command command,
-                           Session session) {
+                           Session session, String actor) {
         if (!stored.requestDigest().equals(digest.digest())) {
             String text = digests.fromEarlierStart(stored.requestDigest())
                     ? "This command_id was decided before the server restarted and cannot be checked again. "
@@ -260,7 +273,7 @@ public class CommandBus {
                     : "This command_id was already used for a different command. Send it with a new command_id.";
             return unsaved(command.commandId(), session, ReasonCode.INVALID, text);
         }
-        if (!stored.actor().equals(session.actorLabel())) {
+        if (!stored.actor().equals(actor)) {
             return unsaved(command.commandId(), session, ReasonCode.NOT_ALLOWED,
                     "This command_id was sent by someone else.");
         }
@@ -287,7 +300,8 @@ public class CommandBus {
         return Rejection.notAllowed("Your session (" + held + ") cannot send " + type + ". It needs: " + needed + ".");
     }
 
-    private Decision apply(Command command, Session session, CommandHandler handler, RequestDigest.Result digest) {
+    private Decision apply(Command command, Session session, String actor, CommandHandler handler,
+                           RequestDigest.Result digest) {
         RecordKey subject = handler.revisionSubject(command);
         Long expected = command.expectedRevision();
         if (expected != null) {
@@ -310,19 +324,104 @@ public class CommandBus {
         HandlerResult result = (HandlerResult) outcome;
         Map<RecordKey, EventDraft> eventByRecord = matchEvents(result);
 
-        List<RecordRef> refs = new ArrayList<>();
-        List<EventRow> saved = new ArrayList<>();
-        for (RecordChange change : result.records()) {
-            StoredRecord record = store.save(change, session.actorLabel(), command.commandId());
-            EventDraft draft = eventByRecord.get(change.key());
-            saved.add(events.append(draft.eventType(), record, draft.simTimeS(), session.actorLabel(), command.commandId()));
-            refs.add(record.ref());
-        }
+        List<CommittedEvent> saved = saveAll(result, eventByRecord, actor, session.isAutomation(),
+                command.commandId(), false);
+        List<RecordRef> refs = saved.stream()
+                .map(c -> new RecordRef(c.event().recordType(), c.event().recordId(), c.event().revision())).toList();
         Receipt receipt = new Receipt(Ids.newId(), command.commandId(), Receipt.Status.APPLIED, null, null, refs,
-                session.actorLabel(), session.isAutomation());
-        commandLog.insert(command, session, digest, receipt);
+                actor, session.isAutomation());
+        commandLog.insert(command, actor, session.isAutomation(), digest, receipt);
         return new Decision(receipt, new CommandCommitted(command.commandId(), command.commandType(),
-                command.runId(), receipt, saved));
+                command.runId(), receipt, saved.stream().map(CommittedEvent::event).toList()), saved);
+    }
+
+    /** Saves every record of {@code result} and its event; inside the caller's transaction. */
+    private List<CommittedEvent> saveAll(HandlerResult result, Map<RecordKey, EventDraft> eventByRecord, String actor,
+                                         boolean automatic, String commandId, boolean appendToLatest) {
+        List<CommittedEvent> saved = new ArrayList<>();
+        for (RecordChange change : result.records()) {
+            RecordChange effective = appendToLatest
+                    ? new RecordChange(change.type(), change.id(), change.runId(),
+                    store.latestRevision(change.type(), change.id()), change.fields())
+                    : change;
+            StoredRecord record = store.save(effective, actor, commandId);
+            EventDraft draft = eventByRecord.get(change.key());
+            EventRow event = events.append(draft.eventType(), record, draft.simTimeS(), actor, commandId);
+            saved.add(new CommittedEvent(event, record.body(), automatic));
+        }
+        return saved;
+    }
+
+    /**
+     * Core only (the world loop, recovery, defaults and fake replay; an ArchUnit test keeps other packages out):
+     * saves records and their events without a command, as {@code actor}, in one transaction on the command
+     * thread, then publishes {@link RecordSaved} and {@link EventsCommitted} after commit.
+     *
+     * @param appendToLatest save each record as the next revision of whatever is latest (fake replay), instead
+     *                       of requiring {@code basedOnRevision} to match
+     */
+    public CompletableFuture<List<CommittedEvent>> saveWithoutCommand(String actor, HandlerResult result,
+                                                                      boolean appendToLatest) {
+        boolean automatic = Session.AUTOMATION_ACTOR.equals(actor);
+        CompletableFuture<List<CommittedEvent>> future = new CompletableFuture<>();
+        Runnable task = () -> {
+            List<CommittedEvent> saved;
+            try {
+                Map<RecordKey, EventDraft> eventByRecord = matchEvents(result);
+                saved = transactions.execute(status ->
+                        saveAll(result, eventByRecord, actor, automatic, null, appendToLatest));
+            } catch (RuntimeException e) {
+                log.error("Saving {} records without a command failed; nothing was saved", result.records().size(), e);
+                future.completeExceptionally(e);
+                return;
+            }
+            future.complete(saved);
+            publishEvents(saved, null);
+        };
+        try {
+            executor.execute(task);
+        } catch (RejectedExecutionException e) {
+            future.completeExceptionally(new IllegalStateException("The command bus is shut down", e));
+        }
+        return future;
+    }
+
+    /**
+     * Core only (fake replay): stores a recorded command exactly as it was decided, with its records, events and
+     * receipt, in one transaction on the command thread. Nothing is checked; the handlers do not run.
+     */
+    public CompletableFuture<Receipt> saveRecordedCommand(RecordedCommand recorded) {
+        CompletableFuture<Receipt> future = new CompletableFuture<>();
+        Runnable task = () -> {
+            boolean automatic = Session.AUTOMATION_ACTOR.equals(recorded.actor());
+            Decision decision;
+            try {
+                decision = transactions.execute(status -> {
+                    Map<RecordKey, EventDraft> eventByRecord = matchEvents(recorded.result());
+                    List<CommittedEvent> saved = saveAll(recorded.result(), eventByRecord, recorded.actor(),
+                            automatic, recorded.commandId(), true);
+                    List<RecordRef> refs = saved.stream().map(c -> new RecordRef(c.event().recordType(),
+                            c.event().recordId(), c.event().revision())).toList();
+                    Receipt receipt = new Receipt(Ids.newId(), recorded.commandId(), recorded.status(),
+                            recorded.reasonCode(), recorded.reasonText(), refs, recorded.actor(), automatic);
+                    commandLog.insertRecorded(recorded, receipt);
+                    return new Decision(receipt, new CommandCommitted(recorded.commandId(), recorded.commandType(),
+                            recorded.runId(), receipt, saved.stream().map(CommittedEvent::event).toList()), saved);
+                });
+            } catch (RuntimeException e) {
+                log.error("Recorded command {} could not be stored; nothing was saved", recorded.commandId(), e);
+                future.completeExceptionally(e);
+                return;
+            }
+            future.complete(decision.receipt());
+            publishAfterCommit(decision);
+        };
+        try {
+            executor.execute(task);
+        } catch (RejectedExecutionException e) {
+            future.completeExceptionally(new IllegalStateException("The command bus is shut down", e));
+        }
+        return future;
     }
 
     /** Checks that every record is saved once, has exactly one event, and every event belongs to a record. */
@@ -349,14 +448,16 @@ public class CommandBus {
         return byRecord;
     }
 
-    private Decision storeRejection(Command command, Session session, RequestDigest.Result digest, Rejection rejection) {
+    private Decision storeRejection(Command command, Session session, String actor, RequestDigest.Result digest,
+                                    Rejection rejection) {
         if (!session.isSignedIn()) {
             // No session at all: never write anything for it (it can never be applied anyway).
             return new Decision(unsaved(command.commandId(), session, rejection.reasonCode(), rejection.reasonText()), null);
         }
         Receipt receipt = new Receipt(Ids.newId(), command.commandId(), Receipt.Status.REJECTED,
-                rejection.reasonCode(), rejection.reasonText(), List.of(), session.actorLabel(), session.isAutomation());
-        transactions.executeWithoutResult(status -> commandLog.insert(command, session, digest, receipt));
+                rejection.reasonCode(), rejection.reasonText(), List.of(), actor, session.isAutomation());
+        transactions.executeWithoutResult(status ->
+                commandLog.insert(command, actor, session.isAutomation(), digest, receipt));
         return new Decision(receipt, new CommandCommitted(command.commandId(), command.commandType(),
                 command.runId(), receipt, List.of()));
     }

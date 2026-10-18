@@ -8,12 +8,14 @@ import fuelprint.core.CoreSpringTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Base for alerts tests that need their own {@code sms.json}: the subclass gives the file's text and
  * registers it with a {@code @DynamicPropertySource} that calls {@link #configure}.
  */
 @SpringBootTest
+@ActiveProfiles("real")
 @AutoConfigureMockMvc
 @Import(AlertsTestConfig.class)
 abstract class AlertsConfiguredSpringTest extends AlertsFlow {

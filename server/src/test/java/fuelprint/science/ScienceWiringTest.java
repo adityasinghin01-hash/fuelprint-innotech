@@ -11,8 +11,10 @@ import fuelprint.api.WorldSetup;
 import fuelprint.core.CoreSpringTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 
 /** The real science beans are wired in the normal (non-stub) profile and drive a run through the api interfaces only. */
+@ActiveProfiles("real")
 class ScienceWiringTest extends CoreSpringTest {
 
     @Autowired
