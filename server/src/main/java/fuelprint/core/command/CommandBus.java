@@ -16,6 +16,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import fuelprint.api.RecordSaved;
 import fuelprint.core.Ids;
 import fuelprint.core.store.EventLog;
 import fuelprint.core.store.EventRow;
@@ -50,7 +51,8 @@ import org.springframework.transaction.support.TransactionTemplate;
  *   <li>The handler decides. Its records, one event per record, and the receipt are saved in ONE
  *       transaction. If anything throws, nothing at all is saved and the (unstored) receipt is REJECTED
  *       {@code SERVER_ERROR}, so resending is safe.</li>
- *   <li>Only after the commit, a {@link CommandCommitted} Spring event is published.</li>
+ *   <li>Only after the commit, one {@link RecordSaved} Spring event per saved record, then a
+ *       {@link CommandCommitted} for the command, are published.</li>
  * </ol>
  * Every rejection from step 3 on is stored with its receipt (that is what the automation log shows),
  * but saves no record and no event. Requests with no session (anonymous) never write anything.
@@ -157,11 +159,28 @@ public class CommandBus {
         // Receipt first, then the broadcast event (AGREEMENT section 3).
         future.complete(decision.receipt());
         if (decision.committed() != null) {
-            try {
-                publisher.publishEvent(decision.committed());
-            } catch (RuntimeException e) {
-                log.error("A listener failed after command {} committed", command.commandId(), e);
-            }
+            publishAfterCommit(decision.committed());
+        }
+    }
+
+    /**
+     * After commit: one {@link RecordSaved} per saved record in cursor order (CORE-API section 1), then the
+     * {@link CommandCommitted} for the whole command. A failing listener never undoes the commit.
+     */
+    private void publishAfterCommit(CommandCommitted committed) {
+        Receipt receipt = committed.receipt();
+        for (EventRow event : committed.events()) {
+            publish(new RecordSaved(event.recordType(), event.recordId(), event.revision(), event.runId(),
+                    receipt.actor(), receipt.automatic()), committed.commandId());
+        }
+        publish(committed, committed.commandId());
+    }
+
+    private void publish(Object event, String commandId) {
+        try {
+            publisher.publishEvent(event);
+        } catch (RuntimeException e) {
+            log.error("A listener failed after command {} committed", commandId, e);
         }
     }
 
@@ -241,7 +260,7 @@ public class CommandBus {
                     : "This command_id was already used for a different command. Send it with a new command_id.";
             return unsaved(command.commandId(), session, ReasonCode.INVALID, text);
         }
-        if (!stored.actor().equals(session.actor())) {
+        if (!stored.actor().equals(session.actorLabel())) {
             return unsaved(command.commandId(), session, ReasonCode.NOT_ALLOWED,
                     "This command_id was sent by someone else.");
         }
@@ -294,13 +313,13 @@ public class CommandBus {
         List<RecordRef> refs = new ArrayList<>();
         List<EventRow> saved = new ArrayList<>();
         for (RecordChange change : result.records()) {
-            StoredRecord record = store.save(change, session.actor(), command.commandId());
+            StoredRecord record = store.save(change, session.actorLabel(), command.commandId());
             EventDraft draft = eventByRecord.get(change.key());
-            saved.add(events.append(draft.eventType(), record, draft.simTimeS(), session.actor(), command.commandId()));
+            saved.add(events.append(draft.eventType(), record, draft.simTimeS(), session.actorLabel(), command.commandId()));
             refs.add(record.ref());
         }
         Receipt receipt = new Receipt(Ids.newId(), command.commandId(), Receipt.Status.APPLIED, null, null, refs,
-                session.actor(), session.isAutomation());
+                session.actorLabel(), session.isAutomation());
         commandLog.insert(command, session, digest, receipt);
         return new Decision(receipt, new CommandCommitted(command.commandId(), command.commandType(),
                 command.runId(), receipt, saved));
@@ -336,7 +355,7 @@ public class CommandBus {
             return new Decision(unsaved(command.commandId(), session, rejection.reasonCode(), rejection.reasonText()), null);
         }
         Receipt receipt = new Receipt(Ids.newId(), command.commandId(), Receipt.Status.REJECTED,
-                rejection.reasonCode(), rejection.reasonText(), List.of(), session.actor(), session.isAutomation());
+                rejection.reasonCode(), rejection.reasonText(), List.of(), session.actorLabel(), session.isAutomation());
         transactions.executeWithoutResult(status -> commandLog.insert(command, session, digest, receipt));
         return new Decision(receipt, new CommandCommitted(command.commandId(), command.commandType(),
                 command.runId(), receipt, List.of()));
@@ -345,7 +364,7 @@ public class CommandBus {
     /** A REJECTED receipt that is not stored (the command could not be identified or nothing was decided). */
     static Receipt unsaved(String commandId, Session session, String reasonCode, String reasonText) {
         return new Receipt(Ids.newId(), commandId, Receipt.Status.REJECTED, reasonCode, reasonText, List.of(),
-                session.actor(), session.isAutomation());
+                session.actorLabel(), session.isAutomation());
     }
 
     private static String staleText(RecordKey key, long expected, long latest) {

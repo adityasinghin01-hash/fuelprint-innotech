@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import fuelprint.api.RecordSaved;
 import fuelprint.core.db.DataDirectory;
 import fuelprint.core.store.RecordRef;
 import fuelprint.core.store.RecordStore;
@@ -45,6 +46,18 @@ public class ChainListener {
         this.dataDirectory = dataDirectory;
         this.bus = bus;
         this.store = store;
+    }
+
+    /** Every RecordSaved seen, with whether a separate connection could already see the record. */
+    public record SavedSeen(RecordSaved event, boolean visible, boolean transactionActive) {
+    }
+
+    static final java.util.List<SavedSeen> SAVED = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+    @EventListener
+    public void onRecordSaved(RecordSaved saved) {
+        SAVED.add(new SavedSeen(saved, TestHandlers.committedElsewhere(dataDirectory, saved.recordType(), saved.recordId()),
+                TransactionSynchronizationManager.isActualTransactionActive()));
     }
 
     @EventListener

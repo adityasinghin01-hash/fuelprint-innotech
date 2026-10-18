@@ -105,6 +105,10 @@ class ApiTypesTest {
         JsonNode channel = fixture("attempt.json").path("channels").get(0);
         ChannelVerdict verdict = roundTrip(channel, ChannelVerdict.class);
         assertThat(verdict.volumeL()).isEqualTo(0.25);
+        VehicleState vehicle = roundTrip(fixture("tick.json").path("payload").path("vehicles").get(0), VehicleState.class);
+        assertThat(vehicle.pilot()).isEqualTo(Pilot.VISITOR);
+        assertThat(vehicle.pose().yawDeg()).isEqualTo(90);
+        assertThat(vehicle.leaseHolder()).isEqualTo("visitor-7f3a");
         WindNow wind = roundTrip(fixture("tick.json").path("payload").path("wind"), WindNow.class);
         assertThat(wind).isEqualTo(new WindNow(270, 3.0));
     }
@@ -115,6 +119,28 @@ class ApiTypesTest {
         window.put("id", fixture("window.json").path("id").asText());
         window.putNull("sensor_or_vehicle_id"); // not in AGREEMENT section 6; see the P1 report
         roundTrip(window, Window.class);
+    }
+
+    @Test
+    void coreHookTypesMatchCoreApi() {
+        assertThat(RunEnded.Reason.values()).extracting(Enum::name)
+                .containsExactly("COMPLETED", "ABORTED", "RESET", "INTERRUPTED");
+        JsonNode saved = MAPPER.valueToTree(new RecordSaved("mission", "m1", 2, null, "automation", true));
+        assertThat(saved.fieldNames()).toIterable()
+                .containsExactly("record_type", "record_id", "revision", "run_id", "actor", "automatic");
+        JsonNode run = MAPPER.valueToTree(new RunContext("r1", "SC1-NIGHT-PLUME", "BLIND", 7));
+        assertThat(run.fieldNames()).toIterable().containsExactly("run_id", "preset_id", "mode", "seed");
+        assertThat(java.util.List.of(AutomationSettings.AUTO_PROPOSE, AutomationSettings.AUTO_AUTOPILOT,
+                AutomationSettings.AUTO_CAPTURE, AutomationSettings.AUTO_SEAL, AutomationSettings.AUTO_ALERTS,
+                AutomationSettings.AUTO_RETRAIN)).allMatch(name -> fixtureHas("automation_settings.json", name));
+    }
+
+    static boolean fixtureHas(String file, String field) {
+        try {
+            return fixture(file).has(field);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Test

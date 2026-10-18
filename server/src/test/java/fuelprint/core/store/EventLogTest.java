@@ -25,7 +25,7 @@ class EventLogTest extends CoreSpringTest {
     // 10
     @Test
     void eventCursorsStrictlyIncrease() {
-        Session analyst = Session.human("analyst@laptop-1", Set.of(Role.ANALYST));
+        Session analyst = Session.human("s-test", "analyst@laptop-1", Set.of(Role.ANALYST));
         long before = events.lastCursor();
         List<Long> cursors = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -51,7 +51,7 @@ class EventLogTest extends CoreSpringTest {
 
     @Test
     void anEventCarriesTheContractFields() {
-        Session analyst = Session.human("analyst@laptop-1", Set.of(Role.ANALYST));
+        Session analyst = Session.human("s-test", "analyst@laptop-1", Set.of(Role.ANALYST));
         String noteId = UUID.randomUUID().toString();
         Command command = new Command(Command.SCHEMA_VERSION, UUID.randomUUID().toString(), "test_auto_note", null,
                 null, JsonNodeFactory.instance.objectNode().put("note_id", noteId).put("text", "x"));

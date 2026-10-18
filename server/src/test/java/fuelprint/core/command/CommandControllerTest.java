@@ -49,8 +49,8 @@ class CommandControllerTest extends CoreSpringTest {
         String commandId = uuid();
         String noteId = uuid();
         JsonNode receipt = send(postJson(noteCommand(commandId, noteId, ""))
-                .header(TestHeaderSessionResolver.ACTOR, "analyst@laptop-1")
-                .header(TestHeaderSessionResolver.ROLES, "analyst"), 200);
+                .header(TestHeaderSessionService.ACTOR, "analyst@laptop-1")
+                .header(TestHeaderSessionService.ROLES, "analyst"), 200);
 
         assertThat(receipt.path("status").asText()).isEqualTo("APPLIED");
         assertThat(receipt.path("command_id").asText()).isEqualTo(commandId);
@@ -72,13 +72,13 @@ class CommandControllerTest extends CoreSpringTest {
                 postJson(noteCommand(uuid(), uuid(), extra)).header("X-Actor", "automation")
                         .header("X-Role", "automation").header("X-Automatic", "true"),
                 // claims through the session resolver itself: reserved actor label
-                postJson(noteCommand(uuid(), uuid(), extra)).header(TestHeaderSessionResolver.ACTOR, "automation")
-                        .header(TestHeaderSessionResolver.ROLES, "analyst"),
+                postJson(noteCommand(uuid(), uuid(), extra)).header(TestHeaderSessionService.ACTOR, "automation")
+                        .header(TestHeaderSessionService.ROLES, "analyst"),
                 // ... or the automation role
-                postJson(noteCommand(uuid(), uuid(), extra)).header(TestHeaderSessionResolver.ACTOR, "mallory")
-                        .header(TestHeaderSessionResolver.ROLES, "automation"),
-                postJson(noteCommand(uuid(), uuid(), extra)).header(TestHeaderSessionResolver.ACTOR, " Automation ")
-                        .header(TestHeaderSessionResolver.ROLES, "analyst,automation"),
+                postJson(noteCommand(uuid(), uuid(), extra)).header(TestHeaderSessionService.ACTOR, "mallory")
+                        .header(TestHeaderSessionService.ROLES, "automation"),
+                postJson(noteCommand(uuid(), uuid(), extra)).header(TestHeaderSessionService.ACTOR, " Automation ")
+                        .header(TestHeaderSessionService.ROLES, "analyst,automation"),
                 // a cookie claiming it
                 postJson(noteCommand(uuid(), uuid(), extra)).cookie(new jakarta.servlet.http.Cookie("fp_session", "automation")),
         };
@@ -100,10 +100,10 @@ class CommandControllerTest extends CoreSpringTest {
     @Test
     void theSameCommandOverHttpTwiceReturnsTheSameReceipt() throws Exception {
         String json = noteCommand(uuid(), uuid(), "");
-        JsonNode first = send(postJson(json).header(TestHeaderSessionResolver.ACTOR, "analyst@laptop-1")
-                .header(TestHeaderSessionResolver.ROLES, "analyst"), 200);
-        JsonNode second = send(postJson(json).header(TestHeaderSessionResolver.ACTOR, "analyst@laptop-1")
-                .header(TestHeaderSessionResolver.ROLES, "analyst"), 200);
+        JsonNode first = send(postJson(json).header(TestHeaderSessionService.ACTOR, "analyst@laptop-1")
+                .header(TestHeaderSessionService.ROLES, "analyst"), 200);
+        JsonNode second = send(postJson(json).header(TestHeaderSessionService.ACTOR, "analyst@laptop-1")
+                .header(TestHeaderSessionService.ROLES, "analyst"), 200);
         assertThat(second).isEqualTo(first);
     }
 
@@ -131,8 +131,8 @@ class CommandControllerTest extends CoreSpringTest {
         String commandId = uuid();
         String json = "{\"schema_version\":\"fp/1\",\"command_id\":\"" + commandId + "\",\"command_type\":\"test_throws\","
                 + "\"payload\":{}}";
-        JsonNode receipt = send(postJson(json).header(TestHeaderSessionResolver.ACTOR, "analyst@laptop-1")
-                .header(TestHeaderSessionResolver.ROLES, "analyst"), 500);
+        JsonNode receipt = send(postJson(json).header(TestHeaderSessionService.ACTOR, "analyst@laptop-1")
+                .header(TestHeaderSessionService.ROLES, "analyst"), 500);
         assertThat(receipt.path("reason_code").asText()).isEqualTo("SERVER_ERROR");
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM commands WHERE command_id = ?", Integer.class, commandId))
                 .isZero();

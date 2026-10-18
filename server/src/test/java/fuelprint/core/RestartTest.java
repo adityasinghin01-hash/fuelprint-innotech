@@ -37,7 +37,7 @@ class RestartTest {
     @Test
     void dataSurvivesARestart() {
         Path dataDir = CoreSpringTest.TempFolders.create("fp-restart-");
-        Session analyst = Session.human("analyst@laptop-1", Set.of(Role.ANALYST));
+        Session analyst = Session.human("s-test", "analyst@laptop-1", Set.of(Role.ANALYST));
         String noteId = UUID.randomUUID().toString();
         String looseId = UUID.randomUUID().toString();
         Command command = new Command(Command.SCHEMA_VERSION, UUID.randomUUID().toString(), "test_auto_note", null,

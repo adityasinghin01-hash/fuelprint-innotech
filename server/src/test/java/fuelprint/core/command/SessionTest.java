@@ -12,25 +12,31 @@ class SessionTest {
     @Test
     void aPersonsSessionCanNeverBeTheAutomationActor() {
         for (String reserved : new String[] {"automation", "Automation", " AUTOMATION ", "anonymous"}) {
-            assertThatThrownBy(() -> Session.human(reserved, Set.of(Role.ANALYST)))
+            assertThatThrownBy(() -> Session.human("s-test", reserved, Set.of(Role.ANALYST)))
                     .isInstanceOf(IllegalArgumentException.class);
         }
-        assertThatThrownBy(() -> Session.human("mallory", Set.of(Role.AUTOMATION)))
+        assertThatThrownBy(() -> Session.human("s-test", "mallory", Set.of(Role.AUTOMATION)))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> Session.human("mallory", Set.of(Role.ANALYST, Role.AUTOMATION)))
+        assertThatThrownBy(() -> Session.human("s-test", "mallory", Set.of(Role.ANALYST, Role.AUTOMATION)))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> Session.human("nobody", Set.of())).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Session.human("s-test", "nobody", Set.of())).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Session.human(" ", "someone", Set.of(Role.GUEST))).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void onlyTheAutomationSessionIsAutomatic() {
-        Session person = Session.human("supervisor@laptop-1", Set.of(Role.SUPERVISOR, Role.ANALYST));
+        Session person = Session.human("s-test", "supervisor@laptop-1", Set.of(Role.SUPERVISOR, Role.ANALYST));
         assertThat(person.isAutomation()).isFalse();
+        assertThat(person.sessionId()).isEqualTo("s-test");
+        assertThat(person.actorLabel()).isEqualTo("supervisor@laptop-1");
+        assertThat(person.toString()).doesNotContain("s-test");
+        assertThat(Session.anonymous().sessionId()).isNull();
+        assertThat(Session.automation().sessionId()).isNull();
         assertThat(person.roles()).containsExactlyInAnyOrder(Role.SUPERVISOR, Role.ANALYST);
         assertThat(Session.anonymous().isAutomation()).isFalse();
         assertThat(Session.anonymous().isSignedIn()).isFalse();
         assertThat(Session.automation().isAutomation()).isTrue();
-        assertThat(Session.automation().actor()).isEqualTo("automation");
+        assertThat(Session.automation().actorLabel()).isEqualTo("automation");
         assertThat(Session.automation().roles()).containsExactly(Role.AUTOMATION);
     }
 

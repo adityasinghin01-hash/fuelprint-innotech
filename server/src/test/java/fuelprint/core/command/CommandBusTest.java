@@ -27,9 +27,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 class CommandBusTest extends CoreSpringTest {
 
-    static final Session ANALYST = Session.human("analyst@laptop-1", Set.of(Role.ANALYST));
-    static final Session SUPERVISOR = Session.human("supervisor@laptop-1", Set.of(Role.SUPERVISOR));
-    static final Session VISITOR = Session.human("visitor-7f3a", Set.of(Role.VISITOR));
+    static final Session ANALYST = Session.human("s-test", "analyst@laptop-1", Set.of(Role.ANALYST));
+    static final Session SUPERVISOR = Session.human("s-test", "supervisor@laptop-1", Set.of(Role.SUPERVISOR));
+    static final Session VISITOR = Session.human("s-test", "visitor-7f3a", Set.of(Role.VISITOR));
 
     @Autowired CommandBus bus;
     @Autowired AutomationBus automation;
@@ -96,7 +96,7 @@ class CommandBusTest extends CoreSpringTest {
     void sameCommandIdFromAnotherSenderIsRefused() {
         Command create = command(TestHandlers.AutoNote.TYPE, note(uuid(), "mine"), 0L);
         Receipt first = bus.send(create, ANALYST);
-        Session other = Session.human("analyst@laptop-9", Set.of(Role.ANALYST));
+        Session other = Session.human("s-test", "analyst@laptop-9", Set.of(Role.ANALYST));
 
         Receipt second = bus.send(create, other);
 
@@ -260,6 +260,38 @@ class CommandBusTest extends CoreSpringTest {
         assertThat(ChainListener.PROBES.get(noteId)).isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    void oneRecordSavedEventPerSavedRecordIsPublishedAfterCommit() throws Exception {
+        String noteId = uuid();
+        Receipt human = bus.send(command(TestHandlers.AutoNote.TYPE, note(noteId, "v1"), null), ANALYST);
+        Receipt auto = automation.submit(TestHandlers.AutoNote.TYPE, null, note(noteId, "v2")).get(10, TimeUnit.SECONDS);
+        bus.awaitIdle();
+
+        List<ChainListener.SavedSeen> seen = ChainListener.SAVED.stream()
+                .filter(s -> s.event().recordId().equals(noteId)).toList();
+        assertThat(seen).extracting(s -> s.event().revision()).containsExactly(1L, 2L);
+        assertThat(seen).allSatisfy(s -> {
+            assertThat(s.visible()).as("committed before publishing").isTrue();
+            assertThat(s.transactionActive()).isFalse();
+            assertThat(s.event().recordType()).isEqualTo(TestHandlers.NOTE);
+            assertThat(s.event().runId()).isNull();
+        });
+        assertThat(seen.get(0).event().actor()).isEqualTo(human.actor()).isEqualTo("analyst@laptop-1");
+        assertThat(seen.get(0).event().automatic()).isFalse();
+        assertThat(seen.get(1).event().actor()).isEqualTo(auto.actor()).isEqualTo("automation");
+        assertThat(seen.get(1).event().automatic()).isTrue();
+    }
+
+    @Test
+    void rejectedAndFailedCommandsPublishNoRecordSaved() {
+        String noteId = uuid();
+        bus.send(command(TestHandlers.HumanNote.TYPE, note(noteId, "x"), null), VISITOR);
+        bus.send(command(TestHandlers.AutoNote.TYPE, note(noteId, "x"), 5L), ANALYST);
+        bus.send(command(TestHandlers.Throws.TYPE, JsonNodeFactory.instance.objectNode(), null), ANALYST);
+        bus.awaitIdle();
+        assertThat(ChainListener.SAVED).noneMatch(s -> s.event().recordId().equals(noteId));
+    }
+
     // 8
     @Test
     void handlerThrowingSavesNothingNotEvenAReceipt() {
@@ -375,7 +407,7 @@ class CommandBusTest extends CoreSpringTest {
     void privatePayloadFieldsAreNeverStoredButIdempotencyStillWorks() {
         String phone = "+919812345678";
         String subscriptionId = uuid();
-        Session guest = Session.human("guest-1a2b", Set.of(Role.GUEST));
+        Session guest = Session.human("s-test", "guest-1a2b", Set.of(Role.GUEST));
         ObjectNode payload = JsonNodeFactory.instance.objectNode()
                 .put("phone_number", phone).put("subscription_id", subscriptionId);
         Command command = command(TestHandlers.PrivateField.TYPE, payload, null);

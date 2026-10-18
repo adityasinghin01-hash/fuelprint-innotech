@@ -31,6 +31,11 @@ public class AutomationBus {
         return submit(commandType, payload, null, null);
     }
 
+    /** Queues {@code commandType} for {@code runId} (may be null) with {@code payload}; the CORE-API section 1 form. */
+    public CompletableFuture<Receipt> submit(String commandType, String runId, ObjectNode payload) {
+        return submit(commandType, payload, runId, null);
+    }
+
     /**
      * Queues {@code commandType} with {@code payload} for {@code runId} (may be null), checked against
      * {@code expectedRevision} of the handler's subject record (may be null).
