@@ -25,7 +25,7 @@ class DatabaseConfigTest extends CoreSpringTest {
     @Autowired JdbcTemplate jdbc;
 
     @Test
-    void everyPooledConnectionHasWalFullSyncAndForeignKeys() throws Exception {
+    void everyPooledConnectionHasWalFullSyncForeignKeysAndSecureDelete() throws Exception {
         List<Connection> held = new ArrayList<>();
         try {
             for (int i = 0; i < DatabaseConfig.POOL_SIZE; i++) {
@@ -34,6 +34,7 @@ class DatabaseConfigTest extends CoreSpringTest {
                 assertThat(pragma(connection, "journal_mode")).isEqualToIgnoringCase("wal");
                 assertThat(pragma(connection, "synchronous")).isEqualTo("2"); // FULL
                 assertThat(pragma(connection, "foreign_keys")).isEqualTo("1");
+                assertThat(pragma(connection, "secure_delete")).as("deleted rows are overwritten").isEqualTo("1");
             }
         } finally {
             for (Connection connection : held) {
@@ -76,5 +77,22 @@ class DatabaseConfigTest extends CoreSpringTest {
             rs.next();
             return rs.getString(1);
         }
+    }
+
+    @Test
+    void deletedTextIsOverwrittenNotLeftInTheFile() throws Exception {
+        String secret = "PHONE-SECRET-" + java.util.UUID.randomUUID();
+        Path file = DATA_DIR.resolve("secure-delete-check.db");
+        try (Connection connection = DatabaseConfig.create(new DataDirectory(DATA_DIR.resolve("sd"))).getConnection()) {
+            try (Statement statement = connection.createStatement()) {
+                statement.execute("CREATE TABLE contact (v TEXT)");
+                statement.execute("INSERT INTO contact VALUES ('" + secret + "')");
+                statement.execute("DELETE FROM contact");
+                statement.execute("PRAGMA wal_checkpoint(TRUNCATE)");
+            }
+        }
+        byte[] bytes = Files.readAllBytes(DATA_DIR.resolve("sd").resolve("fuelprint.db"));
+        assertThat(new String(bytes, java.nio.charset.StandardCharsets.ISO_8859_1)).doesNotContain(secret);
+        Files.deleteIfExists(file);
     }
 }
