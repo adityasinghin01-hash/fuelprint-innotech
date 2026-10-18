@@ -149,6 +149,8 @@ Rules for the live socket:
 
 - The person sending a command comes from the session cookie, never from the payload. The `automation` actor exists only inside the server; no cookie, PIN or payload can claim it.
 - Sending the same `command_id` again returns the first receipt and changes nothing.
+- `expected_revision` is the revision of the command's subject record, the main record named in its payload (for example the mission for `approve_mission`). Each handler says which record that is; a command with no subject sends `null`.
+- The bus checks, in order: the role, then idempotency by `command_id`, then `expected_revision`. (Idempotency comes before the revision check, so re-sending an applied command returns its first receipt instead of a stale error.)
 - If `expected_revision` is old, the receipt is `REJECTED` with `STALE_REVISION`. The browser reloads and shows the newer state. It never overwrites.
 - The server saves the record, then saves the event, then sends the receipt, then broadcasts. It never broadcasts something it has not saved.
 
@@ -168,6 +170,7 @@ Rules for the live socket:
 | `board` | Operations laptop 5 | Record the board decision |
 | `visitor` | Phones that paired | Join the queue, fly only while holding the lease, sign up for alerts |
 | `guest` | **v2.** Phones on `/alerts/` | Sign up for alerts and remove their own sign-up. Nothing else. |
+| `bench_adapter` | Finale only: the optional bench sensor box | Only `ingest_frames` |
 | `automation` | **v2.** The server itself | Only the commands whose Role column lists `automation`. Never the five human commands. |
 
 Each laptop logs in with a station PIN set in `server/config/stations.json` (not committed; an example file is). A station can hold more than one role. Visitors and guests can never approve, capture, change wind, see truth, export, retrain or see anyone's phone number.
@@ -229,7 +232,7 @@ Every record has `id`, `run_id` (null for records not tied to a run), `revision`
 | `run` | `preset_id`, `mode`, `state` (CREATED, RUNNING, PAUSED, COMPLETED, ABORTED), `parent_run_id` | core | D |
 | `sensor` | `label` (N1 to N4), `inlet` (ENU), `channels[]`, `status`, `calibration_state` | core | D |
 | `reading` | `sensor_or_vehicle_id`, `channel`, `value`, `raw_value`, `unit`, `sim_time_s`, `quality[]`, `origin` | science writes, core stores | D |
-| `window` | `channel`, `start_s`, `end_s`, `valid_seconds`, `mean_enhancement`, `std_uncertainty`, `background_window_id` | science | D |
+| `window` | `sensor_or_vehicle_id` (v2), `channel`, `start_s`, `end_s`, `valid_seconds`, `mean_enhancement`, `std_uncertainty`, `background_window_id` | science | D |
 | `trigger` | `channel`, `sensor`, `intervals[]`, `background_window_id`, `rule` (TEACH-DETECT-1) | science | D |
 | `anomaly` **v2** | `sensor`, `channel`, `start_s`, `end_s`, `observed_mean`, `expected_low`, `expected_high`, `model_version_id`, `state` (OPEN, CLOSED), `suggestion` (SCHEDULE_SURVEY or null) | ai | D |
 | `investigation` | `trigger_id` or `survey_id`, `state` (OPEN, ANALYSED, MISSION_PROPOSED, MISSION_APPROVED, EVIDENCE_BACK, CLOSED), `analysis_ids[]`, `warned_area_ids[]` (v2) | ops | D |
@@ -336,6 +339,8 @@ public interface WordingService { Wording write(WordingRequest request); }   // 
 public interface AlertAreas { List<String> downwindOf(String sensorLabel, WindNow wind); }   // section 13 rule
 public interface SmsGateway { SendResult send(String phoneE164, String text); }
 ```
+
+The input and output types of these interfaces (`DetectorInput`, `AnalysisInput`, `PlanContext`, `CaptureInput`, `SendResult` and the rest) are defined in `fuelprint.api` by the core; the implementing package asks Aditya Singh for any change.
 
 The core also gives every package `AutomationBus.submit(commandType, payload)`, which sends a command as the `automation` actor through the normal command bus. Event listeners never save records directly; they submit a command.
 
