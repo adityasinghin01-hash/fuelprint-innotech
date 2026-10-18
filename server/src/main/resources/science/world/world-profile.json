@@ -1,0 +1,218 @@
+{
+  "version": "FP-WORLD-3",
+  "origin": "SYNTHETIC_TEACHING",
+  "coordinates": {
+    "reference_latitude_deg": 28.87,
+    "reference_longitude_deg": 77.12,
+    "earth_radius_m": 6371000,
+    "three_transform": "(east,up,-north)"
+  },
+  "sources": [
+    {
+      "id": "S01",
+      "east_m": -250,
+      "north_m": 100,
+      "effective_height_m": 35,
+      "roof_m": 8,
+      "footprint_m": [
+        80,
+        60
+      ],
+      "horizontal_uncertainty_m": 0
+    },
+    {
+      "id": "S02",
+      "east_m": -100,
+      "north_m": 100,
+      "effective_height_m": 35,
+      "roof_m": 8,
+      "footprint_m": [
+        80,
+        60
+      ],
+      "horizontal_uncertainty_m": 0
+    },
+    {
+      "id": "S03",
+      "east_m": 180,
+      "north_m": 160,
+      "effective_height_m": 45,
+      "roof_m": 8,
+      "footprint_m": [
+        80,
+        60
+      ],
+      "horizontal_uncertainty_m": 0
+    },
+    {
+      "id": "S04",
+      "east_m": 300,
+      "north_m": -150,
+      "effective_height_m": 25,
+      "roof_m": 8,
+      "footprint_m": [
+        80,
+        60
+      ],
+      "horizontal_uncertainty_m": 0
+    },
+    {
+      "id": "S05",
+      "east_m": -320,
+      "north_m": -180,
+      "effective_height_m": 30,
+      "roof_m": 8,
+      "footprint_m": [
+        80,
+        60
+      ],
+      "horizontal_uncertainty_m": 0
+    },
+    {
+      "id": "S06",
+      "east_m": 80,
+      "north_m": -280,
+      "effective_height_m": 40,
+      "roof_m": 8,
+      "footprint_m": [
+        80,
+        60
+      ],
+      "horizontal_uncertainty_m": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "N1",
+      "east_m": -20,
+      "north_m": 60,
+      "inlet_m": 3
+    },
+    {
+      "id": "N2",
+      "east_m": 120,
+      "north_m": 100,
+      "inlet_m": 3
+    },
+    {
+      "id": "N3",
+      "east_m": 280,
+      "north_m": 140,
+      "inlet_m": 3
+    },
+    {
+      "id": "N4",
+      "east_m": 400,
+      "north_m": -100,
+      "inlet_m": 3
+    }
+  ],
+  "roads": {
+    "rectangle_x_m": [
+      -400,
+      400
+    ],
+    "rectangle_y_m": [
+      -350,
+      250
+    ],
+    "central_vertical_x_m": 0,
+    "central_horizontal_y_m": 0,
+    "spur": {
+      "x_m": [
+        0,
+        400
+      ],
+      "y_m": 100
+    },
+    "width_m": 6
+  },
+  "clock": {
+    "dt_s": 0.05,
+    "science_Hz": 20,
+    "durable_Hz": 10,
+    "live_s": 900,
+    "live_puff_cap": 160000,
+    "offline_observed_s": 1200,
+    "offline_prehistory_max_s": 180,
+    "offline_puff_cap": 240000,
+    "max_outlets": 8
+  },
+  "nominal": {
+    "wind_from_deg": 270,
+    "wind_m_s": 3,
+    "temperature_K": 298.15,
+    "pressure_Pa": 101325,
+    "SO2_g_s": 0.5,
+    "CO2_g_s": 500,
+    "sigma0_sq_m2": 4,
+    "Kx_m2_s": 3,
+    "Ky_m2_s": 3,
+    "Kz_m2_s": 1
+  },
+  "vehicle": {
+    "ground_m_s": 2,
+    "aerial_m_s": 3,
+    "aerial_xy_m": [
+      -450,
+      450
+    ],
+    "aerial_z_m": [
+      2,
+      80
+    ],
+    "usable_Wh": 64,
+    "reserve_Wh": 12,
+    "hover_W": 160,
+    "instruments_W": 10,
+    "ground_W": 20,
+    "speed_load": "speed_m_s squared W"
+  },
+  "noise": {
+    "status": "SYNTHETIC_ALLOCATION_NOT_HARDWARE_NOISE",
+    "AR1_rho": 0.8,
+    "SO2_innovation_sd_ppb": 5,
+    "CO2_innovation_sd_ppm": 2,
+    "cross_species_innovation_covariance": 0,
+    "common_background": {
+      "baseline_SO2_ppb": 5,
+      "baseline_CO2_ppm": 420,
+      "rho": 0.95,
+      "innovation_sd": 1,
+      "SO2_loading_ppb": 1,
+      "CO2_loading_ppm": 0.5,
+      "Hz": 1,
+      "placement": "ambient before transport/response; stationary initialized"
+    },
+    "electrical_placement": "1Hz post-response independently perinstrument/channel,stationary initialized"
+  },
+  "limits": {
+    "input_entries": 60,
+    "latest_complete_windows_per_instrument_channel": 6,
+    "window_s": 30,
+    "max_registered_sources": 6,
+    "nuisance_members": 27,
+    "supports": 21,
+    "max_actions": 8,
+    "prospective_entries_per_action": 4
+  },
+  "physics": "reflected Gaussian puffs over z>=0; historical source/wind retained; render LOD cannot remove scientific mass",
+  "restricted_truth_rule": "No final seeds/truth manifests included. Published source/preset examples are development/teaching only.",
+  "clearance": {
+    "vehicle_radius_m": 0.5,
+    "ground_obstacle_m": 1,
+    "aerial_obstacle_m": 2,
+    "acceleration_m_s2": 1
+  },
+  "default_procedure_s": {
+    "setup": 30,
+    "background": 30,
+    "purge": 30,
+    "minimum_settle": 120,
+    "online_valid_collection": 30,
+    "minimum_recovery": 120,
+    "review": 30,
+    "cold_warmup_additional": 120,
+    "route": "actual shortest allowed graph; ties publicnodeID;no defaultconnector to280/140"
+  }
+}
