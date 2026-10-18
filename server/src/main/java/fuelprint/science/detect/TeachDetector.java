@@ -26,8 +26,8 @@ import org.springframework.stereotype.Component;
  *
  * <ul>
  * <li>Only SO2 can trigger. CO2 is ignored by this rule.</li>
- * <li>A background is 30 consecutive valid 1 s values of the same channel, no older than 180 simulation
- * seconds. Without one the answer is {@link DetectionStatus#BACKGROUND_REQUIRED}.</li>
+ * <li>A background is 30 consecutive valid 1 s values of the same channel (flat: the two halves differ by at
+ * most max(12.5 ppb, 1.5 SD)), no older than 180 simulation seconds. Without one the answer is {@link DetectionStatus#BACKGROUND_REQUIRED}.</li>
  * <li>An enhancement is a valid second at least {@code max(25 ppb, 3 x standard uncertainty)} above the
  * background mean. The standard uncertainty is the background SD times sqrt(1 + 1/30).</li>
  * <li>15 enhancements in a row trigger. An invalid, missing, stale-flow or calibration-failed second resets
@@ -229,6 +229,22 @@ public class TeachDetector implements Detector {
             ss += (x - mean) * (x - mean);
         }
         double sd = Math.sqrt(ss / (st.buffer.size() - 1));
+        // A background must be flat: a ramp (smoke arriving) is not a background, even if nothing else exists.
+        double firstHalf = 0;
+        double secondHalf = 0;
+        int i = 0;
+        for (double x : st.buffer) {
+            if (i++ < BACKGROUND_SECONDS / 2) {
+                firstHalf += x;
+            } else {
+                secondHalf += x;
+            }
+        }
+        double drift = Math.abs(secondHalf - firstHalf) / (BACKGROUND_SECONDS / 2);
+        if (drift > Math.max(FLOOR_PPB / 2, 1.5 * sd)) {
+            st.lastRefreshEnd = s - BACKGROUND_SECONDS + 5; // try again in 5 s
+            return;
+        }
         if (st.background != null && mean - st.background.mean > st.background.sd) {
             st.lastRefreshEnd = s; // looks like a rise, not a background: keep the old one
             return;
