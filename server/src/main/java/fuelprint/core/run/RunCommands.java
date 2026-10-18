@@ -20,7 +20,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * The run commands of AGREEMENT section 5 (role presenter): {@code create_run}, {@code pause_run},
- * {@code resume_run}, {@code reset_run}. The handlers only decide and return records; {@link RunLifecycle} moves
+ * {@code resume_run}, {@code reset_run}; {@code complete_run} is automation only. The handlers only decide
+ * and return records; {@link RunLifecycle} moves
  * the world after the commit. At most one run is active (CREATED, RUNNING or PAUSED) at a time.
  */
 public final class RunCommands {
@@ -29,7 +30,9 @@ public final class RunCommands {
     public static final String PAUSE = "pause_run";
     public static final String RESUME = "resume_run";
     public static final String RESET = "reset_run";
-    public static final Set<String> ALL = Set.of(CREATE, PAUSE, RESUME, RESET);
+    public static final String COMPLETE = "complete_run";
+    public static final String WORLD_CAPACITY = "WORLD_CAPACITY";
+    public static final Set<String> ALL = Set.of(CREATE, PAUSE, RESUME, RESET, COMPLETE);
 
     /** Run is in the wrong state for this command. */
     public static final String WRONG_STATE = "WRONG_STATE";
@@ -184,6 +187,53 @@ public final class RunCommands {
             }
             double sim = driver.simTimeS(runId).orElse(Runs.simTime(run.get()));
             return HandlerResult.builder().save(Runs.changeState(run.get(), Runs.PAUSED, sim, null), "RUN_PAUSED", sim)
+                    .build();
+        }
+    }
+
+    /** {@code complete_run}: RUNNING or PAUSED to COMPLETED when science has used the world capacity. */
+    @Component
+    public static class CompleteRun implements CommandHandler {
+        private final ObjectProvider<RunDriver> drivers;
+
+        public CompleteRun(ObjectProvider<RunDriver> drivers) {
+            this.drivers = drivers;
+        }
+
+        @Override
+        public String commandType() {
+            return COMPLETE;
+        }
+
+        @Override
+        public Set<Role> allowedRoles() {
+            return Set.of(Role.AUTOMATION);
+        }
+
+        @Override
+        public RecordKey revisionSubject(Command command) {
+            String runId = runIdOf(command);
+            return Ids.isUuid(runId) ? new RecordKey(Runs.RUN, runId) : null;
+        }
+
+        @Override
+        public HandlerOutcome handle(Command command, Session session, StoreView store) {
+            if (!WORLD_CAPACITY.equals(command.payload().path("reason").asText(null))) {
+                return Rejection.invalid("reason must be WORLD_CAPACITY.");
+            }
+            String runId = runIdOf(command);
+            Optional<StoredRecord> run = Ids.isUuid(runId) ? store.get(Runs.RUN, runId) : Optional.empty();
+            if (run.isEmpty()) {
+                return new Rejection(NOT_FOUND, "There is no run with that run_id.");
+            }
+            String state = Runs.state(run.get());
+            if (!Runs.RUNNING.equals(state) && !Runs.PAUSED.equals(state)) {
+                return new Rejection(WRONG_STATE, "Only a RUNNING or PAUSED run can complete; this one is "
+                        + state + ".");
+            }
+            double sim = drivers.getObject().simTimeS(runId).orElse(Runs.simTime(run.get()));
+            return HandlerResult.builder()
+                    .save(Runs.changeState(run.get(), Runs.COMPLETED, sim, WORLD_CAPACITY), "RUN_COMPLETED", sim)
                     .build();
         }
     }

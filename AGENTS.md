@@ -29,6 +29,8 @@ Tests for a package go in the matching folder under `server/src/test/java/fuelpr
 ## Backend rules
 
 - Java source level 17. Spring Boot 3.5. Maven wrapper (`./mvnw`). Plain SQL with `JdbcTemplate`. Flyway migrations in your number range.
+- The default profile is `stub`; real beans use `@Profile("!stub")`; tests that need real beans use `@ActiveProfiles("real")`.
+- Tests that send commands log in with a real session cookie from `CookieSessionService` (see `CommandControllerTest`).
 - Every state change goes through a command handler. The core `CommandBus` checks the role from the session, then idempotency by `command_id`, then `expected_revision` (of the handler's subject record), runs the handler, saves the new record revision and the event in ONE transaction, then returns the receipt. Use the core `CommandBus` and `RecordStore`; do not write your own.
 - Automatic steps: an event listener never saves records directly. It calls `AutomationBus.submit(...)`, which sends a normal command as the `automation` actor. Register `automation` in the allowed roles of a command only where AGREEMENT section 5 lists it.
 - The five human-only commands (`approve_mission`, `reject_mission`, `review_capture`, `revise_finding`, `record_board_decision`) must refuse the `automation` actor, with a test.
