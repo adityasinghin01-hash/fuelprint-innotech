@@ -107,7 +107,7 @@ class PairingTest extends FieldSpringTest {
         mvc.perform(get("/api/field/queue")).andExpect(status().isOk()).andExpect(jsonPath("$.your_position").doesNotExist());
 
         // The joined visitor can now take the lease with their cookie's session.
-        Receipt lease = send(sessions.resolveToken(token), "acquire_lease", missionVehicle(mission));
+        Receipt lease = send(sessions.resolveToken(token).orElseThrow(), "acquire_lease", missionVehicle(mission));
         assertThat(lease.applied()).as(lease.reasonText()).isTrue();
     }
 

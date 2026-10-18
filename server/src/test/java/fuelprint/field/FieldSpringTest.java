@@ -28,6 +28,7 @@ import fuelprint.core.command.CommandBus;
 import fuelprint.core.command.Receipt;
 import fuelprint.core.command.Role;
 import fuelprint.core.command.Session;
+import fuelprint.core.session.CookieSessionService;
 import fuelprint.core.store.RecordStore;
 import fuelprint.core.store.StoredRecord;
 import fuelprint.field.geo.Vec3;
@@ -40,16 +41,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 /**
- * Base for field tests with the Spring context. There is no core world loop yet, so the test is the loop:
+ * Base for field tests with the Spring context. The core world loop is off, so the test is the loop:
  * {@link #tick} calls {@code onStep}, plays the science observation feed at the drone inlet, calls
  * {@code onObservation} and the safety tick, and moves the manual wall clock 50 ms (20 Hz).
  * Each test starts a fresh run.
  */
-@SpringBootTest(properties = "fp.field.safety-loop=false")
+@SpringBootTest(properties = {"fp.field.safety-loop=false", "fp.loop.auto=false"})
+@ActiveProfiles("real")
 @AutoConfigureMockMvc
 @Import(FieldTestConfig.class)
 public abstract class FieldSpringTest {
@@ -74,7 +77,7 @@ public abstract class FieldSpringTest {
     @Autowired protected JdbcTemplate jdbc;
     @Autowired protected ApplicationEventPublisher events;
     @Autowired protected FieldTestConfig.ManualFieldTime time;
-    @Autowired protected FieldTestConfig.FakeSessions sessions;
+    @Autowired protected CookieSessionService sessions;
     @Autowired protected FieldTestConfig.FakeClock clock;
     @Autowired protected FieldTestConfig.FakeSettings settings;
     @Autowired protected FieldTestConfig.FakeCaptureRules rules;

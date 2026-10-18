@@ -8,19 +8,24 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import fuelprint.core.command.Session;
+import fuelprint.core.session.CookieSessionService;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 /** {@code WS /ws/pilot} over a real HTTP server: handshake checks, input, stale sequence, neutral, reconnect. */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "fp.field.safety-loop=false")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"fp.field.safety-loop=false", "fp.loop.auto=false"})
+@ActiveProfiles("real")
 class PilotSocketTest extends FieldSpringTest {
 
     @Value("${local.server.port}") int port;
@@ -51,7 +56,7 @@ class PilotSocketTest extends FieldSpringTest {
     CompletableFuture<WebSocket> connect(Client client, String token, String origin) {
         WebSocket.Builder builder = HttpClient.newHttpClient().newWebSocketBuilder().connectTimeout(Duration.ofSeconds(5));
         if (token != null) {
-            builder.header("Cookie", FieldTestConfig.FakeSessions.COOKIE + "=" + token);
+            builder.header("Cookie", CookieSessionService.COOKIE + "=" + token);
         }
         if (origin != null) {
             builder.header("Origin", origin);
@@ -65,8 +70,7 @@ class PilotSocketTest extends FieldSpringTest {
     }
 
     WebSocket open(Session session) throws Exception {
-        String token = sessions.tokenOf(session.actorLabel()).orElseGet(() -> sessions.register(session));
-        return connect(new Client(), token, null).get(5, TimeUnit.SECONDS);
+        return connect(new Client(), session.sessionId(), null).get(5, TimeUnit.SECONDS);
     }
 
     String message(String lease, long sequence, boolean neutral, double north, double up) {
@@ -85,11 +89,11 @@ class PilotSocketTest extends FieldSpringTest {
     void theHandshakeNeedsASignedInPilotFromTheSameOrigin() throws Exception {
         approvedMission();
         Session visitor = sessions.createVisitor("visitor-ws1");
-        String token = sessions.register(visitor);
+        String token = visitor.sessionId();
         refused(connect(new Client(), null, null));
         refused(connect(new Client(), "no-such-token", null));
         refused(connect(new Client(), token, "http://evil.example"));
-        String qc = sessions.register(QC);
+        String qc = sessions.createStation("laptop-2", Set.of("qc_reviewer")).sessionId();
         refused(connect(new Client(), qc, null));
         WebSocket ok = connect(new Client(), token, "http://localhost:" + port).get(5, TimeUnit.SECONDS);
         ok.sendClose(WebSocket.NORMAL_CLOSURE, "bye").join();
@@ -100,9 +104,8 @@ class PilotSocketTest extends FieldSpringTest {
         String mission = approvedMission();
         Session visitor = pairedVisitor(mission);
         String lease = acquire(visitor, mission);
-        sessions.register(visitor);
         Client client = new Client();
-        WebSocket socket = connect(client, sessions.tokenOf(visitor.actorLabel()).orElseThrow(), null).get(5, TimeUnit.SECONDS);
+        WebSocket socket = connect(client, visitor.sessionId(), null).get(5, TimeUnit.SECONDS);
 
         long sequence = 1;
         for (int i = 0; i < 20; i++) {
@@ -133,7 +136,7 @@ class PilotSocketTest extends FieldSpringTest {
         Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> speed() == 0);
 
         Client second = new Client();
-        WebSocket again = connect(second, sessions.tokenOf(visitor.actorLabel()).orElseThrow(), null).get(5, TimeUnit.SECONDS);
+        WebSocket again = connect(second, visitor.sessionId(), null).get(5, TimeUnit.SECONDS);
         for (int i = 0; i < 6; i++) {
             tick();
             assertThat(speed()).as("no replay after reconnect").isZero();
@@ -154,7 +157,8 @@ class PilotSocketTest extends FieldSpringTest {
         Session visitor = pairedVisitor(mission);
         String lease = acquire(visitor, mission);
         Client client = new Client();
-        WebSocket operator = connect(client, sessions.register(OPERATOR), null).get(5, TimeUnit.SECONDS);
+        Session operatorSession = sessions.createStation("laptop-2", Set.of("field_operator"));
+        WebSocket operator = connect(client, operatorSession.sessionId(), null).get(5, TimeUnit.SECONDS);
         operator.sendText(message(lease, 1, false, 0, 3), true).join();
         Awaitility.await().atMost(Duration.ofSeconds(3)).until(() -> !client.messages.isEmpty());
         assertThat(client.messages.get(0)).contains("NOT_HOLDER");
@@ -162,7 +166,7 @@ class PilotSocketTest extends FieldSpringTest {
         assertThat(speed()).isZero();
 
         // Keyboard flying: the operator takes over (visitor lease revoked) and flies on the same socket.
-        assertThat(send(OPERATOR, "take_over", payload().put("vehicle_id", world.droneId())).applied()).isTrue();
+        assertThat(send(operatorSession, "take_over", payload().put("vehicle_id", world.droneId())).applied()).isTrue();
         String operatorLease = world.lease().orElseThrow().leaseId();
         assertThat(world.lease().orElseThrow().kind().name()).isEqualTo("OPERATOR");
         for (int i = 1; i <= 10; i++) {
@@ -170,7 +174,7 @@ class PilotSocketTest extends FieldSpringTest {
             tick();
         }
         assertThat(speed()).isPositive();
-        assertThat(world.vehicles().get(0).leaseHolder()).isEqualTo(OPERATOR.actorLabel());
+        assertThat(world.vehicles().get(0).leaseHolder()).isEqualTo(operatorSession.actorLabel());
         operator.sendClose(WebSocket.NORMAL_CLOSURE, "done").join();
     }
 }

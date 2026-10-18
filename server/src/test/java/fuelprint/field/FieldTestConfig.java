@@ -8,9 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -23,7 +21,6 @@ import fuelprint.api.ChannelStatus;
 import fuelprint.api.ChannelVerdict;
 import fuelprint.api.ClockControl;
 import fuelprint.api.Reading;
-import fuelprint.api.SessionService;
 import fuelprint.api.Stage;
 import fuelprint.api.VehicleSource;
 import fuelprint.core.command.Command;
@@ -35,18 +32,15 @@ import fuelprint.core.command.Role;
 import fuelprint.core.command.Session;
 import fuelprint.core.store.RecordChange;
 import fuelprint.core.store.StoreView;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
 /**
- * Test doubles for every {@code fuelprint.api} interface field depends on (core session, clock and settings;
- * science capture rules), plus a manual wall clock and a test-only command that saves {@code mission} records
- * the way ops will. None of the core's stub classes are used.
+ * Controllable clock, settings and capture-rule doubles, plus a manual wall clock and a test-only command
+ * that saves {@code mission} records the way ops will. Sessions use the real core cookie service.
  */
 @TestConfiguration
 public class FieldTestConfig {
@@ -58,22 +52,25 @@ public class FieldTestConfig {
     }
 
     @Bean
-    @Primary
-    public FakeSessions fakeSessions() {
-        return new FakeSessions();
+    static BeanFactoryPostProcessor useManualClock() {
+        // The core mode delegate is already primary; only the controllable test clock should be primary here.
+        return beans -> beans.getBeanDefinition("clockControl").setPrimary(false);
     }
 
     @Bean
+    @Primary
     public FakeClock fakeClock(ObjectProvider<VehicleSource> vehicles) {
         return new FakeClock(vehicles);
     }
 
     @Bean
+    @Primary
     public FakeSettings fakeSettings() {
         return new FakeSettings();
     }
 
     @Bean
+    @Primary
     public FakeCaptureRules fakeCaptureRules() {
         return new FakeCaptureRules();
     }
@@ -103,80 +100,7 @@ public class FieldTestConfig {
         }
     }
 
-    /** Cookie sessions kept in memory; same-origin unless an {@code Origin} header names another host. */
-    public static class FakeSessions implements SessionService {
-        public static final String COOKIE = "fp_session";
-        private final Map<String, Session> byToken = new ConcurrentHashMap<>();
-        private final Map<String, String> tokenByActor = new ConcurrentHashMap<>();
-
-        /** Registers {@code session} and returns its cookie value. */
-        public String register(Session session) {
-            String token = UUID.randomUUID().toString();
-            byToken.put(token, session);
-            tokenByActor.put(session.actorLabel(), token);
-            return token;
-        }
-
-        public Optional<String> tokenOf(String actor) {
-            return Optional.ofNullable(tokenByActor.get(actor));
-        }
-
-        /** The session registered under cookie value {@code token}. */
-        public Session resolveToken(String token) {
-            return byToken.get(token);
-        }
-
-        @Override
-        public Optional<Session> resolve(HttpServletRequest request) {
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if (COOKIE.equals(cookie.getName()) && byToken.containsKey(cookie.getValue())) {
-                        return Optional.of(byToken.get(cookie.getValue()));
-                    }
-                }
-            }
-            String header = request.getHeader("Cookie");
-            if (header != null) {
-                for (String part : header.split(";")) {
-                    String[] kv = part.trim().split("=", 2);
-                    if (kv.length == 2 && COOKIE.equals(kv[0]) && byToken.containsKey(kv[1])) {
-                        return Optional.of(byToken.get(kv[1]));
-                    }
-                }
-            }
-            return Optional.empty();
-        }
-
-        @Override
-        public Session createStation(String stationId, Set<String> roles) {
-            throw new UnsupportedOperationException("not used by field");
-        }
-
-        @Override
-        public Session createVisitor(String visitorLabel) {
-            return Session.human("s-" + UUID.randomUUID(), visitorLabel, Set.of(Role.VISITOR));
-        }
-
-        @Override
-        public Session createGuest() {
-            throw new UnsupportedOperationException("not used by field");
-        }
-
-        @Override
-        public void writeCookie(HttpServletResponse response, Session session) {
-            String token = register(session);
-            response.addHeader("Set-Cookie", COOKIE + "=" + token + "; Path=/; HttpOnly; SameSite=Lax");
-        }
-
-        @Override
-        public boolean originAllowed(HttpServletRequest request) {
-            String origin = request.getHeader("Origin");
-            return origin == null || origin.startsWith("http://localhost");
-        }
-    }
-
-    /** Clock control: grants time scale 15 only while every vehicle is stationary, like the core will. */
+    /** Clock control: grants time scale 15 only while every vehicle is stationary. */
     public static class FakeClock implements ClockControl {
         private final ObjectProvider<VehicleSource> vehicles;
         private final Map<String, Double> requests = new ConcurrentHashMap<>();
