@@ -68,8 +68,8 @@ abstract class AlertsFlow {
         fuelprintLogger.addAppender(logs);
         fuelprintLogger.setLevel(Level.DEBUG);
 
-        // A fresh local day, nobody signed up, everything automatic, no fake wording, nothing sent yet.
-        clock.advance(Duration.ofDays(1));
+        // A fresh local day at 10:00 IST, nobody signed up, everything automatic, no fake wording, nothing sent yet.
+        clock.set(AlertTime.startOfLocalDay(clock.instant()).plus(Duration.ofDays(1)).plus(Duration.ofHours(10)));
         Receipt purge = bus.send(command("purge_subscriptions", JsonNodeFactory.instance.objectNode(), null), PRESENTER);
         assertThat(purge.status()).isEqualTo(Receipt.Status.APPLIED);
         automationSettings.set(AutomationSettings.AUTO_ALERTS, true);
@@ -139,7 +139,7 @@ abstract class AlertsFlow {
         Receipt receipt = bus.send(command("test_save_investigation", payload, null), ANALYST);
         assertThat(receipt.status()).as(receipt.reasonText()).isEqualTo(Receipt.Status.APPLIED);
         assertThat(receipt.recordRefs().get(0).revision()).isEqualTo(revisionToExpect);
-        bus.awaitIdle();
+        settle();
         return id;
     }
 
@@ -155,8 +155,19 @@ abstract class AlertsFlow {
         payload.set("fields", fields);
         Receipt receipt = bus.send(command("test_save_board_decision", payload, null), BOARD);
         assertThat(receipt.status()).as(receipt.reasonText()).isEqualTo(Receipt.Status.APPLIED);
-        bus.awaitIdle();
+        settle();
         return id;
+    }
+
+    /**
+     * Waits until the automatic reaction to a command has finished. {@code awaitIdle} only waits for what
+     * was queued before the call, and the listener queues its follow-up while the first command is
+     * still publishing, so the first call may return too early; the second one waits for the follow-up.
+     */
+    void settle() {
+        for (int i = 0; i < 3; i++) {
+            bus.awaitIdle();
+        }
     }
 
     static final String RUN_ID = "11111111-2222-4333-8444-555555555555";
