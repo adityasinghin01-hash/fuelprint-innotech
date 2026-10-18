@@ -2,7 +2,9 @@ package fuelprint.field.world;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,6 +19,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fuelprint.api.AutomationSettings;
+import fuelprint.api.InletHistory;
+import fuelprint.api.InletSample;
 import fuelprint.api.ObservationListener;
 import fuelprint.api.Pilot;
 import fuelprint.api.Reading;
@@ -61,7 +65,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Profile("!stub")
-public class FieldWorld implements VehicleSource, WorldStepListener, ObservationListener {
+public class FieldWorld implements VehicleSource, WorldStepListener, ObservationListener, InletHistory {
 
     private static final Logger log = LoggerFactory.getLogger(FieldWorld.class);
 
@@ -77,6 +81,9 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
     static final double RETURN_ENERGY_MARGIN = 1.2;
     static final double LANDED_HORIZONTAL_M = 1.5;
     static final double LANDED_HEIGHT_M = 0.5;
+    // Every world step: at most 20 Hz * 900 simulated seconds, plus a possible time-zero sample.
+    // Keep a hard cap even if a caller steps past the run limit; older intervals then become unknown.
+    private static final int MAX_INLET_SAMPLES = 18_001;
 
     private final WorldProfile profile;
     private final CaptureMethod method;
@@ -95,6 +102,9 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
 
     // Everything below is guarded by lock.
     private String runId;
+    // Only RunStarted enables recording: late mission-cleanup records cannot revive an ended track.
+    private String inletRunId;
+    private final Deque<InletSample> inletSamples = new ArrayDeque<>();
     private double simTimeS;
     private final Map<String, MissionView> missions = new LinkedHashMap<>();
     private final Map<String, PairingView> pairings = new LinkedHashMap<>();
@@ -163,6 +173,7 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
         List<Runnable> todo;
         synchronized (lock) {
             step(simTimeS, dtS, scale, waitS);
+            recordInlet(simTimeS);
             todo = drain();
         }
         run(todo);
@@ -198,6 +209,44 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
                     drone.inlet().toEnu(), drone.energyWh(), mission == null ? null : mission.state(),
                     flying ? lease.holder : null, flying ? lease.kind : Pilot.NONE));
         }
+    }
+
+    /** Recorded inlet positions, copied under the same lock that guards the live drone and run lifecycle. */
+    @Override
+    public Optional<List<InletSample>> track(String runId, String sensorOrVehicleId, double startS, double endS) {
+        if (!Double.isFinite(startS) || !Double.isFinite(endS) || startS > endS) {
+            return Optional.empty();
+        }
+        synchronized (lock) {
+            if (inletRunId == null || !inletRunId.equals(runId) || !drone.id().equals(sensorOrVehicleId)
+                    || inletSamples.isEmpty() || inletSamples.getFirst().simTimeS() > startS
+                    || inletSamples.getLast().simTimeS() < endS) {
+                return Optional.empty();
+            }
+            List<InletSample> result = new ArrayList<>();
+            for (InletSample sample : inletSamples) {
+                if (sample.simTimeS() <= startS) {
+                    result.clear();
+                }
+                result.add(sample);
+                if (sample.simTimeS() >= endS) {
+                    break;
+                }
+            }
+            return Optional.of(List.copyOf(result));
+        }
+    }
+
+    /** Called after movement, under lock; the inlet is exactly the one exposed by vehicles(). */
+    private void recordInlet(double t) {
+        if (inletRunId == null || !Double.isFinite(t)
+                || !inletSamples.isEmpty() && t <= inletSamples.getLast().simTimeS()) {
+            return;
+        }
+        if (inletSamples.size() == MAX_INLET_SAMPLES) {
+            inletSamples.removeFirst();
+        }
+        inletSamples.addLast(new InletSample(t, drone.inlet().toEnu()));
     }
 
     private void step(double t, double dt, double scale, int waitS) {
@@ -474,6 +523,7 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
         synchronized (lock) {
             clear();
             runId = newRunId;
+            inletRunId = newRunId;
             drone.placeAt(profile.depot());
             drone.setEnergyWh(profile.usableWh());
             todo = drain();
@@ -510,6 +560,8 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
     private void clear() {
         releaseTimeScale();
         runId = null;
+        inletRunId = null;
+        inletSamples.clear();
         missions.clear();
         pairings.clear();
         queue.clear();
