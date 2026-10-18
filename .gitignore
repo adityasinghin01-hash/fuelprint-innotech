@@ -20,3 +20,4 @@ data/training/
 data/real/
 server/config/sms.json
 server/config/llm.json
+.venv/

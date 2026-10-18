@@ -1,111 +1,102 @@
-> **SUPERSEDED on 18 Oct 2026.** This was the 16 Oct manual (Codex core, Cortex science). Agreement version 2 moved all AI-side building to Kiro and added the AI pieces, automation and SMS alerts. A new build plan replaces this file. Do not follow it.
+# Build plan for the AI side (version 2, Kiro builds)
 
-# Build plan for the AI side (Claude orchestrator, Codex, Cortex, Kiro)
+Written 18 Oct 2026. Replaces the 16 Oct manual. This is the working manual for the chat that runs the build on Aditya Singh's Mac. The teammates' guides are in `docs/plan/`. Read `contracts/AGREEMENT.md` (version 2) and `AGENTS.md` first; this file only says who builds what, when, and how Claude checks it.
 
-Written 16 Oct 2026 at the end of the planning chat. This is the working manual for the chat that runs the build on Aditya Singh's Mac. The teammates' guides are in `docs/plan/`. This file covers the parts the AI tools build themselves: the shared core, the science engine and Field, plus how Claude runs and checks everything.
+## 1. Roles
 
-## 0. Read first, in this order
-
-1. `contracts/AGREEMENT.md`: the contract. Only Claude edits it, and only when Aditya Singh agrees.
-2. `AGENTS.md`: rules and folder ownership for every agent.
-3. `docs/plan/01-team-plan.md` and `docs/plan/04-field-plan.md`: what we promised the team and when.
-4. `docs/reference/r3/03-SCIENCE-FIELD-AND-PHONES.md`, `04-CASES-LABORATORY-AND-EVIDENCE.md`, `02-CONTRACTS-DATABASE-AND-RECOVERY.md`: the detailed research design (Codex's R3, 15 Oct). Where it conflicts with AGREEMENT.md, AGREEMENT.md wins for the department build. It was written for a Python backend; we build in Java.
-5. `contracts/reference/world-profile.json` and `method-profiles.json`: exact numbers.
-
-## 1. Who works where
-
-| Worker | How to run it | Works on |
+| Worker | Does | How |
 |---|---|---|
-| Claude (this chat) | Orchestrates, writes briefs, reviews, merges, does visual design | `contracts/`, `apps/shared` look, Field look, PR reviews |
-| Codex (model `gpt-6.1-sol`, effort `high` from `~/.codex/config.toml`) | `codex exec -s workspace-write -C <worktree> -o OUT.md - < BRIEF.md` in the background. Continue: `codex exec resume --last -c sandbox_mode='"workspace-write"' -o OUT.md - < NEXT.md` (`resume` does NOT take `-s`). | Shared core, Field code, start scripts |
-| Snowflake Cortex Code v1.1.104 | `cortex exec -w <worktree> --effort high --max-turns 200 --file BRIEF.md` (connection `account1`, account FWIHMOS-CC12847, user ADITYA65, role SYSADMIN) | Science engine. Use it as much as possible. |
-| Kiro | See memory `kiro-cli-driving` (`kiro-cli chat --no-interactive --model claude-opus-5.5 --trust-tools=fs_read,fs_write,execute_bash "..."`; Opus 5.5 uses 2× credits) | Backup when Codex or Cortex hit limits; test writing |
-| Teammates | Their own Codex with the prompts in their guides | ops, cases backend, cases screens |
+| Kiro (Opus 5.5, effort high) | All AI-side code: core, science, ai, alerts, field, shared screen kit, scripts, model training | `kiro-cli chat --no-interactive --model claude-opus-5.5 --effort high --trust-tools=fs_read,fs_write,execute_bash "<brief>"`, run from the job's worktree, in the background, output to a log. Continue a job with `--resume` from the same folder. |
+| Claude (this chat) | Briefs, checks, merges, teammate PR reviews, the 3D look of Field | Never codes what Kiro can code. Checks every result on disk and runs the tests itself. |
+| Codex | Backup if Kiro runs out of credits or stalls | See memory `codex-cli-driving` |
+| Teammates | ops, cases backend, cases screens | Their own Codex with the prompts in their guides |
 
-**Before giving Cortex heavy work**, check the Snowflake account's credit allowance (ask Aditya Singh or query `SNOWFLAKE.ACCOUNT_USAGE.METERING_DAILY_HISTORY` with `snow sql`). Tell him the number before you start.
+Kiro account: Kiro Pro, 1000 credits, resets 1 Nov. Check usage for free with `kiro-cli chat --no-interactive --trust-tools= "/usage"`. Log the number after every job.
 
-**Never run two agents in the same folder.** Use git worktrees:
+## 2. Mac limits (checked 18 Oct)
 
-```
-cd ~/dev/fuelprint-innotech
-git worktree add ../fp-wt/core    -b core/build
-git worktree add ../fp-wt/science -b science/build
-git worktree add ../fp-wt/field   -b field/build
-```
+- Apple M1, **8 GB RAM**, **about 14 GB free disk (93 % full)**. Keep downloads and training data small (under 2 GB in total). No video files.
+- Java 17 is the Intel build (runs through Rosetta). ONNX Runtime must use its macOS x86_64 natives on this Mac; teammates use Windows x64.
+- Python: use `uv` with Python 3.12 (`uv venv --python 3.12`). Never install into the system Python.
+- `gh` is an x86_64 build whose git subprocess fails: use `gh` only for API calls; use native `git` for everything else.
+- Keep the Mac awake while jobs run: wrap each job in `caffeinate -dimsu`.
 
-Each agent gets its own worktree. Claude merges branches into `main` after tests pass. `gh` on this Mac is an x86_64 build whose git subprocess fails, so use `gh` only for API calls (PRs, collaborators) and run every git command with native `git`.
+## 3. Worktrees and branches
 
-## 2. Calendar
+One worktree per job. Never two jobs in one folder. Claude merges into `main` with a normal merge commit after the checks in section 6.
 
-| Day | Codex | Cortex | Claude |
-|---|---|---|---|
-| Sat 17 Oct | K1 to K8 core, merged to `main` by 6 PM. That's the hard deadline: teammates start then. | S1 world and puffs, S2 sensor and transport model | Shared look (tokens, components) in `apps/shared`; announce "core ready" message for WhatsApp |
-| Sun 18 Oct | F1 field backend, F2 3D scene, F3 drone and keyboard | S3 detector, S4 ranker | Field visual direction; review teammate PRs (evening) |
-| Mon 19 Oct | F4 pairing, lease and phone page, F5 capture stages, F6 QC review screen | S5 planner, S6 scenarios SC1 to SC3, S7 record replay files from real runs | Review PRs; end-to-end API script for the 3 scenarios |
-| Tue 20 Oct | Fixes | Fixes | Join day: switch off stubs, run all scenarios, triage mismatches |
-| Wed 21 Oct | Fixes | Fixes | Rehearsal checklist, tag `dept-v1` at 10 PM, backup host copy |
-| 25 to 29 Oct | Finale items | Finale scenarios, evaluation runs | Finale review |
+| Job | Worktree | Branch |
+|---|---|---|
+| A core | `~/dev/fp-wt/core` | `core/build` |
+| B real data and normal-air training | `~/dev/fp-wt/data` | `ai/data` |
+| C science | `~/dev/fp-wt/science` | `science/build` |
+| D ai (Java side) | `~/dev/fp-wt/ai` | `ai/build` |
+| E field | `~/dev/fp-wt/field` | `field/build` |
+| F alerts | `~/dev/fp-wt/alerts` | `alerts/build` |
 
-Aditya Singh is at IBM Z on 17 and 18 Oct. Keep his Mac awake (`caffeinate -dimsu &` while agents run).
+## 4. Phases
 
-## 3. Shared core (Codex), steps K1 to K8
+| Phase | Job | Starts when | Builds | Done when | Target |
+|---|---|---|---|---|---|
+| P1 Core foundation | A | now | K1 skeleton, K2 record store + events + blobs, K3 command bus with actors, `AutomationBus`, every interface of AGREEMENT section 9 | `tools/test-all.sh` passes; repeated command applies once; stale rejected; automation refused where not listed; ArchUnit truth boundary | Mon 19, 9 AM |
+| P2 Data and normal-air | B | now (parallel) | `tools/data/fetch_real.sh`, real CPCB SO2 + Open-Meteo wind + tracer kit in `data/real/`, FP-NORMAL-1 trained (Python) and exported to ONNX, background profile, model card | Real data fetched and documented (or a clear report of what could not be fetched); ONNX output matches Python on test rows | Mon 19, 9 AM |
+| P3 Core rest | A | P1 merged | K4 clock and runs, K5 live socket, K6 sessions (station, join, guest) and fake replay SC1-SC3 with v2 records, K7 stubs for every interface + `@fp/shared` (types, `useLive`, `useSnapshot`, `sendCommand`, `Explain`, `StaleBanner`, `OutcomeBadge`, `AutomationLog`, login form, IDEAVERSE palette), K8 scripts and serving incl. `/alerts/`; `automation_settings` + `change_automation` | Fake mode plays SC1 and an app sees ticks; restart keeps records and marks the run INTERRUPTED; teammates' `tools/start-fake.sh` and `dev-app.sh` work | Mon 19, 6 PM (teammates start) |
+| P4 Science part 1 | C | P1 merged | S1 world and puffs, S2 sensors and transport (background SO2 from the P2 profile), S3 detector, S4 ranker FP-COMPAT-3 with the oracle tests | Oracle tests pass; SC1 gives a trigger at N2 | Mon 19 night |
+| P5 AI Java side | D | P1 and P2 merged | `NormalAirModel` (ONNX Runtime) + `record_anomaly` automation, `WordingService` (Anthropic API, checks, templates, `write_wording` automation), `LearnedRanker` loading any ONNX model with a deterministic fallback status MODEL_MISSING, `model_version` records from model cards, `retrain_model` + quality gate + lessons | Tests: anomaly after 5 minutes above band; wording falls back on a bad number, a banned word and no key; learned order never changes outcome or statuses; gate keeps the parent when the child is worse | Tue 20, midday |
+| P6 Field backend | E | P3 merged | F1 vehicles, F4 pairing/queue/lease/`/ws/pilot`/dead man/phone page, autopilot + `return_to_depot`, F5 capture stages incl. automatic start, F6 QC review screen (plain 2D) | Drone stops within 500 ms after silence; autopilot flies SC1 route inside limits; SC2 rejects SO2 and keeps CO2 | Tue 20, evening |
+| P7 Alerts | F | P3 merged | `fuelprint.alerts`: contact table, `AlertAreas`, `SmsGateway` (LOG_ONLY + REAL for SMS Gateway for Android local API), subscribe/unsubscribe/send/purge, smoke warning and board update automation, rate limit and daily cap; `apps/alerts` sign-up page | Privacy test (no number outside the contact table); SC1 warns AREA-E only; suppressed reasons saved | Tue 20, evening |
+| P8 Science part 2 | C | P4 done | S5 planner, S6 scenarios tuned, S7 replay recording, **night generator** for training (random nights, labels only in `data/training/`) | SC1/SC2/SC3 end as AGREEMENT section 10; generator writes N nights with a fixed seed | Tue 20, evening |
+| P9 Learned ranker v1 | B | P8 done | Generate ~20,000 nights (size-checked), train LightGBM ranker on the Mac, export ONNX, model card with test counts on held-out nights, smoke-maths check on one tracer dataset | Test counts written honestly, misses included; ONNX matches Python | Wed 21, 10 AM |
+| P10 Join | all | Wed 21, 2 PM | Stubs off, real parts on, end-to-end API script for SC1-SC3 with automation on and off, fixes | All three scenarios end as specified on all screens | Wed 21, 8 PM |
+| Freeze | Claude | | Tag `dept-v1`, backup copy of the host folder | | Wed 21, 11 PM |
 
-Package `fuelprint.core` and `fuelprint.api`, migrations `V001` to `V099`.
+Claude's own build work: the Field 3D scene and drone look (F2, F3 look) on Tue 20 and Wed 21, on top of P6.
 
-- **K1 Project skeleton.** Maven wrapper, Spring Boot 3.5, Java release 17, packages `core, api, science, ops, cases, field` (empty `package-info.java` with owner comments). SQLite via `org.xerial:sqlite-jdbc`, WAL mode, `PRAGMA synchronous=FULL`, `foreign_keys=ON`. Flyway. JdbcTemplate. Jackson with snake_case. ArchUnit test: nothing outside `fuelprint.science` imports `fuelprint.science.truth`.
-- **K2 RecordStore and events.** Generic revision tables (`records(type, id, revision, run_id, json, created_utc, created_by)`, latest view), `events(cursor autoincrement, run_id, event_type, record_type, record_id, revision, sim_time_s, wall_utc)`, `commands(command_id unique, actor, type, payload, receipt_json)`. Blob store `data/runtime/blobs/<sha256>` with exact bytes.
-- **K3 CommandBus.** `POST /api/commands`. Per command type a registered handler `(Command, Session, Store) -> HandlerResult(records, events) or Rejection`. Bus checks role, `expected_revision`, idempotency (same `command_id` returns the stored receipt; same id with a different payload is rejected), runs the handler, then saves records, events and the receipt in ONE transaction, then publishes Spring events and broadcasts. One single-threaded executor serialises all commands.
-- **K4 Clock and runs.** Run lifecycle commands (`create_run`, `pause_run`, `resume_run`, `reset_run`). World loop at 20 Hz (dt 0.05) on its own thread calling `WorldClock.step`, `ObservationProvider.observe` for sensors N1 to N4 and for vehicle inlets; 1 Hz reading records; 10 Hz `tick` broadcast. Time scale field (1 or 15 for stationary capture).
-- **K5 Live socket.** `/ws/live?run_id&after=cursor`: `hello` with `server_epoch`, replay of events after the cursor from the database (or a "reload snapshot" signal if too old), then live events and ticks. Bounded per-client queue: drop superseded ticks, never drop events; close slow clients. `GET /api/snapshot`, `/api/runs/current`, `/api/records/{type}/{id}`, `/api/records/{type}?run_id=`.
-- **K6 Sessions and fake mode.** Station login with PIN from `server/config/stations.json` (commit `stations.example.json`), HttpOnly SameSite cookie, Origin check on sockets. Visitor sessions via pairing (Field implements pairing; core provides the session type). **Fake mode** `--fp.mode=replay`: plays `server/src/main/resources/replay/SC1.ndjson`, `SC2`, `SC3` as if live (events plus ticks). On Saturday these files are hand-scripted from `apps/shared/fixtures` values following the scenario story in AGREEMENT section 10. On Monday S7 replaces them with recorded real runs.
-- **K7 Stubs and shared front-end library.** Stub implementations of every interface in AGREEMENT section 9 that return fixture-shaped answers (`@Profile("stub")`, default until join day). `apps/shared`: npm workspace package `@fp/shared` with TypeScript types for every record and message, `useLive()`, `useSnapshot()`, `sendCommand()`, `StaleBanner`, `Explain`, `OutcomeBadge`, and the station login form. npm workspaces at `apps/package.json` with `operations`, `cases`, `field`, `shared`, each a Vite + React 18 + TS app with Vitest. Vite dev server proxies `/api` and `/ws` to 8080.
-- **K8 Scripts and serving.** `tools/start-fake.sh`, `start-real.sh`, `dev-app.sh <app>`, `test-all.sh`, `stall.sh` (+ `.ps1` versions). Spring Boot serves the built apps at `/operations/`, `/cases/`, `/field/`, `/field/controller`, binding `0.0.0.0:8080`.
+Finale (25 to 29 Oct): learned ranker version 2 (PyTorch on the KIET DGX A100, one GPU), ranker test on real tracer data, weak-plume scenario for the normal-air model, the finale items in each guide.
 
-**Core done when:** `tools/test-all.sh` passes; fake mode plays SC1 and an app frame sees live ticks; a command retried with the same id applies once; a stale revision is rejected; killing the server mid-run and restarting keeps every committed record and marks the run INTERRUPTED (paused, leases revoked).
+## 5. Briefs
 
-## 4. Science engine (Cortex), steps S1 to S7
+Each brief is a file in the session scratchpad (`fp/<phase>-BRIEF.md`) passed to Kiro as its prompt. Every brief:
 
-Package `fuelprint.science` (public API classes) and `fuelprint.science.truth` (hidden generator state). Migrations `V100` to `V199`. Numbers from `world-profile.json`, `method-profiles.json` and R3 doc 03.
+1. Names the worktree and branch and says "you are the only agent in this folder".
+2. Says to read `AGENTS.md`, `contracts/AGREEMENT.md` and the listed sections of this file fully first.
+3. Lists exactly which folders it may edit (from the AGENTS.md table).
+4. Lists the tests that must pass.
+5. Ends: run the tests, commit on the branch in small commits, do not push, do not merge, final message = files changed, test counts, what is unfinished or assumed, any contract issue.
 
-- **S1 World and puffs.** ENU metres, origin 28.87 N 77.12 E. Sources S01 to S06 with effective heights. Each active source emits a puff per tick: mass = q × 0.05 s per species (SO2 0.5 g/s, CO2 500 g/s nominal, per scenario). Puff variance starts 4 m², grows by 2K × age (Kx = Ky = 3, Kz = 1 m²/s). Reflected Gaussian over z ≥ 0. Puffs keep source id, age, mass and their own wind history; wind changes advect existing puffs; switching a source off never deletes puffs. Default wind from 270° at 3 m/s, 298.15 K, 101325 Pa; molar masses 64.066 and 44.0095 g/mol for ppb/ppm conversion. Caps: live 900 observed sim seconds and 160,000 puffs (pause and refuse beyond). Rendering never removes puffs.
-- **S2 Sensors and transport.** Background 5 ppb SO2 and 420 ppm CO2 with a shared 1 Hz AR(1) (rho 0.95, innovation SD 1, loadings 1 ppb and 0.5 ppm). Per-channel post-response AR(1) noise rho 0.8, SD 5 ppb and 2 ppm. Inlet line 1.5 m × 4 mm ID (18.85 mL), transport tracked by actual sampled volume, flows 0.5 (SO2) and 0.3 (CO2) L/min. Chamber mixing 8 s. First-order response `new = old + (target - old) * (1 - exp(-dt/tau))`, tau = T90 / ln 10, T90 60 s SO2 and 30 s CO2. Failed flow keeps the stale value and raw number, adds no valid volume, sets FLOW_FAULT. Implements `ObservationProvider` and `CaptureRules` (settle error ≤ 5 % after ≥ 120 s, 30 consecutive valid seconds, flow within ±5 %, recovery ≤ 5 %).
-- **S3 Detector TEACH-DETECT-1.** Valid 30 s background of the same channel no older than 180 sim s, else BACKGROUND_REQUIRED. Trigger after 15 consecutive valid 1 s enhancements, each ≥ max(25 ppb, 3 × standard uncertainty). Invalid, gapped, stale or calibration-failed seconds reset the count. CO2 alone never triggers. Emits `window` and `trigger` records.
-- **S4 Ranker FP-COMPAT-3 (Java port).** Inputs: latest ≤ 6 complete non-overlapping 30 s valid windows per instrument channel, up to 60 entries. Kernel for x > 0 alongwind: sy² = 4 + 2Ky·x/u, sz² = 4 + 2Kz·x/u, `C = exp(-l²/2sy²) / (2π u sy sz) · [exp(-(z-H)²/2sz²) + exp(-(z+H)²/2sz²)]`, 0 for x ≤ 0, evaluated along the recorded inlet history through the same line, chamber and sensor response and the same 30 s window. Explanations: 6 singles + 15 pairs, each with 27 nuisance members (direction −10/0/+10°, speed ×0.8/1/1.2, height −10/0/+10 m). Non-negative least squares per gas (Lawson-Hanson, Apache Commons Math for SVD and Cholesky), whitened by the covariance; persist SSE, rank and failures. Cutoff computed from separate calibration episodes (m ≥ 40, rank min(m, ceil(0.95(m+1)))); the historical 132.253985 is forbidden. Outcomes: INVALID, NO_SIGNAL, UNKNOWN_OR_MISMATCH, AMBIGUOUS_OR_OPTIONAL_MIXTURE, PROVISIONAL_SINGLE; qualification SYNTHETIC_SCOPE_ONLY. UNKNOWN row always present. Writes a deterministic plain `explanation_text`. Oracle tests from R3 doc 03 ("Independent oracles"): proportional columns [1,2]/[2,4] with y [3,6] both fit exactly; identity 2×2 with y [4,3] gives pair SSE 0 and singles 9 and 16; swapping hidden labels with identical public input gives identical analysis.
-- **S5 Planner FP-PLAN-INTERVAL-1.** ≤ 8 actions: points (0,100,3), (120,100,3), (280,140,3) [the last is UNREACHABLE for the van], aerial (0,100,35), (120,100,35), depot background, instrument QC. Filter first: unreachable, unsafe, no energy for return, stale dependencies, unaffordable full procedure; keep rejected actions with reasons. For admitted fits, prospective interval per explanation, conservative boxes over nuisance members, separation lower bound minus supported error, clipped at 0, minimum over materially different explanation pairs, divided by complete minutes. All zero means NO_USEFUL_MEASUREMENT. Ties: higher score, shorter time, lower energy, action id. 2 s wall budget; over budget returns pending, never a fake recommendation. Return best plus a cheaper alternative.
-- **S6 Scenarios.** Presets SC1-NIGHT-PLUME, SC2-BLOCKED-INLET, SC3-ABOVE-THE-BOXES exactly as AGREEMENT section 10, with hidden truth in `science.truth` and fixed seeds. Check SC1 actually produces a trigger at N2 and that the drone at (0,100,35) separates S01 from S02; tune emission strength (not the rules) until the story holds, and record the tuning.
-- **S7 Replay recording.** Headless runner that plays each scenario with a scripted drone path and writes `server/src/main/resources/replay/SC*.ndjson` for fake mode. Also an evaluation runner (finale): many seeds per scenario, report every outcome including misses.
+## 6. How Claude checks a job before merging
 
-## 5. Field (Codex code, Claude look), steps F1 to F7
+1. Read Kiro's final message, but trust only what is on disk.
+2. `git diff main...<branch> --stat`: files only in the job's folders.
+3. Run `tools/test-all.sh` in the worktree myself. Read the test names: every rule from the brief has a test, including failure cases.
+4. Spot-read the risky code: transactions, idempotency, automation refusal, truth boundary, phone-number privacy, anything that touches money or time.
+5. For screens: Playwright headless screenshots, read the images.
+6. Merge with a normal merge commit, push `main`, message the group if teammates are waiting.
+7. Log the Kiro credit count.
 
-Package `fuelprint.field` (migrations `V400` to `V499`) and `apps/field`. Numbers in `docs/plan/04-field-plan.md`.
+If a job fails a check, resume the same Kiro session with a short list of what to fix. After two failed rounds, hand the fix to Codex.
 
-- **F1 Vehicles.** Drone kinematics at 20 Hz with speed 3 m/s, acceleration 1 m/s², bounds ±450 m and 2 to 80 m, 2 m clearance from building and stack boxes (no tunnelling at 20 Hz), energy 64 Wh usable and 12 Wh reserve with hover 160 W + 10 W + speed² W. Mission state machine from AGREEMENT section 8, driven by position (AT_TARGET within 5 m and inside the height band).
-- **F2 3D scene.** Three.js directly (no R3F). `(east, up, -north)` in one function. Context crop: ≤ 300 extrusions at 8 m from `data/context/derived-scene-crop.json`, instanced, shared materials. Factories S01 to S06, boxes N1 to N4, roads, depot, wind arrow and drift specks, reading trail. No plume from true sources. DPR cap 1.5, ≥ 30 FPS on Aditya Singh's Mac. Claude sets the look: night estate, the IDEAVERSE palette (velvet green #1E3B32, ivory #F4F2EC, sage #DCE5DD, ink #16211D, clay #B8663E) adapted for a dark scene.
-- **F3 Keyboard flying.** W A S D, R and F, Space stop; field_operator lease; take over.
-- **F4 Pairing, queue, lease, phone page.** `create_pairing` (6-character code + two-word phrase, 120 s), `confirm_pairing`, queue, `acquire_lease` (2 s, renewed only by fresh valid input), `/ws/pilot` input at 10 Hz, 400 ms dead man, neutral on blur, visibility change or pointer cancel, no replay after reconnect. `/field/controller` with two touch pads, `touch-action: none` on pads only, 44 px targets. QR drawn locally (no cloud QR service); short code always shown.
-- **F5 Capture stages.** `start_capture` with stages setup 30, background 30, purge 30, settle ≥ 120, collect 30 valid, recover ≥ 120, review 30; 15× only while stationary, advancing physics, response, flow, energy and stages together. SC2 fault at collection second 10. Per-channel volumes (0.25 L and 0.15 L for 30 s).
-- **F6 QC review.** `review_capture` per channel; a failed rule can't be passed; emits `screening_record` per channel.
-- **F7 Finale.** Cutaway, 3D lab workbench, van on roads, labelled prediction overlay, procedure score, 2D fallback.
-
-## 6. Reviewing teammates' pull requests
+## 7. Teammates' pull requests
 
 For each PR (`gh pr list -R adityasinghin01-hash/fuelprint-innotech`, `gh pr diff`):
 
-1. Files touched only in the author's folders (AGENTS.md table). Anything in `contracts/` = request changes.
-2. `tools/test-all.sh` passes on a checkout of the branch (use a fresh worktree).
-3. No `fuelprint.science.truth` imports, no percentages for scores, no real factory names, no outcome computed in the browser, unknown values not turned into zero.
-4. Every visible number has an `Explain` line.
-5. Screens checked with Playwright headless screenshots (memory `local-frontend-self-review`).
-6. Merge with a normal merge commit, then post a short note in the PR.
+1. Files only in the author's folders. Anything in `contracts/` or `AGENTS.md` = request changes.
+2. `tools/test-all.sh` passes on a checkout of the branch (fresh worktree).
+3. No `fuelprint.science.truth` imports, no percentages for scores or ranks, no real factory names, no outcome computed in the browser, unknown values not turned into zero, listeners use `AutomationBus`, human-only commands refuse automation.
+4. Every visible number has an `Explain` line; automatic steps marked "done automatically".
+5. Screens checked with Playwright headless screenshots.
+6. Merge with a normal merge commit, then a short note in the PR.
 
-## 7. If we fall behind
+## 8. If we fall behind
 
-Cut in this order: van, instrument cutaway, two-word pairing phrase (keep the code), Recharts animations, the hardware page diagram. Never cut: rejected and inconclusive outcomes, persistence and restart, the hidden truth boundary, evidence verify and tamper, the phone dead man.
+Cut in this order: van, instrument cutaway, two-word pairing phrase (keep the code), Recharts animations, hardware page diagram, AI wording (falls back to fixed text), normal-air model (the fixed alarm still works), live retraining (show the model versions only).
 
-## 8. Open items at handoff
+Never cut: rejected and inconclusive outcomes, persistence and restart, the hidden truth boundary, evidence verify and tamper, the phone dead man, the learned ranker's "order only" rule, the five human-only decisions, phone-number privacy and the midnight purge.
 
-- Add the four teammates as collaborators when Aditya Singh sends usernames: `gh api -X PUT repos/adityasinghin01-hash/fuelprint-innotech/collaborators/<user> -f permission=push`.
-- Check the Snowflake credit allowance before S1.
-- `~/Desktop/KIET-InnoTech26-FuelPrint-Upload` (duplicate of Drive) still needs to go to the Trash.
-- After 18 Oct, move the SentinelWard and TessNova folders on the Desktop into `Projects/`.
-- Department slot (22, 23 or 24 Oct) is still unknown.
+## 9. Open items
+
+- Anthropic API key for AI wording (`server/config/llm.json`). Without it the fixed text is used.
+- Which teammate's Android phone is the SMS sender; install "SMS Gateway for Android" on rehearsal day.
+- KIET DGX A100 booking for the version 2 training (finale).
+- Department slot (22, 23 or 24 Oct).
+- The old Kiro P1 attempt left a skeleton in `~/dev/fp-wt/core`; job A reuses or replaces it.
