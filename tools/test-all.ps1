@@ -1,17 +1,22 @@
-# Runs every test in the repository (Windows). P1: the server tests. P3 adds the apps.
-$ErrorActionPreference = 'Stop'
+# Runs every test: the Java server tests, every app's type check and Vitest tests, and the headless end-to-end test
+# against a fake-mode server. Usage: tools\test-all.ps1 [-NoE2e]
+param([switch]$NoE2e)
+. "$PSScriptRoot\lib.ps1"
 
-$Root = Split-Path -Parent $PSScriptRoot
+Say 'server tests'
+Push-Location $Server
+try { Run '.\mvnw.cmd' @('-q', 'package') } finally { Pop-Location }
 
-Write-Host '== server tests'
-Push-Location (Join-Path $Root 'server')
-try {
-    & .\mvnw.cmd -q test
-    if ($LASTEXITCODE -ne 0) {
-        throw "server tests failed (exit code $LASTEXITCODE)"
-    }
-} finally {
-    Pop-Location
+if (Test-Path (Join-Path $Apps 'package.json')) {
+    Install-Apps
+    Push-Location $Apps
+    try {
+        Say 'screen type checks'
+        Run 'npm' @('run', 'typecheck', '--silent')
+        Say 'screen tests'
+        Run 'npm' @('test', '--silent')
+    } finally { Pop-Location }
+    if (-not $NoE2e) { & "$PSScriptRoot\test-e2e.ps1" }
 }
 
-Write-Host '== all tests passed'
+Say 'all tests passed'

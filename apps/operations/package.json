@@ -1,0 +1,20 @@
+{
+  "name": "@fp/operations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:e2e": "vitest run e2e/",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fp/shared": "0.1.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.30.6"
+  }
+}

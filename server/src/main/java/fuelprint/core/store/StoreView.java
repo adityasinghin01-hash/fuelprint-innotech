@@ -18,6 +18,9 @@ public interface StoreView {
      */
     List<StoredRecord> list(String type, String runId);
 
+    /** The latest revision of every record of {@code type} in any run (or none), oldest record first. */
+    List<StoredRecord> listAll(String type);
+
     /** The latest revision number of a record, or 0 if it does not exist. */
     long latestRevision(String type, String id);
 }

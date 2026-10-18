@@ -1,0 +1,82 @@
+/* IDEAVERSE palette for every FuelPrint app. Add class "fp-dark" on <body> for Field's dark variant. */
+:root {
+  --fp-velvet-green: #1e3b32;
+  --fp-ivory: #f4f2ec;
+  --fp-sage: #dce5dd;
+  --fp-ink: #16211d;
+  --fp-clay: #b8663e;
+
+  --fp-bg: var(--fp-ivory);
+  --fp-surface: #ffffff;
+  --fp-text: var(--fp-ink);
+  --fp-muted: #4a5a53;
+  --fp-accent: var(--fp-velvet-green);
+  --fp-warning: var(--fp-clay);
+  --fp-border: var(--fp-sage);
+  --fp-touch: 44px;
+  --fp-radius: 6px;
+  --fp-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.fp-dark {
+  --fp-bg: var(--fp-ink);
+  --fp-surface: var(--fp-velvet-green);
+  --fp-text: var(--fp-ivory);
+  --fp-muted: #b9c7bd;
+  --fp-accent: var(--fp-sage);
+  --fp-warning: #e08a5f;
+  --fp-border: #2e5246;
+}
+
+body {
+  margin: 0;
+  background: var(--fp-bg);
+  color: var(--fp-text);
+  font-family: var(--fp-font);
+  line-height: 1.45;
+}
+
+.fp-button {
+  min-height: var(--fp-touch);
+  padding: 0 1rem;
+  border-radius: var(--fp-radius);
+  border: 2px solid var(--fp-accent);
+  background: var(--fp-accent);
+  color: var(--fp-bg);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.fp-button[data-variant='secondary'] { background: transparent; color: var(--fp-accent); }
+.fp-button:disabled { opacity: 0.45; cursor: not-allowed; }
+.fp-button:focus-visible, .fp-input:focus-visible { outline: 3px solid var(--fp-clay); outline-offset: 2px; }
+
+.fp-input {
+  min-height: var(--fp-touch);
+  padding: 0 0.75rem;
+  border: 2px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+  background: var(--fp-surface);
+  color: var(--fp-text);
+  font: inherit;
+}
+
+.fp-explain { display: block; font-size: 0.85rem; color: var(--fp-muted); }
+.fp-badge {
+  display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.15rem 0.6rem; border-radius: 999px;
+  font-size: 0.85rem; font-weight: 600; border: 2px solid currentColor;
+}
+.fp-badge[data-status='live'] { color: var(--fp-accent); }
+.fp-badge[data-status='stale'], .fp-badge[data-status='offline'] { color: var(--fp-warning); }
+.fp-badge[data-status='connecting'] { color: var(--fp-muted); }
+
+.fp-banner {
+  padding: 0.6rem 1rem; border-left: 6px solid var(--fp-warning); background: var(--fp-surface); color: var(--fp-text);
+}
+.fp-auto { color: var(--fp-accent); font-weight: 600; }
+.fp-log { list-style: none; margin: 0; padding: 0; }
+.fp-log li { padding: 0.4rem 0; border-bottom: 1px solid var(--fp-border); }
+.fp-log .fp-refused { color: var(--fp-warning); }
+.fp-form { display: grid; gap: 0.6rem; max-width: 22rem; }
+.fp-error { color: var(--fp-warning); font-weight: 600; }
+.fp-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
