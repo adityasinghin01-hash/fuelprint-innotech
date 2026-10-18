@@ -2,12 +2,15 @@
   "analysis_ids": [
     "bd102e47-bb60-57cb-8588-8805263298d3"
   ],
-  "created_by": "system",
+  "created_by": "automation",
   "created_utc": "2026-10-22T10:00:00.000Z",
   "id": "220dcf8d-6c28-5658-a7ba-2efac8457436",
   "revision": 1,
   "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
   "state": "ANALYSED",
   "survey_id": null,
-  "trigger_id": "81d3f02e-0579-55d5-980f-0bd10f4e2c5f"
+  "trigger_id": "81d3f02e-0579-55d5-980f-0bd10f4e2c5f",
+  "warned_area_ids": [
+    "AREA-E"
+  ]
 }

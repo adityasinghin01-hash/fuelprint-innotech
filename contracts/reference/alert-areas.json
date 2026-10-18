@@ -1,0 +1,23 @@
+{
+  "version": "FP-AREAS-1",
+  "origin": "SYNTHETIC_TEACHING",
+  "note": "Fictional residential areas around the fictional estate, in ENU metres from the map origin (28.87 N, 77.12 E). They are labels for the SMS demo, not real places.",
+  "warning_rule": {
+    "downwind_half_angle_deg": 30,
+    "max_range_m": 2000,
+    "measured_from": "the sensor box that raised the trigger",
+    "direction": "wind_from_deg + 180, clockwise from north",
+    "area_point": "centre"
+  },
+  "areas": [
+    {"id": "AREA-W", "name": "West village", "centre": {"east": -1000, "north": 0},
+     "polygon": [[-1300, -300], [-700, -300], [-700, 300], [-1300, 300]]},
+    {"id": "AREA-N", "name": "North colony", "centre": {"east": 0, "north": 800},
+     "polygon": [[-350, 500], [350, 500], [350, 1100], [-350, 1100]]},
+    {"id": "AREA-E", "name": "East colony", "centre": {"east": 900, "north": 50},
+     "polygon": [[600, -250], [1200, -250], [1200, 350], [600, 350]]},
+    {"id": "AREA-S", "name": "South village", "centre": {"east": 0, "north": -850},
+     "polygon": [[-350, -1150], [350, -1150], [350, -550], [-350, -550]]}
+  ],
+  "check": "SC1: trigger at N2 (120, 100), wind from 270 -> downwind 90 deg. AREA-E centre bearing 93.7 deg at 782 m -> warned. AREA-N, AREA-W, AREA-S -> not warned."
+}

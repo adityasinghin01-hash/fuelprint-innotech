@@ -1,0 +1,14 @@
+{
+  "auto_alerts": true,
+  "auto_autopilot": true,
+  "auto_capture": true,
+  "auto_propose": true,
+  "auto_retrain": true,
+  "auto_seal": true,
+  "autopilot_wait_s": 60,
+  "created_by": "presenter",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "id": "3390ed7e-d71d-5b19-b1ee-85438491991d",
+  "revision": 1,
+  "run_id": null
+}

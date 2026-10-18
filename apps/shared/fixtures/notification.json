@@ -1,0 +1,50 @@
+[
+  {
+    "area_ids": [
+      "AREA-E"
+    ],
+    "cause": {
+      "id": "81d3f02e-0579-55d5-980f-0bd10f4e2c5f",
+      "revision": 1,
+      "type": "trigger"
+    },
+    "created_by": "automation",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "failed": 0,
+    "gateway_mode": "REAL",
+    "id": "8943ca27-bbef-5029-a202-f9a420fa4534",
+    "kind": "SMOKE_WARNING",
+    "recipients": 3,
+    "revision": 1,
+    "run_id": null,
+    "sent": 3,
+    "state": "SENT",
+    "suppressed_reason": null,
+    "text": "FuelPrint DEMO (simulated): smoke may drift toward East colony in the next 30 min. Investigation started. No action needed.",
+    "wording_id": "c7914274-6830-54d8-8ac2-f4c28fa3f95d"
+  },
+  {
+    "area_ids": [
+      "AREA-E"
+    ],
+    "cause": {
+      "id": "8f6d9a75-83b9-58b7-8a70-37ccf2e7bd9b",
+      "revision": 1,
+      "type": "board_decision"
+    },
+    "created_by": "automation",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "failed": 0,
+    "gateway_mode": "REAL",
+    "id": "47fab706-5426-5aa0-ae22-9d6e01a2d8af",
+    "kind": "BOARD_UPDATE",
+    "recipients": 3,
+    "revision": 1,
+    "run_id": null,
+    "sent": 3,
+    "state": "SENT",
+    "suppressed_reason": null,
+    "text": "FuelPrint DEMO (simulated): the board has acted on the smoke source near East colony. Thank you for staying informed.",
+    "wording_id": null
+  }
+]

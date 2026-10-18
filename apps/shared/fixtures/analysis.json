@@ -46,7 +46,7 @@
       "status": "SURVIVES"
     }
   ],
-  "created_by": "system",
+  "created_by": "automation",
   "created_utc": "2026-10-22T10:00:00.000Z",
   "exclusions": [
     {
@@ -55,10 +55,37 @@
     }
   ],
   "explanation_text": "Box N2 saw a sustained SO2 rise. S01 and S02 sit on the same wind line upwind of N2, so both still fit. A reading closer to S02 at plume height would separate them.",
+  "history_counts": {
+    "S01": 1,
+    "S02": 3,
+    "S03": 0,
+    "S04": 0,
+    "S05": 0,
+    "S06": 0
+  },
   "id": "bd102e47-bb60-57cb-8588-8805263298d3",
   "input_window_ids": [
     "d6195dea-ba55-5267-a761-b7171356dfca"
   ],
+  "learned_model_version_id": "edb308f3-b319-5388-8589-02569e031d3f",
+  "learned_order": [
+    {
+      "explanation_id": "S02",
+      "order_score": 1.84,
+      "rank": 1
+    },
+    {
+      "explanation_id": "S01+S02",
+      "order_score": 0.97,
+      "rank": 2
+    },
+    {
+      "explanation_id": "S01",
+      "order_score": 0.41,
+      "rank": 3
+    }
+  ],
+  "learned_status": "OK",
   "limitations": [
     "Synthetic model only, not field validated",
     "Unregistered sources cannot be ruled out",

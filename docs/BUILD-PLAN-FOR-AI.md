@@ -1,3 +1,5 @@
+> **SUPERSEDED on 18 Oct 2026.** This was the 16 Oct manual (Codex core, Cortex science). Agreement version 2 moved all AI-side building to Kiro and added the AI pieces, automation and SMS alerts. A new build plan replaces this file. Do not follow it.
+
 # Build plan for the AI side (Claude orchestrator, Codex, Cortex, Kiro)
 
 Written 16 Oct 2026 at the end of the planning chat. This is the working manual for the chat that runs the build on Aditya Singh's Mac. The teammates' guides are in `docs/plan/`. This file covers the parts the AI tools build themselves: the shared core, the science engine and Field, plus how Claude runs and checks everything.

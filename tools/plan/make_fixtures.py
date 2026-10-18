@@ -7,8 +7,10 @@ def uid(name): return str(uuid.uuid5(uuid.NAMESPACE_URL, "fuelprint/" + name))
 RUN = uid("run")
 def base(kind, name, rev=1, by="system", t="2026-10-22T10:00:00.000Z"):
     return {"id": uid(name), "run_id": RUN, "revision": rev, "created_utc": t, "created_by": by}
-def rec(kind, name, **f):
-    d = base(kind, name, f.pop("_rev", 1), f.pop("_by", "system")); d.update(f); return d
+def glob(d):
+    d["run_id"] = None; return d
+def rec(_kind, _name, **f):
+    d = base(_kind, _name, f.pop("_rev", 1), f.pop("_by", "system")); d.update(f); return d
 sensors = [rec("sensor", n, label=n, inlet={"east": e, "north": no, "up": 3}, channels=["SO2_ppb", "CO2_ppm", "PM_ugm3"],
                status="OK", calibration_state="VALID_SYNTHETIC")
            for n, e, no in [("N1", -20, 60), ("N2", 120, 100), ("N3", 280, 140), ("N4", 400, -100)]]
@@ -22,8 +24,11 @@ F = {
                std_uncertainty=6.1, background_window_id=uid("bg-window")),
  "trigger": rec("trigger", "trigger", channel="SO2_ppb", sensor=sensors[1]["id"], intervals=[[397.0, 412.0]],
                 background_window_id=uid("bg-window"), rule="TEACH-DETECT-1"),
+ "anomaly": rec("anomaly", "anomaly", sensor=sensors[1]["id"], channel="SO2_ppb", start_s=360.0, end_s=660.0, observed_mean=54.8,
+                expected_low=2.1, expected_high=9.6, model_version_id=uid("model-normal-1"), state="OPEN",
+                suggestion="SCHEDULE_SURVEY", _by="automation"),
  "investigation": rec("investigation", "investigation", trigger_id=uid("trigger"), survey_id=None, state="ANALYSED",
-                      analysis_ids=[uid("analysis")]),
+                      analysis_ids=[uid("analysis")], warned_area_ids=["AREA-E"], _by="automation"),
  "analysis": rec("analysis", "analysis", input_window_ids=[uid("window")], outcome="AMBIGUOUS_OR_OPTIONAL_MIXTURE",
                  qualification="SYNTHETIC_SCOPE_ONLY",
                  candidates=[{"explanation_id": "S02", "sources": ["S02"], "fit": 0.94, "status": "SURVIVES", "reason": None},
@@ -35,7 +40,12 @@ F = {
                  limitations=["Synthetic model only, not field validated", "Unregistered sources cannot be ruled out",
                               "Fit numbers are not probabilities"],
                  explanation_text="Box N2 saw a sustained SO2 rise. S01 and S02 sit on the same wind line upwind of N2, so both still fit. A reading closer to S02 at plume height would separate them.",
-                 algorithm_version="FP-COMPAT-3-stub"),
+                 algorithm_version="FP-COMPAT-3-stub",
+                 learned_order=[{"explanation_id": "S02", "rank": 1, "order_score": 1.84},
+                                {"explanation_id": "S01+S02", "rank": 2, "order_score": 0.97},
+                                {"explanation_id": "S01", "rank": 3, "order_score": 0.41}],
+                 learned_status="OK", learned_model_version_id=uid("model-learn-1"),
+                 history_counts={"S01": 1, "S02": 3, "S03": 0, "S04": 0, "S05": 0, "S06": 0}, _by="automation"),
  "proposal": rec("proposal", "proposal", analysis_id=uid("analysis"), result="BEST_ACTION", best_action_id="A-AER-0-100",
                  cheaper_action_id="A-GND-120-100",
                  actions=[{"action_id": "A-AER-0-100", "kind": "DISCRIMINATE", "vehicle": "DRONE", "target": {"east": 0, "north": 100, "up": 35},
@@ -47,7 +57,7 @@ F = {
  "mission": rec("mission", "mission", proposal_id=uid("proposal"), survey_id=None, action_id="A-AER-0-100", vehicle_id=uid("drone-1"),
                 target={"east": 0, "north": 100, "up": 35}, route=[{"east": 0, "north": 0, "up": 2}, {"east": 0, "north": 100, "up": 35}],
                 method_id="TEACH-NODE-ONLINE-2", channel_ids=["SO2_ppb", "CO2_ppm"], dependency_hash=mission_hash,
-                state="APPROVED", expires_s=712.0, _rev=2, _by="supervisor"),
+                state="APPROVED", expires_s=712.0, pilot="VISITOR", _rev=2, _by="supervisor"),
  "pairing": rec("pairing", "pairing", mission_id=uid("mission"), vehicle_id=uid("drone-1"), code="KQ7TXP", phrase="green river",
                 expires_utc="2026-10-22T10:02:00.000Z", state="CONFIRMED"),
  "lease": rec("lease", "lease", vehicle_id=uid("drone-1"), holder_session="visitor-7f3a", state="ACTIVE",
@@ -81,7 +91,7 @@ F = {
                 legal_suitability="NOT_ASSESSED"),
  "board_decision": rec("board_decision", "board", case_id=uid("case"), decision="CANDIDATE_SUPPORTED_SIMULATED",
                        rationale="Valid screening and a passing synthetic lab result; alternatives remain.",
-                       notice={"area": "Estate block west", "interval": "22 Oct, 01:00 to 03:00", "status_text": "An air quality investigation is in progress in this area."}),
+                       notice={"area_ids": ["AREA-E"], "area": "East colony", "interval": "22 Oct, 01:00 to 03:00", "status_text": "An air quality investigation is in progress in this area."}),
  "export": rec("export", "export", case_id=uid("case"), case_revision=6, manifest_sha256=hashlib.sha256(b"example-manifest").hexdigest(),
                members=[{"path": "payload/records/finding/%s-r1.json" % uid("finding"), "length": 812, "sha256": hashlib.sha256(b"finding").hexdigest()}],
                signature=None, state="SEALED"),
@@ -90,17 +100,52 @@ F = {
                                   "custody_documentation": "PASS", "measurement_qualification": "SYNTHETIC_SCOPE_ONLY", "legal_suitability": "NOT_ASSESSED"},
                             reasons=[]),
  "receipt": {"receipt_id": uid("receipt"), "command_id": uid("cmd"), "status": "APPLIED", "reason_code": None, "reason_text": None,
-             "record_refs": [{"type": "mission", "id": uid("mission"), "revision": 2}]},
+             "record_refs": [{"type": "mission", "id": uid("mission"), "revision": 2}], "actor": "supervisor@laptop-1", "automatic": False},
  "tick": {"schema_version": "fp/1", "message_type": "tick", "run_id": RUN, "server_epoch": uid("epoch"), "cursor": 1842, "sim_time_s": 412.35,
           "server_time_utc": "2026-10-22T10:15:04.120Z",
           "payload": {"wind": {"from_deg": 270, "speed_m_s": 3.0}, "time_scale": 1,
                       "vehicles": [{"vehicle_id": uid("drone-1"), "label": "DRONE-1", "kind": "DRONE",
                                     "pose": {"east": 12.0, "north": 98.5, "up": 35.0, "yaw_deg": 90}, "velocity": {"east": 1.2, "north": 0, "up": 0},
-                                    "inlet": {"east": 12.4, "north": 98.5, "up": 34.6}, "energy_wh": 51.3, "stage": "OUTBOUND", "lease_holder": "visitor-7f3a"}],
+                                    "inlet": {"east": 12.4, "north": 98.5, "up": 34.6}, "energy_wh": 51.3, "stage": "OUTBOUND", "lease_holder": "visitor-7f3a", "pilot": "VISITOR"}],
                       "latest_readings": [{"sensor": "N2", "channel": "SO2_ppb", "value": 61.2, "quality": ["OK"], "sim_time_s": 412.0}]}},
+ # v2 (18 Oct): AI, automation and SMS alerts. Records not tied to a run have run_id null.
+ "model_version": [glob(rec("model_version", "model-learn-1", model_kind="LEARNED_RANKER", version="FP-LEARN-1.0", parent_id=None, state="ACTIVE",
+                        trained_on={"synthetic_nights": 20000, "case_examples": 0, "real_hours": 0,
+                                    "note": "EXAMPLE ONLY, not a real result. Random simulated nights; SC1-SC3 settings and seeds never used"},
+                        trained_where="MAC_CPU",
+                        test_results={"nights": 600, "first_correct": 412, "in_top_3": 561, "wrong_when_no_source": 9,
+                                      "wrong_when_unregistered": 31, "misses": 39},
+                        real_checks=[{"dataset": "KINCAID", "what": "Smoke-spread maths vs measured arc maximum",
+                                      "result_text": "EXAMPLE ONLY: real numbers come from the check run"}],
+                        gate={"passed": True, "reason": "First version"}, lessons=[],
+                        file={"path": "models/fp-learn-1.0.onnx", "sha256": hashlib.sha256(b"fp-learn-1.0").hexdigest()})),
+                   glob(rec("model_version", "model-normal-1", model_kind="NORMAL_AIR", version="FP-NORMAL-1.0", parent_id=None, state="ACTIVE",
+                        trained_on={"synthetic_nights": 0, "case_examples": 0, "real_hours": 8760,
+                                    "note": "EXAMPLE ONLY, not a real result. Real hourly SO2, CPCB Murthal (Sonipat), with Open-Meteo wind"},
+                        trained_where="MAC_CPU", test_results={"hours": 2190, "inside_band": 1981, "above_band": 112, "below_band": 97},
+                        real_checks=[], gate={"passed": True, "reason": "First version"}, lessons=[],
+                        file={"path": "models/fp-normal-1.0.onnx", "sha256": hashlib.sha256(b"fp-normal-1.0").hexdigest()}))],
+ "wording": rec("wording", "wording-expl", target={"type": "analysis", "id": uid("analysis"), "revision": 1}, purpose="EXPLANATION",
+                text="Box N2 picked up sulphur gas for more than 15 seconds. Two factories, S01 and S02, are upwind on the same line, so both could explain it. A drone reading at 35 m near S02 can tell them apart.",
+                source="LLM", model="claude-haiku-5-5", prompt_version="FP-WORD-1",
+                checks=[{"check": "numbers_match_input", "passed": True}, {"check": "banned_words", "passed": True},
+                        {"check": "length", "passed": True}], fallback_reason=None, _by="automation"),
+ "alert_subscription": glob(rec("alert_subscription", "sub-1", phone_masked="+91 98xxxxxx78", area_ids=["AREA-E"],
+                                consent_text_version="FP-CONSENT-1", consent_utc="2026-10-22T09:40:00.000Z", state="ACTIVE",
+                                expires_utc="2026-10-22T18:29:59.000Z", _by="guest-21c9")),
+ "notification": [glob(rec("notification", "note-warn", kind="SMOKE_WARNING", area_ids=["AREA-E"],
+                           text="FuelPrint DEMO (simulated): smoke may drift toward East colony in the next 30 min. Investigation started. No action needed.",
+                           wording_id=uid("wording-sms"), cause={"type": "trigger", "id": uid("trigger"), "revision": 1},
+                           recipients=3, sent=3, failed=0, state="SENT", suppressed_reason=None, gateway_mode="REAL", _by="automation")),
+                  glob(rec("notification", "note-board", kind="BOARD_UPDATE", area_ids=["AREA-E"],
+                           text="FuelPrint DEMO (simulated): the board has acted on the smoke source near East colony. Thank you for staying informed.",
+                           wording_id=None, cause={"type": "board_decision", "id": uid("board"), "revision": 1},
+                           recipients=3, sent=3, failed=0, state="SENT", suppressed_reason=None, gateway_mode="REAL", _by="automation"))],
+ "automation_settings": glob(rec("automation_settings", "automation", auto_propose=True, auto_autopilot=True, autopilot_wait_s=60,
+                                 auto_capture=True, auto_seal=True, auto_alerts=True, auto_retrain=True, _by="presenter")),
 }
 for k, v in F.items():
     (OUT / f"{k}.json").write_text(json.dumps(v, indent=2, sort_keys=True) + "\n")
-(OUT / "README.md").write_text("# Example data (fp/1)\n\nOne example of every record and message in `contracts/AGREEMENT.md`, from scenario SC1. "
+(OUT / "README.md").write_text("# Example data (fp/1, version 2)\n\nOne example of every record and message in `contracts/AGREEMENT.md`, from scenario SC1. "
     "Screens use these before the fake server is ready. Generated by `tools/plan/make_fixtures.py`; do not edit by hand.\n")
 print(len(F), "fixture files written to", OUT)

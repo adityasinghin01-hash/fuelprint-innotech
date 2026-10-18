@@ -1,0 +1,15 @@
+{
+  "area_ids": [
+    "AREA-E"
+  ],
+  "consent_text_version": "FP-CONSENT-1",
+  "consent_utc": "2026-10-22T09:40:00.000Z",
+  "created_by": "guest-21c9",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "expires_utc": "2026-10-22T18:29:59.000Z",
+  "id": "fdbb53b8-e2f9-5c73-9cde-d7e2e3835979",
+  "phone_masked": "+91 98xxxxxx78",
+  "revision": 1,
+  "run_id": null,
+  "state": "ACTIVE"
+}

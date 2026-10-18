@@ -14,3 +14,9 @@ server/config/stations.json
 keys/
 *.pem
 docs/plan/build/
+
+# v2: training labels, downloaded real data, local secrets
+data/training/
+data/real/
+server/config/sms.json
+server/config/llm.json

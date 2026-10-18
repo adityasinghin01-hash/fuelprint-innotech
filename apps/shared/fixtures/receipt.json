@@ -1,4 +1,6 @@
 {
+  "actor": "supervisor@laptop-1",
+  "automatic": false,
   "command_id": "5dcec16e-26a1-53a2-b7df-5d33bf7d0017",
   "reason_code": null,
   "reason_text": null,

@@ -1,0 +1,17 @@
+{
+  "channel": "SO2_ppb",
+  "created_by": "automation",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "end_s": 660.0,
+  "expected_high": 9.6,
+  "expected_low": 2.1,
+  "id": "c99212c6-53ce-5b7c-9920-49092cb3c46f",
+  "model_version_id": "d3f5446f-cd25-59f9-9b7a-4479d18c54fa",
+  "observed_mean": 54.8,
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "sensor": "bd8d7561-fe95-5a5b-9105-e6d29b83bc2b",
+  "start_s": 360.0,
+  "state": "OPEN",
+  "suggestion": "SCHEDULE_SURVEY"
+}

@@ -67,9 +67,21 @@ def build(md_path):
 <div class="s">{meta.get('subtitle','')}</div></div><div class="cols">{body}</div></body></html>"""
     h = HTML / (md_path.stem + ".html"); h.write_text(html)
     pdf = OUT / (md_path.stem + ".pdf")
-    with tempfile.TemporaryDirectory() as prof:
-        subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--no-pdf-header-footer", f"--user-data-dir={prof}",
-                        f"--print-to-pdf={pdf}", h.as_uri()], check=True, capture_output=True, timeout=120)
+    pdf.unlink(missing_ok=True)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as prof:
+        # Chrome writes the PDF but on some macOS versions never exits, so wait for the
+        # "bytes written" line and then stop it.
+        proc = subprocess.Popen([CHROME, "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
+                                 "--no-pdf-header-footer", f"--user-data-dir={prof}", f"--print-to-pdf={pdf}", h.as_uri()],
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        try:
+            for line in proc.stdout or []:
+                if "bytes written to file" in line:
+                    break
+        finally:
+            proc.kill(); proc.wait()
+    if not pdf.exists() or pdf.stat().st_size == 0:
+        sys.exit(f"PDF not written: {pdf}")
     return pdf
 for p in sorted(SRC.glob("0*.md")):
     print(build(p))

@@ -25,6 +25,7 @@
         "kind": "DRONE",
         "label": "DRONE-1",
         "lease_holder": "visitor-7f3a",
+        "pilot": "VISITOR",
         "pose": {
           "east": 12.0,
           "north": 98.5,

@@ -5,7 +5,10 @@
   "decision": "CANDIDATE_SUPPORTED_SIMULATED",
   "id": "8f6d9a75-83b9-58b7-8a70-37ccf2e7bd9b",
   "notice": {
-    "area": "Estate block west",
+    "area": "East colony",
+    "area_ids": [
+      "AREA-E"
+    ],
     "interval": "22 Oct, 01:00 to 03:00",
     "status_text": "An air quality investigation is in progress in this area."
   },

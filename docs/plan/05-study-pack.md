@@ -1,23 +1,25 @@
 ---
 title: "FuelPrint study pack"
-subtitle: "The whole idea for all five of us · mostly for Abhivansh, our pitcher · 16 Oct 2026"
+subtitle: "The whole idea for all five of us · mostly for Abhivansh, our pitcher · version 2, 18 Oct 2026"
 ---
 
 # Study pack
 
-**Who reads what.** Everyone reads parts 1 to 6 and part 9. Abhivansh reads everything, including the hardware, the money and all 92 judge questions. The schedule at the end is his.
+**Who reads what.** Everyone reads parts 1 to 9 and part 12. Abhivansh reads everything, including the hardware, the money, all 92 judge questions and the 16 AI and automation questions. The schedule at the end is his.
+
+**New in version 2:** the pitch (part 1), the run (part 3), the AI (part 5), automation (part 6), SMS alerts (part 7), real data (part 8), new "never say" lines (part 12) and questions AI01 to AI16 (part 13, group K).
 
 ## 1. The two-minute pitch
 
-> Industrial pollution investigations in NCR are slow and messy. In January 2026 the Commission for Air Quality Management ordered 16 industrial units to close, 14 of them in Sonipat, for problems ranging from missing consents to unapproved fuels and broken pollution-control equipment. An inspector facing a pollution spike has to guess which factory to visit, when, and what to measure.
+> Industrial pollution investigations in NCR are slow and manual. In January 2026 the Commission for Air Quality Management ordered 16 industrial units to close, 14 of them in Sonipat, for problems ranging from missing consents to unapproved fuels and broken pollution-control equipment. An inspector facing a pollution spike has to guess which factory to visit, when, and what to measure.
 >
-> FuelPrint is an AI-assisted investigation system. Sensor boxes watch the air. When one sees a sustained sulphur rise, FuelPrint ranks which registered factories could explain it, and also keeps "unknown source" and "can't tell" as real answers. Then it plans the one next measurement that would best tell the remaining suspects apart, checks it is reachable and safe, and a human approves it. A drone (you can fly it from your phone) takes that measurement. Every sample is checked channel by channel, the inspector's specimen is kept separate with seals and handovers, and the whole case is sealed so any tampering shows up.
+> FuelPrint is an AI system that automates the investigation, from the first sulphur rise to a sealed case. Sensor boxes watch the air, and a normal-air model trained on real CPCB data flags anything unusual. When an alarm fires, FuelPrint opens the investigation by itself, ranks which registered factories could explain it, keeps "unknown source" and "can't tell" as real answers, and plans the one measurement that would best tell the suspects apart. It warns nearby residents by SMS. A drone flies the mission by itself, or you fly it from your phone. Every sample is checked gas by gas, the evidence is sealed so any tampering shows, and every closed case teaches the AI. People sign only the five decisions that carry legal weight.
 >
-> What makes it different is honesty. A box can miss a plume entirely, and FuelPrint says so instead of calling the area clean. It never claims to detect a fuel or prove guilt. It tells the investigator what the evidence supports and what it doesn't.
+> What makes it different is honesty. A box can miss a plume entirely, and FuelPrint says so instead of calling the area clean. It never claims to detect a fuel or prove guilt, and its AI can never override the physics checks.
 >
-> Today it runs on a synthetic estate laid on the real Kundli map. The hardware path is costed in stages, starting with a ₹50,000 two-day test against a reference SO2 analyser. Come and fly the drone.
+> Today it runs on a synthetic estate laid on the real Kundli map, and its learned ranker trains on simulated nights on KIET's DGX A100. The hardware path is costed in stages, starting with a ₹50,000 two-day test against a reference SO2 analyser. Sign up for the SMS, and come and fly the drone.
 
-Keep to this order: problem, what we do, why it's different, what's real today, invitation. Never add "detects coal" or a percentage.
+Keep to this order: problem, what we do, why it's different, what's real today, invitation. Never add "detects coal" or a percentage. The one line to remember: **"AI does the work, humans sign it."**
 
 ## 2. The problem in India, and what the numbers mean
 
@@ -33,16 +35,20 @@ Keep to this order: problem, what we do, why it's different, what's real today, 
 
 ## 3. How FuelPrint works, in one run
 
-1. Four boxes (N1 to N4) report SO2, CO2 and particles every second.
-2. An alarm rule fires only after 15 valid seconds in a row are clearly above a fresh background.
-3. The ranking tests every registered factory (S01 to S06), every pair, and a range of weather errors. It keeps the explanations that still fit, plus unknown.
-4. The planner looks at up to 8 possible measurements, throws out the unreachable or unsafe ones, and picks the one that best separates the remaining explanations per minute of work. It may say "no measurement would help".
-5. A supervisor approves. Any change in wind or analysis cancels the approval.
-6. The drone flies (by phone or keyboard) and samples at its inlet, through all the stages.
-7. Each channel is checked: VALID, LIMITED or REJECTED with reasons.
-8. The ranking updates with the new evidence.
-9. Cases: a separate inspector specimen, custody handovers, lab result with QC, a limited finding, a sealed and verifiable evidence pack.
-10. The board decides and previews a public notice that names no factory.
+AUTO = the system does it by itself. HUMAN = a person decides.
+
+1. AUTO: four boxes (N1 to N4) report SO2, CO2 and particles every second.
+2. AUTO: an alarm rule fires only after 15 valid seconds in a row are clearly above a fresh background. The normal-air model separately flags air that is unusual for this hour and wind.
+3. AUTO: an investigation opens. The ranking tests every registered factory (S01 to S06), every pair, and a range of weather errors. It keeps the explanations that still fit, plus unknown. The learned ranker puts the survivors in order.
+4. AUTO: an SMS warning goes to people signed up in the downwind area.
+5. AUTO: the planner looks at up to 8 possible measurements, throws out the unreachable or unsafe ones, and picks the one that best separates the remaining explanations per minute of work. It may say "no measurement would help". The mission is proposed.
+6. HUMAN: a supervisor approves. AUTO: any change in wind or analysis cancels the approval.
+7. AUTO or a visitor: the drone flies (autopilot, phone or keyboard) and samples at its inlet, through all the stages, which start by themselves.
+8. AUTO: each gas is pre-checked. HUMAN: the QC person confirms VALID, LIMITED or REJECTED with reasons.
+9. AUTO: the ranking updates with the new evidence.
+10. Cases: a separate inspector specimen, custody handovers, lab result with QC (AUTO maths), a limited finding (HUMAN), a sealed and verified evidence pack (AUTO).
+11. HUMAN: the board decides. AUTO: an area-level SMS that names no factory.
+12. AUTO: the learned ranker retrains from the closed case and must pass a quality check.
 
 ## 4. The science in plain words
 
@@ -52,7 +58,7 @@ Keep to this order: problem, what we do, why it's different, what's real today, 
 
 **Wind "from".** 270° means wind from the west, blowing east. Our default is 3 m/s from 270°.
 
-**Background.** Clean air is not zero. Our background is 5 ppb SO2 and 420 ppm CO2, and it drifts slowly. Every measurement is compared to a background measured close in time.
+**Background.** Clean air is not zero. Our background SO2 follows the real daily pattern measured at the CPCB station at Murthal, Sonipat; CO2 sits around 420 ppm; both drift slowly. The readings are still synthetic. Every measurement is compared to a background measured close in time.
 
 **Sensor lag (T90).** A sensor takes time to catch up with a change. T90 is the time to reach 90 % of a step. In our model SO2 takes 60 s and CO2 30 s. A short puff can be missed or flattened, and that is a valid result.
 
@@ -68,19 +74,67 @@ Keep to this order: problem, what we do, why it's different, what's real today, 
 
 ## 5. The AI part
 
-**What the AI does.**
+FuelPrint has seven AI pieces. The AI and automation page (OP07, laptop 5) shows all of them.
 
-- **Ranking.** For each explanation (6 single factories, 15 pairs) and each of 27 weather variations (wind direction ±10°, speed ×0.8 to 1.2, height ±10 m), it fits how strongly each factory would have to emit to match the readings, never allowing negative emissions. Explanations whose error stays under a cutoff survive. The cutoff is calculated from separate calibration runs, never tuned on the final test.
-- **Outcomes.** INVALID, NO_SIGNAL, UNKNOWN_OR_MISMATCH, AMBIGUOUS_OR_OPTIONAL_MIXTURE, PROVISIONAL_SINGLE. Even a single surviving factory never rules out an unregistered source.
-- **Planning.** For each feasible action, it predicts the range of readings each surviving explanation would produce there, and scores how far apart those ranges are per minute of the full procedure. If all ranges overlap, the answer is NO_USEFUL_MEASUREMENT, and the investigator saves a wasted trip.
+| # | Piece | Kind of AI | What it does | Learns from |
+|---|---|---|---|---|
+| 1 | Smoke-spread reasoning | Physics model plus a constrained best fit | Tests which factories can explain the readings | Nothing; checked against real tracer experiments |
+| 2 | Learned ranker | Machine learning (trees in version 1, a neural network in version 2) | Puts the surviving factories in order | Simulated nights; version 2 on the KIET DGX A100 |
+| 3 | Planner | Decision-making search | Picks the next measurement | Nothing; reasons fresh each time |
+| 4 | Learning loop | Retraining with a quality gate | Turns closed cases into lessons | Our own sealed cases |
+| 5 | AI wording | An existing chat model (Claude) | Plain words for explanations, findings, SMS | Nothing |
+| 6 | Normal-air model | Machine learning | Flags air that isn't normal for the hour and wind | Real CPCB SO2 data, Murthal |
+| 7 | Autopilot | Automatic flight control | Flies the approved route | Nothing |
 
-**What the AI never does.** It never approves its own mission, never sees the hidden truth, never turns a fit into a probability, never writes an official outcome, and never names a fuel.
+**1. Smoke-spread reasoning.** For each explanation (6 single factories, 15 pairs) and each of 27 weather variations (wind direction ±10°, speed ×0.8 to 1.2, height ±10 m), it fits how strongly each factory would have to emit to match the readings, never allowing negative emissions. Explanations whose error stays under a cutoff survive. The cutoff is calculated from separate calibration runs, never tuned on the final test. Outcomes: INVALID, NO_SIGNAL, UNKNOWN_OR_MISMATCH, AMBIGUOUS_OR_OPTIONAL_MIXTURE, PROVISIONAL_SINGLE. Even a single surviving factory never rules out an unregistered source.
 
-**Honest weakness.** In an older synthetic test, the system made 25 wrong single-source calls in 240 episodes, mostly with mixed sources and weather errors. We keep that number and show we learned from it: the new version admits pairs, unknown sources and "can't tell".
+**2. The learned ranker.** It looks at the same public data (readings, wind, positions, the fits) plus "past nights" (how often each factory fit on earlier runs) and puts the survivors in order: 1, 2, 3. It learned from thousands of random simulated nights: a random factory, a pair, an unregistered source or nothing, with winds drawn from the real Kundli history and random sensor faults. The demo scenarios are never in its training data, and it is tested on nights it never saw, split by factory so it can't pass by memory. **It can only order. It can't bring back a factory the physics check rejected, change the outcome or hide "unknown".**
 
-**An LLM?** Optional in the finale, only to rewrite the explanation in plain words. It can't change any number or decision.
+**3. Planning.** For each feasible action, it predicts the range of readings each surviving explanation would produce there, and scores how far apart those ranges are per minute of the full procedure. If all ranges overlap, the answer is NO_USEFUL_MEASUREMENT, and the investigator saves a wasted trip.
 
-## 6. Samples and evidence
+**4. The learning loop.** When a case is sealed with a supported finding and a passing lab test, it becomes a lesson (the label is the site the inspector sampled). Rejected and inconclusive cases are skipped, with the reason shown. The new version is tested on the same unseen nights; if it got worse, it is rejected and the old one stays. Both results are normal.
+
+**5. AI wording.** A chat model rewrites the explanation, the finding and each SMS in plain words. Before the text is used, the server checks that every number matches the original, that no SMS names a factory, and that no banned word appears. If anything fails, or there is no internet, the fixed text is used. It never sees the hidden truth or anyone's phone number.
+
+**6. The normal-air model.** It learned the normal SO2 band for each hour, month and wind from real hourly data at the CPCB station at Murthal, Sonipat. When a box stays above that band for five minutes, it flags "unusual air" and suggests a survey. It never fires the alarm; the alarm stays a fixed, published rule.
+
+**7. The autopilot.** It flies the approved route, holds position while sampling and comes home, under exactly the same limits as a person. It never picks a target itself.
+
+**Where the DGX comes in.** Version 1 of the learned ranker is small and trains in minutes on a laptop. Version 2, for the finale, is a neural network trained on far more simulated nights on KIET's NVIDIA DGX A100 (one A100 GPU). We say exactly which version is running.
+
+**What the AI never does.** It never approves its own mission, never sees the hidden truth, never turns a fit or a rank into a probability, never writes an official outcome, never names a fuel, and never overrides the physics check.
+
+**Honest weaknesses.** In an older synthetic test, the system made 25 wrong single-source calls in 240 episodes, mostly with mixed sources and weather errors. We keep that number and show we learned from it: the new version admits pairs, unknown sources and "can't tell". The learned ranker learns our model of the world, not the real one; that is why its order can't override the physics check, and why a real pilot would retrain it on confirmed cases. Its test numbers come only from the test report, misses included.
+
+## 6. The automation
+
+Everything routine happens by itself: watching the boxes, the alarm, opening the investigation, the ranking, the SMS warning, proposing the mission, expiring a stale approval, flying, the safety stop, the battery return, the sampling stages, the pre-check, updating the ranking, the lab maths, sealing and verifying the evidence, the board update SMS, retraining, and deleting phone numbers at midnight.
+
+**Five decisions stay human:** approving a mission, rejecting a mission, reviewing a capture, writing a finding, and the board decision. They carry legal responsibility, so the system refuses to do them itself.
+
+**How it works.** Every automatic step is a normal command sent by the server's `automation` actor. It goes through the same checks as a person's command, gets a receipt, and appears in the automation log. If a step is refused, automation stops that step instead of retrying in a loop. The presenter can switch each automatic step off on OP07 and run the same story by hand.
+
+## 7. SMS alerts and privacy
+
+- Visitors sign up at `/alerts/` with their number, one or more of four fictional areas, and a consent tick.
+- They get an SMS when smoke heads to their area, and another when the board decides. Each SMS starts "FuelPrint DEMO (simulated):" and names no factory.
+- The SMS goes from one teammate's Android phone running the free "SMS Gateway for Android" app. A real deployment would use the pollution board's registered SMS sender (India requires DLT registration for business SMS).
+- Limits: one warning per area every 10 minutes, at most 80 SMS a day.
+- Numbers are kept in one table only, masked everywhere else, never sent to the chat model, and deleted at midnight.
+
+## 8. Real data we use
+
+| Data | Real? | Used for |
+|---|---|---|
+| Kundli building outlines (Overture Maps: Google, Microsoft, OpenStreetMap) | Real | The 3D context buildings |
+| Kundli hourly wind, Nov 2025 to Jan 2026 (Open-Meteo) | Real, but computer-modelled weather | Winds for the training nights and the normal-air model |
+| Hourly SO2 at CPCB Murthal, Sonipat | Real measurements | Training the normal-air model; the background pattern |
+| Tracer field experiments with known sources (Kincaid 187 m stack, Copenhagen 115 m, Indianapolis, Lillestrøm, Prairie Grass) | Real measurements | Checking our smoke-spread maths, and in the finale the learned ranker, against real air |
+| The factories, their emissions, every reading in the demo, lab results, cases | Synthetic | The whole demo |
+
+There is no public dataset that links Indian factories to sensor readings. That is why the ranker learns from simulated nights, and we say so. A published 2024 study (Xu and others, Geoscientific Model Development) used the same approach: train on simulations, test on real tracer releases.
+
+## 9. Samples and evidence
 
 **Three different things.** The drone's online air reading (a screening record), a retained filter or container (finale), and the inspector's specimen are three separate items. One never becomes another.
 
@@ -94,7 +148,7 @@ Keep to this order: problem, what we do, why it's different, what's real today, 
 
 **The law.** India's Air Act section 26 describes official sampling: notice to the occupier, sampling in their presence, marking and sealing, sending to a recognised lab. Our inspector flow imitates the shape of that workflow. Legal suitability is always "not assessed".
 
-## 7. Hardware (Abhivansh must know this well)
+## 10. Hardware (Abhivansh must know this well)
 
 Nothing physical has been bought, built or tested. These are costed plans with conditions.
 
@@ -127,7 +181,7 @@ Nothing physical has been bought, built or tested. These are costed plans with c
 
 **The van.** We don't buy one first. A portable kit with rented reference access comes first.
 
-## 8. Money and business (Abhivansh)
+## 11. Money and business (Abhivansh)
 
 | Stage | Cash | What it buys |
 |---|---|---|
@@ -143,7 +197,7 @@ Base C + D is ₹2,10,000; with the bench box ₹2,12,000; with all CO2 options 
 
 **Business, honestly.** Our first buyer guess is a measurement or lab partner, or an industrial estate association, testing a small paid pilot. A regulator buying it is a separate, slower path we can't assume. We have no customer yet. In one example, a fully managed service would cost ₹4,81,000 a month against ₹1,50,000 revenue and lose ₹3,31,000. A partner-software model breaks even at about four contracts under assumed prices. One two-person crew can handle about 20 complete events a month, so 100 events would need at least five crews. Without a grant, a three-month payment delay needs about ₹3.7 lakh of working capital.
 
-## 9. What we say and never say
+## 12. What we say and never say
 
 | Say | Never say |
 |---|---|
@@ -154,8 +208,12 @@ Base C + D is ₹2,10,000; with the bench box ₹2,12,000; with all CO2 options 
 | "An official-style workflow demo" | "Legal evidence" |
 | "A costed hardware plan, not yet tested" | "Our hardware works" |
 | "Synthetic estate on the real Kundli map" | Any real factory name |
+| "AI does the work, humans sign it" | "The AI decides" |
+| "First in N of M test nights, misses included" (from the report) | "The AI is 90 % accurate" |
+| "Trained on simulated nights; normal air learned from real CPCB data" | "Trained on real factory data" |
+| "A demo SMS, labelled simulated" | "A real pollution warning" |
 
-## 10. The 92 judge questions, short answers
+## 13. The 92 judge questions, short answers
 
 Answers are short so you can say them. "Can't" answers are fine: judges respect a clear limit more than a bluff.
 
@@ -363,16 +421,49 @@ Answers are short so you can say them. "Can't" answers are fine: judges respect 
 
 **FP92 Small errors in wind, height, lag and interference combine to blame an innocent neighbour?** The model can fail like that, which is why we keep uncertainty, mixtures and unknowns, and need independent evidence before any action.
 
-## 11. Abhivansh's schedule
+### K. AI and automation (AI01 to AI16)
+
+**AI01 Where is the AI?** Seven pieces: smoke-spread reasoning, the learned ranker, the planner, the learning loop, AI wording, the normal-air model and the autopilot. All seven are on OP07.
+
+**AI02 What is the learned ranker trained on?** Thousands of random simulated nights: a random factory, a pair, an unregistered source or none, winds from the real Kundli history, random sensor faults. No public Indian dataset links factories to readings.
+
+**AI03 Isn't training on your own simulation circular?** Partly, yes: it learns our model of the world. That is why its order can't override the physics check, why it is tested on unseen nights split by factory, and why we check the smoke maths against real tracer experiments with known sources. A real pilot would retrain it on confirmed cases.
+
+**AI04 How accurate is it?** We quote only the counts from the test report on unseen nights, misses included. Never a percentage on a factory.
+
+**AI05 Why the DGX?** Version 2 is a neural network on far more nights; one A100 GPU makes that hours instead of days. Version 1 trains in minutes on a laptop, and we say which one is running.
+
+**AI06 What does the learning loop learn from?** Only sealed cases with a supported finding and a passing lab test. Rejected and inconclusive cases are skipped with a reason. A new version must not get worse on the same test nights, or it is rejected.
+
+**AI07 Can the AI blame a factory?** No. It orders suspects; the physics check decides who survives; "unknown" always stays; five decisions are human; legal suitability is "not assessed".
+
+**AI08 What does the chat model do?** Rewrites text in plain words. Numbers must match the original, no SMS may name a factory, banned words are refused; otherwise the fixed text is used. It never sees the hidden truth or phone numbers, and without internet the fixed text is used.
+
+**AI09 Which AI uses real data?** The normal-air model learned from real hourly SO2 at the CPCB Murthal station with real wind. The smoke maths is checked on real tracer experiments. The map and wind are real.
+
+**AI10 Why not let the model fire the alarm?** A fixed, published rule is easy to check and explain; a learned model can drift. The model suggests a survey; a person decides.
+
+**AI11 What is automated, and what isn't?** Every routine step is automatic. The five decisions with legal weight (approve, reject, review a capture, write a finding, board decision) are always human.
+
+**AI12 Can you show the same run without automation?** Yes. OP07 has a switch for each automatic step.
+
+**AI13 What if automation goes wrong?** Every automatic step is a normal command with a receipt and a log entry. A refused step stops instead of looping, and a person can switch automation off at any time.
+
+**AI14 Is the SMS real?** A real SMS from a teammate's phone, labelled "DEMO (simulated)", only to people who opted in, with numbers deleted at midnight. A real deployment would use the board's registered SMS sender.
+
+**AI15 Could an SMS cause panic or defame a factory?** Every SMS says demo, names no factory, covers an area not a building, and is rate-limited. In a real deployment the board would approve the message templates.
+
+**AI16 What is real and what is simulated?** Real: the map, the wind, the CPCB SO2 data and the tracer experiments. Synthetic: the factories, every reading in the demo, the lab results and the cases.
+
+## 14. Abhivansh's schedule
 
 | Day | Study | Practise |
 |---|---|---|
-| Fri 16 Oct | Parts 1 to 3 and the team plan | Read the pitch aloud three times |
-| Sat 17 Oct | Part 4, questions A and B | Explain "why a box can miss" to a friend |
-| Sun 18 Oct | Parts 5 and 6, questions G and H | Say the seven checks from memory |
-| Mon 19 Oct | Part 7 hardware, questions C, D, E, F | Draw the node block diagram from memory |
-| Tue 20 Oct | Part 8 money, questions I and J | Watch the join day; note what each screen shows |
-| Wed 21 Oct | Everything again | Full 6-minute demo talk; teammates fire 10 random questions each |
-| 25 to 29 Oct | Weak answers again, the finale additions | Two timed run-throughs a day; one-page hardware sheet for judges |
+| Sun 18 Oct | Parts 1 to 3 and the team plan | Read the pitch aloud three times |
+| Mon 19 Oct | Parts 4 to 8, questions A, B and K | Explain "where is the AI" and "why a box can miss" to a friend |
+| Tue 20 Oct | Parts 9 and 10, questions C to H | Say the seven checks and the five human decisions from memory |
+| Wed 21 Oct | Part 11 money, questions I and J, then everything again | Full 7-minute demo talk at the rehearsal; teammates fire 10 random questions each |
+| 22 to 24 Oct | Weak answers again | One run-through before the slot |
+| 25 to 29 Oct | Weak answers, the finale additions, the DGX model results | Two timed run-throughs a day; one-page hardware sheet for judges |
 
 Rule for answering on stage: answer in one sentence, give one number if you have it, say the limit, then offer to show it on screen.

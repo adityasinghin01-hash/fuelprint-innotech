@@ -1,0 +1,78 @@
+[
+  {
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "file": {
+      "path": "models/fp-learn-1.0.onnx",
+      "sha256": "01dd521b23156fe0ef7ee2b4acfa7d4049bf795f83d9f3f9928a1a8d1dcbbf8b"
+    },
+    "gate": {
+      "passed": true,
+      "reason": "First version"
+    },
+    "id": "edb308f3-b319-5388-8589-02569e031d3f",
+    "lessons": [],
+    "model_kind": "LEARNED_RANKER",
+    "parent_id": null,
+    "real_checks": [
+      {
+        "dataset": "KINCAID",
+        "result_text": "EXAMPLE ONLY: real numbers come from the check run",
+        "what": "Smoke-spread maths vs measured arc maximum"
+      }
+    ],
+    "revision": 1,
+    "run_id": null,
+    "state": "ACTIVE",
+    "test_results": {
+      "first_correct": 412,
+      "in_top_3": 561,
+      "misses": 39,
+      "nights": 600,
+      "wrong_when_no_source": 9,
+      "wrong_when_unregistered": 31
+    },
+    "trained_on": {
+      "case_examples": 0,
+      "note": "EXAMPLE ONLY, not a real result. Random simulated nights; SC1-SC3 settings and seeds never used",
+      "real_hours": 0,
+      "synthetic_nights": 20000
+    },
+    "trained_where": "MAC_CPU",
+    "version": "FP-LEARN-1.0"
+  },
+  {
+    "created_by": "system",
+    "created_utc": "2026-10-22T10:00:00.000Z",
+    "file": {
+      "path": "models/fp-normal-1.0.onnx",
+      "sha256": "89501e3801f36a1478544f30eb4a78a25893f0de88322e1527b82c9b0358ff3c"
+    },
+    "gate": {
+      "passed": true,
+      "reason": "First version"
+    },
+    "id": "d3f5446f-cd25-59f9-9b7a-4479d18c54fa",
+    "lessons": [],
+    "model_kind": "NORMAL_AIR",
+    "parent_id": null,
+    "real_checks": [],
+    "revision": 1,
+    "run_id": null,
+    "state": "ACTIVE",
+    "test_results": {
+      "above_band": 112,
+      "below_band": 97,
+      "hours": 2190,
+      "inside_band": 1981
+    },
+    "trained_on": {
+      "case_examples": 0,
+      "note": "EXAMPLE ONLY, not a real result. Real hourly SO2, CPCB Murthal (Sonipat), with Open-Meteo wind",
+      "real_hours": 8760,
+      "synthetic_nights": 0
+    },
+    "trained_where": "MAC_CPU",
+    "version": "FP-NORMAL-1.0"
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "checks": [
+    {
+      "check": "numbers_match_input",
+      "passed": true
+    },
+    {
+      "check": "banned_words",
+      "passed": true
+    },
+    {
+      "check": "length",
+      "passed": true
+    }
+  ],
+  "created_by": "automation",
+  "created_utc": "2026-10-22T10:00:00.000Z",
+  "fallback_reason": null,
+  "id": "dc34438f-f659-5005-938e-87c434f5cb94",
+  "model": "claude-haiku-5-5",
+  "prompt_version": "FP-WORD-1",
+  "purpose": "EXPLANATION",
+  "revision": 1,
+  "run_id": "dde2d0fb-324a-58fd-ac10-15136eb5843c",
+  "source": "LLM",
+  "target": {
+    "id": "bd102e47-bb60-57cb-8588-8805263298d3",
+    "revision": 1,
+    "type": "analysis"
+  },
+  "text": "Box N2 picked up sulphur gas for more than 15 seconds. Two factories, S01 and S02, are upwind on the same line, so both could explain it. A drone reading at 35 m near S02 can tell them apart."
+}

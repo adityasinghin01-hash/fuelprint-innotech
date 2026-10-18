@@ -1,9 +1,17 @@
 ---
 title: "FuelPrint Cases guide"
-subtitle: "For Antara and Aditya · step by step, with the Codex prompts · 16 Oct 2026"
+subtitle: "For Antara and Aditya · step by step, with the Codex prompts · version 2, 18 Oct 2026"
 ---
 
 # Cases guide
+
+## What changed in version 2 for you
+
+- **Sealing and verifying can happen by themselves.** When a finding is saved, the server's `automation` actor seals the export and then verifies it (if `auto_seal` is on). Antara's handlers accept `automation` for `seal_export` and `verify_export`, and a listener submits them. The exporter can still press the buttons.
+- **`revise_finding` is human only.** It must refuse the `automation` actor, with a test.
+- **AI plain words for findings.** After a finding is saved, the AI package writes a plain-words summary (a `wording` record). CA05 shows it, labelled as AI wording.
+- **Learning loop.** A sealed case with a SUPPORTED_WITHIN_SCOPE finding and a passing lab result becomes a lesson for the learned ranker. You build nothing for this; just keep `specimen.site_id` and `lab_result.qc_status` exactly as specified.
+- **New dates:** the core foundation lands Mon 19 Oct morning (Antara starts then), the fake server Mon 19 Oct evening (Aditya starts then). Join day is Wed 21 Oct.
 
 ## What Cases does
 
@@ -40,10 +48,12 @@ Three ideas run through everything you build:
 
 | From | What | Ready |
 |---|---|---|
-| Core | Server, database, `CommandBus`, `RecordStore`, blob store for exact bytes, `/ws/live`, fake replay mode, `@fp/shared` | Sat 17 Oct evening |
-| Field | `screening_record` events (one per channel per capture, VALID, LIMITED or REJECTED with reasons) | Join day, Tue 20 Oct. Fixtures before that. |
+| Core (Kiro) | Server, database, `CommandBus`, `AutomationBus`, `RecordStore`, blob store for exact bytes | **Mon 19 Oct morning** (Claude messages the group) |
+| Core (Kiro) | `/ws/live`, fake replay mode, `@fp/shared` with `AutomationLog` | **Mon 19 Oct evening** |
+| Field (Kiro) | `screening_record` events (one per channel per capture, VALID, LIMITED or REJECTED with reasons) | Join day, Wed 21 Oct. Fixtures before that. |
+| AI (Kiro) | `wording` records with plain words for your findings | Join day. Fixture before that. |
 | Operations | The `investigation` and `analysis` the case belongs to | Join day |
-| Example data | `apps/shared/fixtures/*.json` | Fri 16 Oct night |
+| Example data | `apps/shared/fixtures/*.json` | Now (version 2) |
 
 ## What you give to others
 
@@ -78,18 +88,17 @@ If both duplicates are zero the RPD is undefined: mark it unavailable, never div
 
 ## Steps for Antara
 
-### N0 · Set up and run the fake server (Sat 17 Oct, after 6 PM)
+### N0 · Get the core (Mon 19 Oct, morning)
 
 ```
 git pull origin main
 git checkout cases/antara && git merge main
-tools/start-fake.sh
 tools/test-all.sh
 ```
 
-**Done when** the server starts and the core tests pass on your laptop.
+**Done when** the core tests pass on your laptop. From Monday evening `tools/start-fake.sh` also works.
 
-### N1 · Case records and intake (Sat 17 to Sun 18 Oct)
+### N1 · Case records and intake (Mon 19 Oct)
 
 ```
 Build case records in server/src/main/java/fuelprint/cases.
@@ -107,7 +116,7 @@ kept with its limitation; wrong state rejected; repeated command_id does
 nothing; wrong role rejected.
 ```
 
-### N2 · Specimens and custody (Sun 18 Oct)
+### N2 · Specimens and custody (Mon 19 Oct)
 
 ```
 In fuelprint.cases:
@@ -127,7 +136,7 @@ still visible; non-holder cannot append without an exception; a correction
 leaves the original row unchanged.
 ```
 
-### N3 · Lab result maths (Sun 18 to Mon 19 Oct)
+### N3 · Lab result maths (Tue 20 Oct, morning)
 
 ```
 In fuelprint.cases, command request_lab (lab_demo): specimen_id, method_id,
@@ -145,7 +154,7 @@ Write the exact tests from the table in docs/plan/03-cases-guide.md: 2.0 %,
 missing spike = PENDING, hold time exceeded.
 ```
 
-### N4 · Findings (Mon 19 Oct)
+### N4 · Findings (Tue 20 Oct)
 
 ```
 In fuelprint.cases, command revise_finding (case_reviewer): outcome,
@@ -159,21 +168,22 @@ cited_refs[], alternatives[], limitations[].
 - legal_suitability is always NOT_ASSESSED; reject any attempt to set it.
 - Reject finding text containing "guilty", "illegal", "proved" or "coal used".
 - A new finding is a new revision; old ones stay. Case state FINDING.
-Tests for each rule.
+- revise_finding is human only: refuse the automation actor.
+Tests for each rule, including automation refused.
 ```
 
-### N5 · Evidence vault (Mon 19 Oct)
+### N5 · Evidence vault (Tue 20 Oct, evening)
 
 ```
 In fuelprint.cases:
-- Command seal_export (exporter): case must be in FINDING. Collect every record
+- Command seal_export (roles exporter and automation): case must be in FINDING. Collect every record
   the finding cites, plus the case, specimens, custody events and lab results.
   Serialise each as canonical JSON (sorted keys, no spaces, UTF-8), store the
   exact bytes in the core blob store at payload/records/<type>/<id>-r<rev>.json.
   Build the manifest {schema:"fp.evidence/1", case_id, case_revision,
   created_utc, members:[{path,length,sha256}], limitations}. Store its exact
   bytes and manifest_sha256. Case state SEALED. Never re-serialise later.
-- Command verify_export: recompute every member hash and the manifest hash from
+- Command verify_export (roles exporter and automation): recompute every member hash and the manifest hash from
   stored bytes. Save a verification_report with seven axes: integrity
   (PASS/FAIL), key_trust (NOT_SIGNED until the finale), lineage (PASS if every
   cited ref is a member), trusted_time (UNVERIFIED), custody_documentation
@@ -182,18 +192,25 @@ In fuelprint.cases:
   which member failed.
 - Command tamper_copy: copy the export into a NEW export marked
   TAMPER_DEMO_COPY, flip one byte of one member's copied bytes. The original
-  export and its blobs must stay byte-identical.
+  export and its blobs must stay byte-identical. tamper_copy is exporter only.
+- Automation: an @EventListener on finding events submits seal_export through
+  AutomationBus.submit (only if automation_settings.auto_seal is on), and a
+  listener on export events submits verify_export the same way. Listeners
+  never save records themselves.
+- Never put alert_subscription or notification records in an export.
 Tests: seal then verify passes; tamper copy fails integrity on exactly that
-member; original still passes after tampering the copy.
+member; original still passes after tampering the copy; a saved finding is
+sealed and verified automatically (receipts automatic=true) when auto_seal is
+on, and not when it is off.
 ```
 
-### N6 · Join day (Tue 20 Oct)
+### N6 · Join day (Wed 21 Oct, 2 PM)
 
-Run SC1, SC2 and SC3 end to end with the real server and Field's real screening records. Check that the SC2 case ends REJECTED_FOR_USE and the SC3 case ends INCONCLUSIVE.
+Run SC1, SC2 and SC3 end to end with the real server and Field's real screening records. Check that the SC2 case ends REJECTED_FOR_USE and the SC3 case ends INCONCLUSIVE, and that only the SC1 case is used as a lesson on the AI page (OP07).
 
 ## Steps for Aditya
 
-### D0 · Set up (Sat 17 Oct evening)
+### D0 · Set up (Mon 19 Oct, evening)
 
 ```
 git pull origin main
@@ -202,22 +219,22 @@ tools/start-fake.sh
 tools/dev-app.sh cases       # http://localhost:5173/cases/
 ```
 
-### D1 · App frame and case list (Sat 17 Oct)
+### D1 · App frame and case list (Mon 19 Oct, evening)
 
 ```
 Build the Cases app frame in apps/cases with @fp/shared (live connection,
-station login, StaleBanner, Explain).
+station login, StaleBanner, Explain, AutomationLog).
 - Top bar: run, case id short code, case state, connection status, roles.
 - Case list page /cases/: every case with state, outcome so far and next
   responsible role.
 - Routes for CA01 to CA06 as placeholders.
 - A case timeline component used on every case page: every record and custody
   event in time order with who did it. Corrections show next to what they
-  correct.
+  correct. Steps done by the automation actor say "done automatically".
 Vitest tests for the timeline order and for the stale state.
 ```
 
-### D2 · Intake screen CA01 (Sun 18 Oct)
+### D2 · Intake screen CA01 (Tue 20 Oct, morning)
 
 ```
 CA01 at /cases/:id/intake (case_reviewer):
@@ -228,7 +245,7 @@ CA01 at /cases/:id/intake (case_reviewer):
 - A clear line: "This is an air reading from the drone. It is not a specimen."
 ```
 
-### D3 · Specimen and custody screens CA02, CA03 (Sun 18 Oct)
+### D3 · Specimen and custody screens CA02, CA03 (Tue 20 Oct)
 
 ```
 CA02 /cases/:id/specimens/new (inspector_demo): form for site (S01-S06),
@@ -240,7 +257,7 @@ holder. "Record exception" form with the exception types. Corrections appear
 beside the original, which stays visible.
 ```
 
-### D4 · Lab screen CA04 (Mon 19 Oct)
+### D4 · Lab screen CA04 (Tue 20 Oct)
 
 ```
 CA04 /cases/specimens/:id/lab (lab_demo):
@@ -253,27 +270,33 @@ CA04 /cases/specimens/:id/lab (lab_demo):
   It does not show that this material caused the plume."
 ```
 
-### D5 · Finding screen CA05 (Mon 19 Oct)
+### D5 · Finding screen CA05 (Tue 20 Oct, evening)
 
 ```
 CA05 /cases/:id/finding (case_reviewer): choose outcome, tick cited records,
 write alternatives and limitations. Show the server's rule errors in plain
 words. Legal suitability is shown as "Not assessed" and cannot be changed.
+After saving, show the wording record for this finding (purpose
+FINDING_SUMMARY) labelled "Plain words by AI (it cannot change any number)",
+or "fixed text" if its source is TEMPLATE. The finding itself is always shown
+above it, unchanged.
 ```
 
-### D6 · Vault screen CA06 (Mon 19 Oct)
+### D6 · Vault screen CA06 (Wed 21 Oct, morning)
 
 ```
 CA06 /cases/:id/vault (exporter):
 - Seal button, then the member list with path, size and the first 12
-  characters of each SHA-256.
+  characters of each SHA-256. If the export was sealed by automation, say
+  "sealed automatically" with the time.
 - Verify button: show the seven axes as seven separate rows with their own
-  status and one-line meaning. Never one big green "verified" badge.
+  status and one-line meaning. Never one big green "verified" badge. Mark an
+  automatic verify as "verified automatically".
 - Tamper demo button: makes a copy, changes one byte, verifies the copy. Show
   the failed member highlighted and that the original still verifies.
 ```
 
-### D7 · Join day (Tue 20 Oct)
+### D7 · Join day (Wed 21 Oct, 2 PM)
 
 Walk all three scenarios on laptops 3 and 4 and note every mismatch with a screenshot.
 
