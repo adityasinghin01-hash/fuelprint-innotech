@@ -1,5 +1,18 @@
 # Lane A: AI prototype, minimal demo and integration implementation plan
 
+## Current execution update — 20 October, after B0 review
+
+Aditya explicitly authorized steps 2 and 3 while Kiro executes step 1. The AI prototype is qualified separately. Further 3D frontend work is paused. Lane B has incorporated `reviews/laneA-B0-review-20261020.md` and is implementing B1–B5 in its own candidate.
+
+Next bounded batch:
+
+1. Add behavioral regressions to the real Cases workbench with transport fixtures: new media commands submit only human inputs with the viewed revision; blank lab inputs remain null; unsupported decimal precision cannot silently change a QC input; aerosol findings cite exact media-lab revisions; below-LOQ stays limited; all signature/trust axes render independently; ZIP access is station/exporter gated and stale views are read-only.
+2. Add the approved shared record types, human action labels, separate aerosol collection/custody/lab panels, and compatible v1/v2 evidence display/download controls. Browser code performs no QC, volume, concentration, ranking or outcome calculation. Existing fuel controls remain intact.
+3. Run the affected app tests, workspace type checks/builds and record actual source hashes. These tests use transport fixtures and do not establish backend integration.
+4. Prepare an explicit integration/final-verification checklist and Windows verification instructions. Receive B's READY file/hash/test manifest, review the delta before composing it into A, accept the AI isolation test, then run current-source backend checks and real-mode fuel/aerosol/signing/ZIP/CLI rehearsal under shared reservations. Do not count inherited test runs as verification of integrated bytes.
+
+Dependency: final signing/aerosol/ZIP qualification and Windows pack commands require B's completed implementation and actual generated artifacts. No early completion claim or duplicate B implementation. No commit/push/deploy in this batch.
+
 > **For agentic workers:** Use executing-plans task by task. Coordinate with the separate Cases chat; do not spawn additional workers automatically. This is a plan, not implemented source.
 
 **Goal:** Build the4–8h rules-based prototype, then the minimal server-connected3D demo, integrate reviewed Cases/Operations changes and qualify the whole system.

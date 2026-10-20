@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component @Profile("!stub")
 final class FindingHandlers extends CasesHandlers.Handler {
     static final Set<String> OUTCOMES = Set.of("SUPPORTED_WITHIN_SCOPE", "REJECTED_FOR_USE", "INCONCLUSIVE");
-    static final Set<String> CITABLE = Set.of("screening_record", "lab_result", "analysis");
+    static final Set<String> CITABLE = Set.of("screening_record", "lab_result", "media_lab_result", "analysis");
     static final List<String> SERVER_LIMITATIONS = List.of(
             "Synthetic teaching observation only; this finding does not assess legal suitability.",
             LabHandlers.CAUSATION_LIMITATION);
@@ -107,7 +107,7 @@ final class FindingHandlers extends CasesHandlers.Handler {
                     "Each cited ref needs exactly a type, an id and a positive whole revision.");
             String type = ref.path("type").textValue(), id = ref.path("id").textValue();
             long revision = ref.path("revision").longValue();
-            CasesRecords.require(CITABLE.contains(type), "A finding may cite only screening_record, lab_result or analysis records.");
+            CasesRecords.require(CITABLE.contains(type), "A finding may cite only screening_record, lab_result, media_lab_result or analysis records.");
             CasesRecords.require(Ids.isUuid(id), "Cited record ids must be UUIDs.");
             CasesRecords.require(seen.add(type + "/" + id), "A record may be cited once.");
             StoredRecord cited = store.get(type, id, revision).filter(r -> c.runId().equals(r.runId()))
@@ -130,20 +130,32 @@ final class FindingHandlers extends CasesHandlers.Handler {
                     usable |= "PASS".equals(qc);
                     rejected |= "FAIL".equals(qc);
                 }
-                default -> {
+                case "media_lab_result" -> {
+                    // Aerosol filter result: its media must belong to this case. Only a USABLE result supports a finding;
+                    // a limited (below LOQ) or pending one supports neither outcome, a failed one supports rejection.
+                    StoredRecord media = store.get("media", CasesRecords.text(b, "media_id"))
+                            .filter(r -> c.runId().equals(r.runId()))
+                            .orElseThrow(() -> CasesRecords.invalid("The cited media lab result has no media in this run."));
+                    CasesRecords.require(caseRecord.id().equals(CasesRecords.text(media.body(), "case_id")),
+                            "The cited media lab result belongs to another case.");
+                    usable |= "USABLE".equals(CasesRecords.text(b, "result_use"));
+                    rejected |= "FAIL".equals(CasesRecords.text(b, "qc_status"));
+                }
+                case "analysis" -> {
                     CasesRecords.require(Ids.isUuid(CasesRecords.text(b, "investigation_id"))
                             && CasesRecords.text(b, "investigation_id").equals(CasesRecords.text(caseBody, "investigation_id")),
                             "The cited analysis belongs to another investigation.");
                     needsAlternatives |= !"PROVISIONAL_SINGLE".equals(CasesRecords.text(b, "outcome"));
                 }
+                default -> throw CasesRecords.invalid("Unsupported cited record type.");
             }
             refs.add(CasesRecords.ref(cited));
         }
         switch (outcome) {
             case "SUPPORTED_WITHIN_SCOPE" -> CasesRecords.require(usable,
-                    "A supported finding must cite a VALID screening record or a lab result whose QC passed.");
+                    "A supported finding must cite a VALID screening record, a lab result whose QC passed, or a usable aerosol media result.");
             case "REJECTED_FOR_USE" -> CasesRecords.require(rejected,
-                    "A rejected-for-use finding must cite a REJECTED screening record or a lab result whose QC failed.");
+                    "A rejected-for-use finding must cite a REJECTED screening record or a lab or media lab result whose QC failed.");
             default -> { }
         }
         CasesRecords.require(!needsAlternatives || !alternatives.isEmpty(),

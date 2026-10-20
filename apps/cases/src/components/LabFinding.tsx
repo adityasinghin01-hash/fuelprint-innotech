@@ -23,9 +23,11 @@ export function FindingForm({record}:{record:CaseRecord}){
   const {snapshot}=useCases();const action=useCasesCommand('case_reviewer');
   const [outcome,setOutcome]=useState<FindingOutcome>('INCONCLUSIVE');const [limitations,setLimits]=useState('');const [alternatives,setAlternatives]=useState('');const [cited,setCited]=useState<RecordRef[]>([]);
   const samples=snapshot.records('specimen').filter(s=>s.case_id===record.id).map(s=>s.id);
+  const media=snapshot.records('media').filter(m=>m.case_id===record.id).map(m=>m.id);
   const investigation=snapshot.record('investigation',record.investigation_id);
   const available=[...snapshot.records('screening_record').filter(s=>record.screening_record_ids.includes(s.id)).map(s=>({type:'screening_record',record:s})),
     ...snapshot.records('lab_result').filter(l=>samples.includes(l.specimen_id)).map(l=>({type:'lab_result',record:l})),
+    ...snapshot.records('media_lab_result').filter(l=>media.includes(l.media_id)).map(l=>({type:'media_lab_result',record:l})),
     ...snapshot.records('analysis').filter(a=>investigation?.analysis_ids.includes(a.id)).map(a=>({type:'analysis',record:a}))];
   return <section className="case-panel"><h2>5 · Human finding</h2><p>Legal suitability remains NOT_ASSESSED.</p>
     <label>Finding outcome<select value={outcome} onChange={e=>setOutcome(e.target.value as FindingOutcome)}>{['SUPPORTED_WITHIN_SCOPE','REJECTED_FOR_USE','INCONCLUSIVE'].map(o=><option key={o}>{o}</option>)}</select></label>

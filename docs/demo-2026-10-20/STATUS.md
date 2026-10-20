@@ -1,6 +1,16 @@
 # FuelPrint connected-demo checkpoint — 20 October 2026
 
+## Final backend closeout — 20 October2026
+
+Independent SPEC/QUALITY review is approved. The persistent local synthetic demo signer is selected and verified, and the owner-authorized AGREEMENT2.4 updates are complete. Final clean package: **1423 tests,0 failures/errors/skips**. Real configured-signer checks and13 packaged CLI cases passed. The refreshed qualification02Windows bundle is ready. Physical Windows and the owner-authorized one SMS test remain pending. All frontend work remains paused. The owner has authorized publication of this verified checkpoint to GitHub `main`. The exact published commit is reported after the remote push is verified. See [backend result](BACKEND-INTEGRATION-RESULTS.md) and [SMS status](NOTIFICATION-STATUS-AND-PHONE-CHECK.md). The entries below are historical checkpoints.
+
+## Latest local backend verification — 20 October 2026
+
+Lane B READY is integrated in candidate A with two additional review fixes and the AI isolation tests. The fresh full backend package passed **1,419 tests, zero failures or skips**. Real HTTP fuel/aerosol/signing/ZIP/tamper, LOG_ONLY and standalone Java verifier checks passed. The Windows bundle is prepared. Independent final review, real signer selection, protected contract text and physical Windows verification remain open. All frontend work is paused and existing app files are preserved. No new commit or push has been made. See [backend result](BACKEND-INTEGRATION-RESULTS.md). The entries below describe earlier checkpoints.
+
 This is an in-progress source checkpoint published at the owner's explicit request. It includes the previously accepted uncommitted backend and the current Lane A candidate. It is not final whole-system acceptance.
+
+Local update after published commit `c236f2e` (not yet pushed): Lane B's D1–D7 protocols were approved with amendments and incorporated by B. A has added the corresponding shared media/signature types and thin Cases forms, independent signature/trust display and ZIP link. Login now shares state with the workbench, and replay disables its controls. Current workspace checks passed: 127 tests, 2 conditional fake-server e2e skips, all type checks and production builds. Browser checks with explicitly mocked protocol data found no page errors or horizontal overflow at 200% zoom; they are not real backend evidence. A's final integration/Windows runner is prepared in the shared evidence directory. Lane B is still implementing its backend; its READY delivery and final integrated qualification remain pending. Further 3D frontend work is paused by Aditya.
 
 Implemented in this checkpoint:
 - Server-side rules-based ordering of existing physics survivors, after planning. Candidate facts and learned metadata remain unchanged; no trained model is claimed.
@@ -9,7 +19,7 @@ Implemented in this checkpoint:
 - Thin Cases screens over the existing intake/specimen/custody/lab/human-finding/seal/verify/tamper-copy commands. Raw laboratory teaching inputs are explicitly labelled; blank inputs remain unknown.
 
 Pending:
-- Lane B's reviewed versioned canonicalization/signing/ZIP/offline CLI/aerosol delta and owner decisions on its exact interfaces and trust anchor. No Lane B readiness manifest was available at this checkpoint.
+- Lane B's READY versioned canonicalization/signing/ZIP/offline CLI/aerosol delta. Exact design interfaces are now approved; selection of any actual trusted signer remains a separate technical setup step.
 - Real-mode same-run browser rehearsal, final integrated full checks and independent SPEC/QUALITY review.
 - Physical second-laptop, phone and Windows checks; external signer trust acceptance.
 

@@ -35,6 +35,9 @@ final class ExportHandlers {
 
     static final String SCOPE_NOTE = "Unsigned integrity check of stored bytes only. It does not show who made the pack, "
             + "when, whether any measurement is true, or legal suitability.";
+    static final String SIGNED_SCOPE_NOTE = "Integrity check of stored bytes and an Ed25519 signature over the exact manifest bytes. A valid signature "
+            + "verifies against the named key; external trust policy decides whether that key is trusted. It does not establish a person's identity, "
+            + "signing time, measurement truth, or legal suitability.";
 
     /** Text appended to an automatic step's refusal so a replayed event can recognise it already ran. */
     static String marker(JsonNode cause) {
@@ -79,8 +82,9 @@ final class ExportHandlers {
         private final BlobStore blobs;
         private final Clock wall;
         private final ObjectProvider<AutomationSettings> settings;
-        SealExport(ObjectProvider<ClockControl> clock, BlobStore blobs, Clock wall, ObjectProvider<AutomationSettings> settings) {
-            super(clock); this.blobs = blobs; this.wall = wall; this.settings = settings;
+        private final EvidenceConfig config;
+        SealExport(ObjectProvider<ClockControl> clock, BlobStore blobs, Clock wall, ObjectProvider<AutomationSettings> settings, EvidenceConfig config) {
+            super(clock); this.blobs = blobs; this.wall = wall; this.settings = settings; this.config = config;
         }
         public String commandType() { return "seal_export"; }
         public Set<Role> allowedRoles() { return Set.of(Role.EXPORTER, Role.AUTOMATION); }
@@ -106,15 +110,19 @@ final class ExportHandlers {
                 if (!cause.isMissingNode())
                     CasesRecords.require(sameRef(cause, caseRecord.body().path("finding_ref")), "cause must be the exact finding revision the case records.");
 
+                // External format/signing configuration. Invalid configuration or a key that cannot sign refuses the
+                // seal; it never falls back to an unsigned or legacy pack.
+                EvidenceConfig.Settings format = config.settings();
+                if (!format.ok()) return marked(new Rejection(format.code(), format.reason()), p);
                 EvidenceVault.Sealed sealed;
                 try {
-                    sealed = new EvidenceVault(blobs).seal(store, caseRecord, WallTime.now(wall));
+                    sealed = new EvidenceVault(blobs).seal(store, caseRecord, WallTime.now(wall), format.options());
                 } catch (EvidenceVault.Refusal r) {
                     return marked(new Rejection(r.code, r.getMessage()), p);
                 }
                 String exportId = Ids.newId(), now = WallTime.now(wall);
                 ObjectNode body = CasesRecords.object();
-                body.put("case_id", caseRecord.id()).put("case_revision", caseRecord.revision()).put("schema", EvidenceVault.SCHEMA);
+                body.put("case_id", caseRecord.id()).put("case_revision", caseRecord.revision()).put("schema", sealed.schema());
                 body.set("case_ref", sealed.caseRef());
                 body.set("finding_ref", sealed.findingRef());
                 body.put("manifest_sha256", sealed.manifestSha256()).put("manifest_length", sealed.manifestBytes().length);
@@ -123,10 +131,20 @@ final class ExportHandlers {
                 for (EvidenceVault.Member m : sealed.members()) members.addObject().put("path", m.path()).put("length", m.length()).put("sha256", m.sha256());
                 ArrayNode refs = body.putArray("member_refs");
                 sealed.memberRefs().forEach(refs::add);
-                body.putNull("signature").put("signature_reason", "NOT_SIGNED_UNTIL_FINALE");
+                if (EvidenceVault.SCHEMA.equals(sealed.schema())) {
+                    body.putNull("signature").put("signature_reason", "NOT_SIGNED_UNTIL_FINALE");
+                } else if (sealed.signatureBytes() == null) {
+                    body.put("signing_policy", "UNSIGNED").putNull("signature").put("signature_reason", "UNSIGNED_BY_POLICY");
+                } else {
+                    body.put("signing_policy", "SIGN_REQUIRED");
+                    body.putObject("signature").put("path", EvidenceVault.SIGNATURE_PATH).put("length", sealed.signatureBytes().length)
+                            .put("sha256", sealed.signatureSha256()).put("algorithm", "Ed25519").put("key_fingerprint_sha256", sealed.keyFingerprint());
+                    body.putNull("signature_reason");
+                }
                 body.set("custody_summary", sealed.custody());
                 body.put("state", "SEALED").put("kind", "ORIGINAL").putNull("copy_of");
-                body.put("origin", CasesRecords.ORIGIN).put("sealed_by", session.actorFor(allowedRoles())).put("scope_note", SCOPE_NOTE);
+                body.put("origin", CasesRecords.ORIGIN).put("sealed_by", session.actorFor(allowedRoles()))
+                        .put("scope_note", sealed.signatureBytes() == null ? SCOPE_NOTE : SIGNED_SCOPE_NOTE);
 
                 ObjectNode nextCase = CasesRecords.own(caseRecord).put("state", "SEALED").put("export_id", exportId).put("sealed_utc", now);
                 nextCase.set("export_ref", CasesRecords.object().put("type", "export").put("id", exportId).put("revision", 1));
@@ -143,8 +161,9 @@ final class ExportHandlers {
     static final class VerifyExport extends CasesHandlers.Handler {
         private final BlobStore blobs;
         private final ObjectProvider<AutomationSettings> settings;
-        VerifyExport(ObjectProvider<ClockControl> clock, BlobStore blobs, ObjectProvider<AutomationSettings> settings) {
-            super(clock); this.blobs = blobs; this.settings = settings;
+        private final EvidenceConfig config;
+        VerifyExport(ObjectProvider<ClockControl> clock, BlobStore blobs, ObjectProvider<AutomationSettings> settings, EvidenceConfig config) {
+            super(clock); this.blobs = blobs; this.settings = settings; this.config = config;
         }
         public String commandType() { return "verify_export"; }
         public Set<Role> allowedRoles() { return Set.of(Role.EXPORTER, Role.AUTOMATION); }
@@ -162,9 +181,11 @@ final class ExportHandlers {
                 CasesRecords.require(Set.of("SEALED", "TAMPER_DEMO_COPY").contains(state), "This record is not a verifiable export.");
                 if (session.isAutomation() && !"SEALED".equals(state))
                     return marked(Rejection.notAllowed("Automation verifies original sealed exports only, never a tamper demo copy."), p);
-                ObjectNode body = new EvidenceVerifier(blobs).verify(export);
+                EvidenceConfig.Trust trust = config.trust();
+                ObjectNode body = new EvidenceVerifier(EvidenceVerifier.blobLookup(blobs), trust.trust(), trust.problem()).verify(export);
                 body.put("export_id", export.id()).put("subject_kind", state).put("origin", CasesRecords.ORIGIN)
-                        .put("verified_by", session.actorFor(allowedRoles())).put("scope_note", SCOPE_NOTE);
+                        .put("verified_by", session.actorFor(allowedRoles()))
+                        .put("scope_note", body.has("signature_check") ? SIGNED_SCOPE_NOTE : SCOPE_NOTE);
                 body.set("export_ref", CasesRecords.ref(export));
                 return HandlerResult.builder().save(RecordChange.create("verification_report", Ids.newId(), c.runId(), body), "EXPORT_VERIFIED", simTime(c, store)).build();
             } catch (CasesRecords.Invalid invalid) {

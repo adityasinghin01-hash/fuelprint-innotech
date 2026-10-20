@@ -1,4 +1,4 @@
-import { CasesWorkbench } from './components/CasesWorkbench';
+import { CasesWorkbenchView } from './components/CasesWorkbench';
 import './cases.css';
 // Minimal case workflow over accepted server commands.
 import {
@@ -48,7 +48,7 @@ function Frame() {
       <StaleBanner status={live.status} />
       <main style={{ padding: '1rem' }}>
         <Routes>
-          <Route path="/" element={<><Placeholder /><CasesWorkbench /></>} />
+          <Route path="/" element={<><Placeholder /><CasesWorkbenchView state={{snapshot:snap,session,live}} /></>} />
           <Route path="*" element={<p>This page does not exist yet. <Link to="/">Back</Link></p>} />
         </Routes>
         {session.status === 'ready' && !session.session?.signed_in ? (

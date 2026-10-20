@@ -7,7 +7,7 @@ export function useCases(){const state=useContext(CasesContext);if(!state)throw 
 export function useCasesCommand(role:Role){
   const {live,snapshot,session}=useCases();const action=useCommand();const run=snapshot.snapshot?.run;
   const allowed=session.status==='ready' && session.session?.signed_in===true && session.can(role);
-  const disabled=!allowed || action.pending || live.status!=='live' || snapshot.status!=='ready' || !run || run.state_reason==='INTERRUPTED';
+  const disabled=!allowed || action.pending || live.status!=='live' || live.mode!=='live' || snapshot.status!=='ready' || !run || run.state_reason==='INTERRUPTED';
   async function send(type:string,payload:object,revision:number|null=null){
     if(disabled)return;
     const receipt=await action.send(type,payload,revision,{runId:run?.id});

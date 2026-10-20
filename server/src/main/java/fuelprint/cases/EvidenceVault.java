@@ -31,6 +31,14 @@ import fuelprint.core.store.StoredRecord;
  */
 final class EvidenceVault {
     static final String SCHEMA = "fp.evidence/1";
+    static final String SCHEMA_V2 = "fp.evidence/2";
+    static final String MEMBER_ENCODING = "fp-canonical-json/1";
+    static final String SIGNATURE_PATH = "signature.json";
+    static final String SIGNATURE_SCHEMA = "fp.evidence-signature/1";
+    static final String UNSIGNED_LIMITATION = "Unsigned integrity record only: matching hashes show these stored bytes are unchanged since sealing, "
+            + "not who made them, when, or that any measurement is true.";
+    static final String SIGNED_LIMITATION = "Signed integrity record: a valid signature from a trusted key shows these stored bytes are unchanged "
+            + "since that key signed them, not when, or that any measurement is true.";
     static final String MANIFEST_PATH = "manifest.json";
     static final int MAX_MEMBERS = 500;
     static final int MAX_MEMBER_BYTES = 1 << 20;
@@ -40,11 +48,12 @@ final class EvidenceVault {
     static final String UNSAFE = "EVIDENCE_UNSAFE";
     static final String INCOHERENT = "EVIDENCE_INCOHERENT";
     static final String STORAGE = "EVIDENCE_STORAGE";
+    static final String SIGNING = "EVIDENCE_SIGNING_FAILED";
 
     /** The only record types that may be members. Anything else reached from a reference is refused. */
     static final Set<String> ALLOWED = Set.of("case", "finding", "specimen", "custody_event", "lab_result",
             "screening_record", "analysis", "attempt", "mission", "proposal", "investigation", "survey",
-            "trigger", "window");
+            "trigger", "window", "media", "media_custody_event", "media_lab_result");
     static final Pattern MEMBER_PATH = Pattern.compile(
             "payload/records/([a-z][a-z0-9_]{0,63})/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-r([1-9][0-9]{0,17})\\.json");
     static final Pattern SHA256 = Pattern.compile("[0-9a-f]{64}");
@@ -63,7 +72,24 @@ final class EvidenceVault {
 
     /** Everything the export record needs, after the manifest and all members were written and read back. */
     record Sealed(byte[] manifestBytes, String manifestSha256, List<Member> members, ObjectNode custody,
-                  ObjectNode caseRef, ObjectNode findingRef, List<ObjectNode> memberRefs) {}
+                  ObjectNode caseRef, ObjectNode findingRef, List<ObjectNode> memberRefs,
+                  String schema, byte[] signatureBytes, String signatureSha256, String keyFingerprint) {}
+
+    /** Produces an Ed25519 signature over exact manifest bytes; never exposes key material. */
+    interface Signer {
+        String fingerprint();
+        byte[] publicKeySpki();
+        byte[] sign(byte[] manifest);
+    }
+
+    /** Format 1 (legacy, unsigned) or format 2 with an optional signer (null = unsigned v2). */
+    record Options(int format, Signer signer) {
+        static final Options V1 = new Options(1, null);
+        Options {
+            if (format != 1 && format != 2) throw new IllegalArgumentException("format");
+            if (format == 1 && signer != null) throw new IllegalArgumentException("v1 cannot be signed");
+        }
+    }
 
     private final BlobStore blobs;
 
@@ -77,8 +103,11 @@ final class EvidenceVault {
         return path != null && path.length() <= 200 && MEMBER_PATH.matcher(path).matches();
     }
 
-    Sealed seal(StoreView store, StoredRecord caseRecord, String createdUtc) {
-        Pack pack = new Pack(store, caseRecord);
+    Sealed seal(StoreView store, StoredRecord caseRecord, String createdUtc) { return seal(store, caseRecord, createdUtc, Options.V1); }
+
+    Sealed seal(StoreView store, StoredRecord caseRecord, String createdUtc, Options options) {
+        boolean v2 = options.format() == 2;
+        Pack pack = new Pack(store, caseRecord, v2 && options.signer() != null);
         pack.collect();
         // Pass 1: every member's bytes are produced and checked before anything is written, so a refusal
         // leaves no partial pack in the blob store.
@@ -96,20 +125,42 @@ final class EvidenceVault {
         for (Map.Entry<String, byte[]> e : files.entrySet())
             members.add(new Member(e.getKey(), e.getValue().length, store(e.getValue(), e.getKey())));
         ObjectNode manifest = CasesRecords.object();
-        manifest.put("schema", SCHEMA).put("case_id", caseRecord.id()).put("case_revision", caseRecord.revision())
+        manifest.put("schema", v2 ? SCHEMA_V2 : SCHEMA).put("case_id", caseRecord.id()).put("case_revision", caseRecord.revision())
                 .put("created_utc", createdUtc);
         ArrayNode list = manifest.putArray("members");
         for (Member m : members) list.addObject().put("path", m.path()).put("length", m.length()).put("sha256", m.sha256());
         ArrayNode limits = manifest.putArray("limitations");
         pack.limitations().forEach(limits::add);
+        Signer signer = options.signer();
+        if (v2) {
+            manifest.put("canonicalization", JcsManifest.PROFILE).put("member_encoding", MEMBER_ENCODING);
+            if (signer == null) manifest.putNull("signing");
+            else manifest.putObject("signing").put("policy", "SIGN_REQUIRED").put("algorithm", "Ed25519")
+                    .put("key_fingerprint_sha256", signer.fingerprint());
+        }
         byte[] manifestBytes;
-        try { manifestBytes = CanonicalJson.bytes(manifest); }
-        catch (CanonicalJson.Unsupported u) { throw new Refusal(UNSAFE, "The manifest cannot be written as canonical JSON: " + u.getMessage()); }
+        try { manifestBytes = v2 ? JcsManifest.bytes(manifest) : CanonicalJson.bytes(manifest); }
+        catch (CanonicalJson.Unsupported | JcsManifest.Unsupported u) { throw new Refusal(UNSAFE, "The manifest cannot be written in its canonical form: " + u.getMessage()); }
         String manifestSha = store(manifestBytes, "manifest");
+        byte[] envelope = null;
+        String envelopeSha = null;
+        if (signer != null) {
+            byte[] signature;
+            try { signature = signer.sign(manifestBytes); }
+            catch (RuntimeException e) { throw new Refusal(SIGNING, "SIGNING_FAILED: the manifest could not be signed."); }
+            ObjectNode env = CasesRecords.object().put("schema", SIGNATURE_SCHEMA).put("algorithm", "Ed25519")
+                    .put("manifest_sha256", manifestSha)
+                    .put("public_key_spki_b64", java.util.Base64.getEncoder().encodeToString(signer.publicKeySpki()))
+                    .put("key_fingerprint_sha256", signer.fingerprint())
+                    .put("signature_b64", java.util.Base64.getEncoder().encodeToString(signature));
+            envelope = JcsManifest.bytes(env);
+            envelopeSha = store(envelope, "signature");
+        }
         List<ObjectNode> refs = new ArrayList<>();
         pack.byPath.values().forEach(r -> refs.add(CasesRecords.ref(r)));
         return new Sealed(manifestBytes, manifestSha, members, pack.custodySummary(), CasesRecords.ref(caseRecord),
-                CasesRecords.ref(pack.finding), refs);
+                CasesRecords.ref(pack.finding), refs, v2 ? SCHEMA_V2 : SCHEMA, envelope, envelopeSha,
+                signer == null ? null : signer.fingerprint());
     }
 
     /** Writes bytes and reads them back from disk, so the pack never names bytes that are not really stored. */
@@ -134,9 +185,12 @@ final class EvidenceVault {
         final Map<String, StoredRecord> byPath = new TreeMap<>();
         final List<StoredRecord> specimens = new ArrayList<>();
         final List<StoredRecord> custodyEvents = new ArrayList<>();
+        final List<StoredRecord> media = new ArrayList<>();
+        final List<StoredRecord> mediaEvents = new ArrayList<>();
         StoredRecord finding;
+        final boolean signed;
 
-        Pack(StoreView store, StoredRecord caseRecord) { this.store = store; this.caseRecord = caseRecord; }
+        Pack(StoreView store, StoredRecord caseRecord, boolean signed) { this.store = store; this.caseRecord = caseRecord; this.signed = signed; }
 
         void collect() {
             JsonNode body = caseRecord.body();
@@ -177,6 +231,60 @@ final class EvidenceVault {
                     throw new Refusal(INCOHERENT, "The finding cites a screening record revision the case did not record.");
             specimens(body);
             labs(body);
+            media(body);
+        }
+
+        /** Aerosol filter media, their full media custody chains and media lab results (separate from fuel specimens). */
+        private void media(JsonNode body) {
+            Set<String> mediaIds = new HashSet<>();
+            for (String id : ids(body, "media_ids")) {
+                StoredRecord m = latest("media", id, "a media item of the case");
+                if (!caseRecord.id().equals(CasesRecords.text(m.body(), "case_id")))
+                    throw new Refusal(INCOHERENT, "Media " + id + " belongs to another case.");
+                add(m); media.add(m); mediaIds.add(id);
+                mediaChain(m);
+            }
+            Set<String> labIds = new LinkedHashSet<>(ids(body, "media_lab_result_ids"));
+            for (JsonNode ref : finding.body().path("cited_refs"))
+                if ("media_lab_result".equals(ref.path("type").asText()) && !labIds.contains(ref.path("id").asText()))
+                    throw new Refusal(INCOHERENT, "The finding cites a media lab result that the case did not record.");
+            for (String id : labIds) addMediaLab(latest("media_lab_result", id, "a media lab result of the case"), mediaIds);
+            for (JsonNode ref : finding.body().path("cited_refs"))
+                if ("media_lab_result".equals(ref.path("type").asText())) addMediaLab(exact(ref, "media_lab_result", "a cited media lab result"), mediaIds);
+        }
+
+        private void mediaChain(StoredRecord m) {
+            String next = CasesRecords.text(m.body(), "current_media_custody_event_id");
+            Set<String> seen = new LinkedHashSet<>();
+            while (next != null) {
+                if (!seen.add(next) || seen.size() > 1000) throw new Refusal(INCOHERENT, "The custody chain of media " + m.id() + " loops.");
+                StoredRecord event = latest("media_custody_event", next, "a media custody event");
+                if (!m.id().equals(CasesRecords.text(event.body(), "media_id")))
+                    throw new Refusal(INCOHERENT, "A media custody event on the chain belongs to other media.");
+                add(event); mediaEvents.add(event);
+                next = CasesRecords.text(event.body(), "previous_event_id");
+            }
+            if (seen.isEmpty()) throw new Refusal(MISSING, "Media " + m.id() + " has no custody event.");
+            long recorded = store.list("media_custody_event", caseRecord.runId()).stream()
+                    .filter(e -> m.id().equals(CasesRecords.text(e.body(), "media_id"))).count();
+            if (recorded != seen.size()) throw new Refusal(INCOHERENT, "Media " + m.id() + " has custody events that are not on its chain.");
+        }
+
+        private void addMediaLab(StoredRecord lab, Set<String> mediaIds) {
+            JsonNode b = lab.body();
+            if (!mediaIds.contains(CasesRecords.text(b, "media_id")))
+                throw new Refusal(INCOHERENT, "Media lab result " + lab.id() + " belongs to media outside this case.");
+            add(lab);
+            StoredRecord pinnedCase = exact(b.path("case_ref"), "case", "the case a media lab result used");
+            if (!caseRecord.id().equals(pinnedCase.id())) throw new Refusal(INCOHERENT, "A media lab result was made for another case.");
+            add(pinnedCase);
+            StoredRecord pinnedMedia = exact(b.path("media_ref"), "media", "the media a media lab result used");
+            if (!pinnedMedia.id().equals(CasesRecords.text(b, "media_id"))) throw new Refusal(INCOHERENT, "A media lab result names different media than it records.");
+            add(pinnedMedia);
+            StoredRecord pinnedCustody = exact(b.path("custody_ref"), "media_custody_event", "the media custody step a media lab result used");
+            if (!pinnedMedia.id().equals(CasesRecords.text(pinnedCustody.body(), "media_id")))
+                throw new Refusal(INCOHERENT, "A media lab result's custody step belongs to other media.");
+            add(pinnedCustody);
         }
 
         private String pathOfPinned(JsonNode screenings, String id) {
@@ -326,8 +434,7 @@ final class EvidenceVault {
 
         List<String> limitations() {
             List<String> all = new ArrayList<>();
-            all.add("Unsigned integrity record only: matching hashes show these stored bytes are unchanged since sealing, "
-                    + "not who made them, when, or that any measurement is true.");
+            all.add(signed ? SIGNED_LIMITATION : UNSIGNED_LIMITATION);
             all.add("Synthetic teaching evidence only; no physical measurement, authenticity or legal suitability is assessed.");
             for (JsonNode l : finding.body().path("limitations")) if (l.isTextual()) all.add(l.textValue());
             ObjectNode custody = custodySummary();
@@ -343,7 +450,11 @@ final class EvidenceVault {
             return names;
         }
 
-        ObjectNode custodySummary() { return summarizeCustody(specimens, custodyEvents); }
+        ObjectNode custodySummary() {
+            List<StoredRecord> items = new ArrayList<>(specimens), events = new ArrayList<>(custodyEvents);
+            items.addAll(media); events.addAll(mediaEvents);
+            return summarizeCustody(items, events);
+        }
     }
 
     /** PASS, LIMITED or NOT_APPLICABLE from exact saved custody records; used at sealing and kept in the export record. */

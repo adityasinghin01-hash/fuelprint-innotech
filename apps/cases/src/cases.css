@@ -4,5 +4,6 @@
 .case-workbench input, .case-workbench select, .case-workbench textarea { min-height: 44px; padding: 8px; font: inherit; border: 1px solid var(--fp-border); background: var(--fp-bg); color: var(--fp-text); border-radius: 4px; box-sizing: border-box; max-width: 100%; }
 .case-workbench .case-choice { display: flex; align-items: center; gap: 12px; }
 .case-workbench .fp-button { margin: 8px 8px 8px 0; }
+.case-workbench a { display: inline-flex; align-items: center; min-height: 44px; overflow-wrap: anywhere; }
 .case-workbench dt { color: var(--fp-muted); }.case-workbench dd { margin: 0 0 12px; }
 .case-workbench pre { white-space: pre-wrap; }.case-workbench fieldset { border: 1px solid var(--fp-border); }

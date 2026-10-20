@@ -1,4 +1,4 @@
-# The FuelPrint agreement (fp/1, version 2.3)
+# The FuelPrint agreement (fp/1, version 2.4)
 
 This file is the contract between the parts of FuelPrint: the shared core, the science engine, the AI pieces, the alerts, Operations, Cases and Field. Every part builds against this file and nothing else, which is how the groups can work at the same time without waiting for each other.
 
@@ -35,6 +35,16 @@ FuelPrint is entered in **AI Solutions for Automation**, so version 2 makes the 
 - Field supplies an optional `ProspectiveInlets` forecast through public API types. Science uses it to predict an immediate hypothetical mission, including sampling stages and complete procedure/return time and energy, without moving the live vehicle or saving observations.
 - Forecasts preserve recorded history, distinguish hypothetical future samples, and support cancellation within the planner's two-second budget. Missing or unavailable forecasts never become instant steady measurements.
 - This approval does not change scenario outcomes, pair filtering, human-only decisions or the scenario/freeze gate. The initial product direction is a hardware-and-physics demonstration in 3D; gameplay is deferred. This backend continuation does not build the 3D environment.
+
+### What changed in version 2.4 (20 Oct 2026, owner-delegated)
+
+Aditya Singh explicitly authorized Codex in this session to complete the signing-key selection and protected contract-document updates. This is a bounded exception for the previously approved Cases additions; AGENTS.md, reference science thresholds, scenario policies and the original accepted worktree are unchanged.
+
+- Section 16 and its two linked extension documents define versioned evidence manifests, Ed25519 signing, separate external key trust, ZIP download and offline verification, and the distinct synthetic teaching aerosol media/custody/lab flow.
+- Existing `fp.evidence/1` bytes and unsigned defaults are retained. New signed v2 seals are allowed for Round 1 when explicitly configured. `SIGN_IF_CONFIGURED` is unsupported: errors refuse sealing instead of silently falling back.
+- The restricted JCS profile applies to new manifests and detached signature envelopes only. Payload record bytes retain the existing exact-decimal canonical encoding.
+- Aerosol results remain separate from fuel results and cannot become fuel-training lessons. Raw values, below-LOQ limits, negative corrected mass and human-only decisions remain visible.
+- This documents approved interfaces, not trained-model availability, physical aerosol capture, real-world source attribution, physical SMS delivery or Windows test completion. Round 1 uses the separately labelled rules-based ordering prototype; a missing trained model is never reported as learned success.
 
 Exact numbers that this file does not repeat live in `contracts/reference/`:
 
@@ -89,6 +99,7 @@ Everything runs from one laptop (the host) at one address, for example `http://1
 | `/field/controller` | The phone joystick page |
 | `/alerts/` | **v2.** The phone page where a visitor signs up for SMS alerts |
 | `POST /api/commands` | Send one command, get one receipt |
+| `GET /api/exports/{export_id}/pack.zip?run_id=` | **v2.4.** Exporter-only download of a sealed original or labelled tamper copy; section 16 |
 | `GET /api/runs/current` | The current run's ID and state |
 | `GET /api/snapshot?run_id=` | Everything current about one run, plus its `cursor` |
 | `GET /api/records/{type}/{id}` | One saved record, latest revision |
@@ -186,7 +197,7 @@ Rules for the live socket:
 | `field_operator` | Field laptop 2 | Fly with the keyboard, start captures, create pairings, start or stop the autopilot |
 | `qc_reviewer` | Field laptop 2 | Review a capture channel by channel |
 | `case_reviewer` | Cases laptops 3 and 4 | Create cases, write findings |
-| `inspector_demo` | Cases laptop 4 | Create specimens, add custody steps |
+| `inspector_demo` | Cases laptop 4 | Create fuel specimens or teaching aerosol media, add custody steps |
 | `lab_demo` | Cases laptop 3 | Enter lab results |
 | `exporter` | Cases laptop 4 | Seal and verify evidence |
 | `board` | Operations laptop 5 | Record the board decision |
@@ -236,6 +247,9 @@ D = needed for the department round. F = finale. **v2** = new or changed in vers
 | `create_specimen` | inspector_demo | `case_id`, `site_id`, `material`, `method_id`, `container`, `seal_id`, `mass_mg` | case in INTAKE or later; mass at least 50 mg | cases | D |
 | `append_custody` | inspector_demo or lab_demo | `specimen_id`, `to_holder`, `seal_state`, `event_time_utc`, `exceptions[]` | from the current holder, or an explicit exception | cases | D |
 | `request_lab` | lab_demo | `specimen_id`, `method_id`, `qc_inputs` | method matches material | cases | D |
+| `create_media` **v2.4** | inspector_demo | `case_id`, `material`, `method_id`, `media_type`, `container`, `seal_id`, `location_label`, `collection` | same-run mutable synthetic case; valid declared collection; subject is case | cases | D |
+| `append_media_custody` **v2.4** | inspector_demo or lab_demo | `media_id`, `to_holder`, `seal_state`, `event_time_utc`, `exceptions[]` | same-run media, exact current custody; holder or documented exception; subject is media | cases | D |
+| `request_media_lab` **v2.4** | lab_demo | `media_id`, `method_id`, `qc_inputs` | same-run teaching media and method; subject is media | cases | D |
 | `revise_finding` | case_reviewer (human only) | `case_id`, `outcome`, `cited_refs[]`, `alternatives[]`, `limitations[]` | outcome allowed by the cited records | cases | D |
 | `record_board_decision` **v2** | board (human only) | `case_id`, `decision`, `rationale`, `notice` (with `area_ids[]`) | case has a finding; notice names no factory | ops | D |
 | `seal_export` **v2** | exporter or automation | `case_id`, `case_revision` | finding exists; all cited bytes present; automation only if `auto_seal` is on | cases | D |
@@ -272,14 +286,17 @@ Every record has `id`, `run_id` (null for records not tied to a run), `revision`
 | `lease` **v2** | `mission_id`, `vehicle_id`, `holder_session` (actor label, `autopilot` for the autopilot), `holder_kind` (VISITOR, OPERATOR, AUTOPILOT), `purpose` (MISSION or RETURN), `state` (ACTIVE, RELEASED, REVOKED, EXPIRED), `expires_utc` (null for autopilot), `last_sequence`, `ended_reason` | field | D |
 | `attempt` | `mission_id`, `method_id`, `stages[]` (stage, start_s, end_s), `channels[]` (channel, valid_seconds, volume_L, status, reasons[], `checked_by` (CAPTURE_RULES or FIELD, null before check), `mean_enhancement`, `mean_enhancement_note` (reason when unknown)), `state` | field | D |
 | `screening_record` | `attempt_id`, `mission_id`, `channel`, `named_use`, `decision` (VALID, LIMITED, REJECTED), `reasons[]`, `summary` (`valid_seconds`, `volume_L`, `mean_enhancement_<unit>`, `automatic_status`, `reviewed_by`) | field | D |
-| `case` | `investigation_id`, `screening_record_ids[]`, `purpose`, `state` (DRAFT, INTAKE, SPECIMEN, LAB, FINDING, SEALED) | cases | D |
+| `case` | `investigation_id`, `screening_record_ids[]`, `purpose`, optional `media_ids[]` and `media_lab_result_ids[]` (v2.4), `state` (DRAFT, INTAKE, SPECIMEN, LAB, FINDING, SEALED) | cases | D |
 | `specimen` | `case_id`, `site_id`, `material`, `method_id`, `container`, `seal_id`, `mass_mg`, `authority_basis` (always INSPECTOR_DEMO), `current_holder` | cases | D |
 | `custody_event` | `specimen_id`, `from_holder`, `to_holder`, `seal_state` (INTACT, BROKEN, MISSING), `event_time_utc`, `recorded_utc`, `exceptions[]` | cases | D |
 | `lab_result` | `specimen_id`, `method_id`, `raw` (gross_ug, blank_ug, mass_mg, dup_a_pct, dup_b_pct, spike_added_ug, spike_recovered_ug), `computed` (net_ug, percent_w_w, rpd_pct, recovery_pct), `qc_status`, `qc_reasons[]`, `reporting` (REPORTED or BELOW_LOQ) | cases | D |
 | `finding` | `case_id`, `outcome` (SUPPORTED_WITHIN_SCOPE, REJECTED_FOR_USE, INCONCLUSIVE), `cited_refs[]`, `alternatives[]`, `limitations[]`, `legal_suitability` (always NOT_ASSESSED) | cases | D |
 | `board_decision` **v2** | `case_id`, `decision` (MORE_INVESTIGATION, NO_SUPPORTED_SOURCE, CANDIDATE_SUPPORTED_SIMULATED, SAMPLE_INVALID), `rationale`, `notice` (`area_ids[]`, area text, interval, status_text) | ops | D |
-| `export` | `case_id`, `case_revision`, `manifest_sha256`, `members[]` (path, length, sha256), `signature` (F), `state` | cases | D |
-| `verification_report` | `export_id`, `axes` (integrity, key_trust, lineage, trusted_time, custody_documentation, measurement_qualification, legal_suitability), `reasons[]` | cases | D |
+| `media` **v2.4** | Separate teaching filter record: `case_id`, material/method/size class, declared `collection`, computed volume and reasons, custody state, exact `case_ref`; null Field attempt with reason. Exact fields in section 16 | cases | D |
+| `media_custody_event` **v2.4** | `media_id`, `previous_event_id`, holders, seal, event/record times, actor, exceptions; insert-only, loop-free chain | cases | D |
+| `media_lab_result` **v2.4** | `media_id`, raw inputs, computed/decimal results and reasons, QC checks/status, reporting/result use, hold time, exact media/case/custody refs, limits and scope; section 16 | cases | D |
+| `export` | `case_id`, `case_revision`, `manifest_sha256`, `members[]` (path, length, sha256), `signature`, `state`; legacy exports retain `schema: fp.evidence/1` and `signature_reason: NOT_SIGNED_UNTIL_FINALE`; **v2.4** adds v2 `signing_policy` and the detached signature locator, with v2 unsigned reason UNSIGNED_BY_POLICY | cases | D |
+| `verification_report` | `export_id`, `axes` (integrity, key_trust, lineage, trusted_time, custody_documentation, measurement_qualification, legal_suitability), `reasons[]`; **v2.4** separate `signature_check` and verifier version where applicable, section 16 | cases | D |
 | `model_version` **v2** | `model_kind` (LEARNED_RANKER, NORMAL_AIR), `version`, `parent_id`, `state` (ACTIVE, RETIRED, REJECTED_BY_GATE), `trained_on` (synthetic_nights, case_examples, real_hours, note), `trained_where` (MAC_CPU, DGX_A100), `test_results` (counts only, see section 11), `real_checks[]` (dataset, what, result_text), `gate` (passed, reason), `lessons[]` (case ids used and case ids skipped with reason), `file` (path, sha256) | ai | D |
 | `wording` **v2** | `target` (type, id, revision), `purpose` (EXPLANATION, FINDING_SUMMARY, SMS_SMOKE_WARNING, SMS_BOARD_UPDATE), `text`, `source` (LLM or TEMPLATE), `model`, `prompt_version`, `checks[]` (check, passed), `fallback_reason` | ai | D |
 | `alert_subscription` **v2** | `phone_masked`, `area_ids[]`, `consent_text_version`, `consent_utc`, `state` (ACTIVE, REMOVED, PURGED), `expires_utc` | alerts | D |
@@ -343,6 +360,9 @@ mission:      PROPOSED -> APPROVED -> LEASED -> OUTBOUND -> AT_TARGET -> COLLECT
 attempt:      COLLECTING -> COMPLETE | FAILED | INTERRUPTED   (a retry is a NEW attempt)
 case:         DRAFT -> INTAKE -> SPECIMEN -> LAB -> FINDING -> SEALED
 custody:      append only; corrections are new events, never edits
+media:        separate filter identity; create_media uses case INTAKE -> SPECIMEN
+              request_media_lab uses INTAKE/SPECIMEN -> LAB; SEALED cases refuse media edits
+media_custody: append only, loop-free, separate from fuel specimen custody
 model_version: (new) -> ACTIVE | REJECTED_BY_GATE ; ACTIVE -> RETIRED when a newer one becomes ACTIVE
 notification: QUEUED -> SENDING -> SENT | PARTIAL | FAILED ; QUEUED -> SUPPRESSED
 subscription: ACTIVE -> REMOVED | PURGED
@@ -517,6 +537,7 @@ The whole chain. AUTO = sent by `automation`. HUMAN = only a person.
 - **Text rules.** At most 160 characters, starts with "FuelPrint DEMO (simulated):", names no factory, uses the AI wording only if it passes the checks in AI-5.
 - **Limits.** At most 1 SMOKE_WARNING per area per 10 wall minutes, and at most `daily_cap` (default 80) SMS per day in total. Over a limit the notification is saved as SUPPRESSED with the reason, never silently dropped.
 - **Gateway.** One teammate's Android phone with a SIM runs the open-source "SMS Gateway for Android" app in local server mode on the stall Wi-Fi. Settings in `server/config/sms.json` (not committed): `mode` (LOG_ONLY or REAL), `gateway_url`, `username`, `password`, `daily_cap`. Default LOG_ONLY: the message is written to the log and the screen, nothing is sent. Only the host at the stall uses REAL. A failed send is retried twice, then counted as failed.
+- **Phone compatibility.** The sending gateway is Android with a working SMS-capable SIM. Consenting recipients can receive ordinary carrier SMS on Android or iPhone; this is not iMessage, WhatsApp or push delivery. The current HTTP adapter records a gateway 2xx acknowledgment as accepted/SENT; it does not establish carrier delivery or that the recipient read it. LOG_ONLY proves no physical send. AI wording is optional and must pass the existing checks; the fixed template remains the fallback.
 - **Privacy.** See ground rule 10. A test checks that no phone number appears in any record, event, export or prompt.
 
 ## 14. Real data we use (v2)
@@ -547,3 +568,38 @@ The whole chain. AUTO = sent by `automation`. HUMAN = only a person.
 | `server/.../fuelprint/cases` | Antara | Her Codex |
 | `apps/cases` | Aditya | His Codex |
 | `apps/shared` | Aditya Singh | Kiro (Claude reviews the look) |
+
+## 16. Cases evidence and teaching aerosol extensions (v2.4)
+
+The following documents are normative extensions of this agreement. Their exact field names, formats, bounded input rules, signature/trust distinctions, command guards and exit precedence govern the implemented additions. If older research catalog summaries disagree, this agreement and these extensions win. No scientific reference value is changed.
+
+- [Evidence v2, signing, ZIP and offline verifier](extensions/cases-evidence-v2.md).
+- [Teaching aerosol media, custody and lab results](extensions/cases-aerosol.md).
+
+### Evidence compatibility and trust
+
+Legacy `fp.evidence/1` stays unsigned and retains exact stored bytes, extreme-decimal behavior and the existing CanonicalJson encoding. It is never relabelled or re-signed. New `fp.evidence/2` manifests and `fp.evidence-signature/1` detached envelopes use `FP-JCS-RESTRICTED-1`: text, safe whole numbers from −(2^53−1) to +(2^53−1), booleans, null, arrays and objects, with RFC 8785 string/property rules and no lone Unicode surrogates. Unsupported or malformed versions never fall back. Member records keep `fp-canonical-json/1`; the restricted profile is not general RFC 8785 numeric support.
+
+An explicit external configuration selects v1 UNSIGNED, v2 UNSIGNED or v2 SIGN_REQUIRED. The default is v1 UNSIGNED. SIGN_IF_CONFIGURED is refused. Invalid configuration, mismatched/missing keys or signing failure reject sealing atomically. Private/public keys stay outside the repo; Ed25519 key pairs are checked. A valid embedded public key never establishes trust. The trust anchor is a SHA-256 fingerprint of DER SubjectPublicKeyInfo supplied externally. A local synthetic demo signer may be selected under the owner's explicit delegation, labelled for that scope; this does not assert the owner's personal identity, trusted time, physical truth or legal suitability.
+
+The manifest binds signing intent and fingerprint; the detached envelope binds the exact manifest bytes/hash and key. Removing or altering an expected envelope, or supplying an unexpected one, is a failure even with --allow-unsigned. Signature validity, external key trust and all seven evidence axes remain separate.
+
+### Bounded download and offline interpretation
+
+`GET /api/exports/{export_id}/pack.zip?run_id=<uuid>` requires a signed-in, non-automation station session with exporter role. Authorization is checked before lookup. Statuses: 403 unauthorized, 400 malformed IDs or non-packable state, 404 missing/wrong-run export. Preparation refuses missing evidence with 409, size-limit violations with 413 and storage/preparation errors with 500. The entire private temporary ZIP is prepared and checked before HTTP success headers. Downloads set application/zip, no-store, nosniff and a generated ORIGINAL or TAMPER_DEMO_COPY attachment name. Original records/bytes are never mutated. Transfer interruption can still truncate a response.
+
+ZIP contains manifest.json, optional signature.json, and exactly the declared payload paths. Bounds: 64 MiB compressed/expanded, 500 payload members plus two metadata entries, 1 MiB per payload or manifest, 16 KiB signature, JSON depth 64 and entry names at most 200 characters. Unsafe paths, duplicate/case-colliding names, unsupported/encrypted entries, central/local disagreement, truncation, size/CRC defects and extra/missing members are refused. JSON encoding/duplicate-field/trailing-content defects in manifest/payload records fail integrity (5), with the offending member named. Malformed or noncanonical signature envelopes fail signature verification (7); excessive JSON depth is an archive refusal (3). No archive member is extracted to a filesystem path.
+
+The CLI runs from the packaged jar using PropertiesLauncher with loader.main=fuelprint.cases.EvidenceVerifyCli. It requires no server/database/private key. Exit precedence is usage 2, archive 3, unsupported version 4, integrity 5, lineage 6, invalid/unverified signature 7, untrusted signer or unsigned without explicit allowance 8, otherwise PASS 0; unexpected internal errors use 1. --allow-unsigned applies only to declared unsigned packs and never excuses missing, invalid or untrusted signed intent. A gateway or archive pass does not establish trusted time, measurement truth or legal suitability.
+
+Exact references require a record type, UUID and positive whole-number revision; references are never rounded or coerced. Offline lineage checks exact member identity, run/case ownership, material/method identity, custody ownership and loop-free chains. Malformed record shapes must yield a coded failed check rather than an uncaught internal error.
+
+### Separate aerosol scope and decisions
+
+The method remains TEACH-AEROSOL-S-1 with material SYNTHETIC_UNCLASSIFIED_AEROSOL and size class UNCLASSIFIED. All collection/lab inputs are human-recorded SYNTHETIC_TEACHING. Media has no factory/site training label; attempt_ref is null with FIELD_AEROSOL_CAPTURE_NOT_AVAILABLE. The three new commands refuse automation, foreign case/run links, swapped fuel/media identities, unsupported payload fields and SEALED case changes. Revision and idempotency rules are unchanged.
+
+Volume is flow × valid seconds / 60: 2 L/min × 600 s = 20 L. The declared collection cannot exceed its window or end after the known current run clock. Profile limits remain: flow 2 L/min, valid collection at least 600 s, blank at most 0.02 µg, net-mass reporting limit 0.1 µg, duplicate RPD at most 20%, recovery 80–120%, and hold at most 300 s from collection end to analysis. Bounds are inclusive. Undefined or missing inputs stay pending with reasons.
+
+gross_ug is sulfur-assay mass before blank correction, not a bulk filter weight. net_ug = gross_ug − blank_ug; negative corrected mass stays negative. Below the net reporting limit, reporting is BELOW_LOQ and measured values are never replaced by zero. Result use is LIMITED_BELOW_LOQ only when QC is PASS; QC FAIL yields NOT_USABLE and QC PENDING remains PENDING. BELOW_LOQ never overrides a failed or pending QC check. Raw values and exact subtraction/QC comparisons are retained; non-terminating derived divisions use DECIMAL128_HALF_EVEN with computed_decimal strings. An unrepresentable binary64 projection is null with NOT_REPRESENTABLE and cannot produce USABLE.
+
+A passing, reported media result may be cited by the human finding command; QC failure may support rejection for use, and limited/pending values do not force a supported result. Aerosol results never become fuel-training lessons, and no finding is created automatically. Gravimetric pre/post filter weighing and physical drone aerosol capture remain deferred.

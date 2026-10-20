@@ -224,6 +224,101 @@ export interface CaseRecord extends RecordBase {
   screening_record_ids: Uuid[];
   purpose: string;
   state: CaseState;
+  /** Absent on legacy fuel-only cases. */
+  media_ids?: Uuid[];
+  media_lab_result_ids?: Uuid[];
+}
+
+export type SealState = 'INTACT' | 'BROKEN' | 'MISSING';
+export interface MediaCollection {
+  start_sim_s: number;
+  end_sim_s: number;
+  valid_s: number;
+  flow_L_min: number;
+  status: 'COMPLETE' | 'INTERRUPTED';
+  time_check?: string;
+}
+export interface MediaRecord extends RecordBase {
+  case_id: Uuid;
+  media_type: 'FILTER';
+  material: 'SYNTHETIC_UNCLASSIFIED_AEROSOL';
+  method_id: 'TEACH-AEROSOL-S-1';
+  size_class: 'UNCLASSIFIED';
+  container: string;
+  seal_id: string;
+  location_label: string;
+  collection: MediaCollection;
+  collection_computed: {
+    volume_L: number | null; volume_m3: number | null;
+    computed_decimal: Record<string, string | null>;
+    calculation_precision: 'DECIMAL128_HALF_EVEN';
+    computed_reasons: Record<string, unknown>;
+  };
+  collection_reasons: string[];
+  attempt_ref: null;
+  attempt_ref_reason: 'FIELD_AEROSOL_CAPTURE_NOT_AVAILABLE';
+  origin: 'SYNTHETIC_TEACHING';
+  input_basis: 'HUMAN_RECORDED_SYNTHETIC_TEACHING';
+  authority_basis: 'INSPECTOR_DEMO';
+  collector_id: string;
+  current_holder: string;
+  current_media_custody_event_id: Uuid;
+  seal_state: SealState;
+  custody_exceptions: string[];
+  recorded_utc: Utc;
+  recorded_sim_time_s: number | null;
+  recorded_sim_time_reason: string | null;
+  case_ref: RecordRef;
+}
+export interface MediaCustodyEventRecord extends RecordBase {
+  media_id: Uuid;
+  previous_event_id: Uuid | null;
+  from_holder: string | null;
+  to_holder: string;
+  seal_state: SealState;
+  event_time_utc: Utc;
+  recorded_utc: Utc;
+  recorded_by: string;
+  exceptions: string[];
+  attempted_to_holder?: string;
+}
+export interface MediaLabInputs {
+  gross_ug: number | null;
+  blank_ug: number | null;
+  dup_a_ug: number | null;
+  dup_b_ug: number | null;
+  spike_added_ug: number | null;
+  spike_recovered_ug: number | null;
+}
+export interface MediaLabResultRecord extends RecordBase {
+  media_id: Uuid;
+  method_id: 'TEACH-AEROSOL-S-1';
+  origin: 'SYNTHETIC_TEACHING';
+  input_basis: 'HUMAN_RECORDED_SYNTHETIC_TEACHING';
+  qc_inputs: MediaLabInputs | null;
+  raw: Record<string, unknown>;
+  computed: Record<string, number | null>;
+  computed_decimal: Record<string, string | null>;
+  calculation_precision: 'DECIMAL128_HALF_EVEN';
+  computed_reasons: Record<string, unknown>;
+  qc_status: 'PASS' | 'FAIL' | 'PENDING';
+  qc_checks: Record<string, {status: string; reasons: string[]}>;
+  qc_reasons: string[];
+  diagnostics: string[];
+  reporting: 'REPORTED' | 'BELOW_LOQ' | null;
+  reporting_reason: string | null;
+  result_use: 'USABLE' | 'LIMITED_BELOW_LOQ' | 'NOT_USABLE' | 'PENDING';
+  hold_time_s: number | null;
+  hold_time_reason: string | null;
+  collection_end_sim_s: number | null;
+  analysis_sim_time_s: number | null;
+  analysis_sim_time_reason: string | null;
+  media_ref: RecordRef;
+  case_ref: RecordRef;
+  custody_ref: RecordRef;
+  method_limits: Record<string, unknown>;
+  analyzed_by: string;
+  limitations: string[];
 }
 
 export interface SpecimenRecord extends RecordBase {
@@ -284,7 +379,9 @@ export interface ExportRecord extends RecordBase {
   case_revision: number;
   manifest_sha256: string;
   members: { path: string; length: number; sha256: string }[];
-  signature: string | null;
+  signature: string | {path: string; length: number; sha256: string; algorithm: string; key_fingerprint_sha256: string} | null;
+  signature_reason?: string | null;
+  signing_policy?: string;
   state: string;
 }
 
@@ -295,6 +392,14 @@ export interface VerificationReportRecord extends RecordBase {
     measurement_qualification: string; legal_suitability: string;
   };
   reasons: string[];
+  verifier_version?: string;
+  signature_check?: {
+    validity: 'VALID' | 'INVALID' | 'NOT_SIGNED' | 'UNVERIFIED';
+    trust: 'TRUSTED' | 'UNTRUSTED' | 'NOT_EVALUATED';
+    trust_source: 'SERVER_CONFIG' | 'CLI_ARGUMENT' | 'NONE';
+    key_fingerprint_sha256: string | null;
+    reason: string;
+  };
 }
 
 export interface ModelVersionRecord extends RecordBase {
@@ -379,6 +484,9 @@ export interface RecordTypes {
   specimen: SpecimenRecord;
   custody_event: CustodyEventRecord;
   lab_result: LabResultRecord;
+  media: MediaRecord;
+  media_custody_event: MediaCustodyEventRecord;
+  media_lab_result: MediaLabResultRecord;
   finding: FindingRecord;
   board_decision: BoardDecisionRecord;
   export: ExportRecord;
