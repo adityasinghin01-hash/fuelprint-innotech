@@ -41,10 +41,35 @@ public record Cutoff(double value, int episodes, int rank, String method, String
                 throw new IllegalStateException("Missing " + RESOURCE + "; run CalibrationRunner");
             }
             JsonNode n = new ObjectMapper().readTree(in);
-            return new Cutoff(n.path("cutoff").asDouble(), n.path("episodes").asInt(), n.path("rank").asInt(),
-                    n.path("method").asText(), n.path("seeds").asText(), n.path("statistics_sha256").asText());
+            return fromJson(n);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    /** Validate the offline artifact before its statistic can govern runtime decisions. */
+    static Cutoff fromJson(JsonNode n) {
+        if (!CompatRanker.ALGORITHM.equals(n.path("algorithm").asText())
+                || !WorldProfile.load().version().equals(n.path("world").asText())
+                || !ResponseModel.TEACHING.label().equals(n.path("response").asText()))
+            throw new IllegalStateException("Cutoff provenance mismatch: recalibrate " + CompatRanker.ALGORITHM);
+        int episodes = n.path("episodes").asInt(), rank = n.path("rank").asInt();
+        JsonNode manifest = n.path("episode_statistics");
+        if (episodes < 40 || rank != rankFor(episodes) || !manifest.isArray() || manifest.size() != episodes)
+            throw new IllegalStateException("Invalid cutoff episode count or order-statistic rank");
+        double[] statistics = new double[episodes];
+        for (int i = 0; i < episodes; i++) {
+            JsonNode value = manifest.get(i).path("statistic");
+            statistics[i] = value.asDouble(Double.NaN);
+            if (Double.isNaN(statistics[i]) || statistics[i] < 0)
+                throw new IllegalStateException("Invalid cutoff statistic manifest");
+        }
+        if (!CalibrationRunner.statisticsHash(statistics).equals(n.path("statistics_sha256").asText()))
+            throw new IllegalStateException("Cutoff statistic hash mismatch");
+        java.util.Arrays.sort(statistics);
+        if (Double.compare(statistics[rank - 1], n.path("cutoff").asDouble(Double.NaN)) != 0)
+            throw new IllegalStateException("Cutoff is not its declared order statistic");
+        return new Cutoff(n.path("cutoff").asDouble(), episodes, rank,
+                n.path("method").asText(), n.path("seeds").asText(), n.path("statistics_sha256").asText());
     }
 }

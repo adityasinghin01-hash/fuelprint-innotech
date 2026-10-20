@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import fuelprint.api.AutomationSettings;
 import fuelprint.api.RecordSaved;
 import fuelprint.core.command.AutomationBus;
+import fuelprint.core.command.HandlerRegistry;
 import fuelprint.core.store.StoreView;
 import fuelprint.core.store.StoredRecord;
 import org.slf4j.Logger;
@@ -40,12 +41,15 @@ class AlertAutomation {
     private final AutomationBus automation;
     private final StoreView store;
     private final ObjectProvider<AutomationSettings> settings;
+    private final ObjectProvider<HandlerRegistry> handlers;
     private final Set<String> submitted = ConcurrentHashMap.newKeySet();
 
-    AlertAutomation(AutomationBus automation, StoreView store, ObjectProvider<AutomationSettings> settings) {
+    AlertAutomation(AutomationBus automation, StoreView store, ObjectProvider<AutomationSettings> settings,
+                    ObjectProvider<HandlerRegistry> handlers) {
         this.automation = automation;
         this.store = store;
         this.settings = settings;
+        this.handlers = handlers;
     }
 
     @EventListener
@@ -100,10 +104,26 @@ class AlertAutomation {
             log.info("auto_alerts is off: no board update sent for decision {}", saved.recordId());
             return;
         }
+        // The in-memory set covers pending work; retained notifications cover a fresh adapter/replay.
+        if (alreadyUpdated(saved.recordId(), saved.revision())) {
+            return;
+        }
         if (!submitted.add(saved.recordId() + "|" + saved.revision())) {
             return;
         }
         submit(AlertTexts.BOARD_UPDATE, areas, saved);
+    }
+
+    private boolean alreadyUpdated(String boardId, long revision) {
+        return store.list(AlertRecords.NOTIFICATION, null).stream().anyMatch(notification -> {
+            JsonNode body = notification.body();
+            JsonNode cause = body.path("cause");
+            return AlertTexts.BOARD_UPDATE.equals(body.path("kind").asText())
+                    && AlertRecords.BOARD_DECISION.equals(cause.path("type").asText())
+                    && boardId.equals(cause.path("id").asText())
+                    && cause.path("revision").isIntegralNumber() && cause.path("revision").canConvertToLong()
+                    && revision == cause.path("revision").longValue();
+        });
     }
 
     private void submit(String kind, List<String> areas, RecordSaved cause) {
@@ -113,7 +133,26 @@ class AlertAutomation {
         areas.forEach(areaIds::add);
         payload.putObject("cause").put("type", cause.recordType()).put("id", cause.recordId())
                 .put("revision", cause.revision());
-        automation.submit(SendAlertHandler.TYPE, cause.runId(), payload).thenAccept(receipt -> {
+        // Both steps are ordinary queued commands. Never wait on the command thread.
+        // Optional AI installations may omit write_wording; the existing checked template remains available.
+        HandlerRegistry registry = handlers.getIfAvailable();
+        if (registry != null && registry.find("write_wording").isPresent()) {
+            ObjectNode request = JsonNodeFactory.instance.objectNode();
+            request.set("target", payload.path("cause").deepCopy());
+            request.put("purpose", AlertTexts.SMOKE_WARNING.equals(kind) ? "SMS_SMOKE_WARNING" : "SMS_BOARD_UPDATE");
+            automation.submit("write_wording", cause.runId(), request).whenComplete((receipt, error) -> {
+                if (error != null || !receipt.applied()) {
+                    log.warn("Saved wording unavailable for {}; using checked SMS fallback", kind);
+                }
+                send(kind, cause.runId(), payload);
+            });
+        } else {
+            send(kind, cause.runId(), payload);
+        }
+    }
+
+    private void send(String kind, String runId, ObjectNode payload) {
+        automation.submit(SendAlertHandler.TYPE, runId, payload).thenAccept(receipt -> {
             if (!receipt.applied()) {
                 log.warn("send_alert {} was refused: {} (not retried)", kind, receipt.reasonCode());
             }

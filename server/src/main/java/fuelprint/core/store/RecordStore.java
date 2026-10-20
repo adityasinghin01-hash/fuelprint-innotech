@@ -1,5 +1,6 @@
 package fuelprint.core.store;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Clock;
@@ -9,8 +10,15 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.cfg.JsonNodeFeature;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.DecimalNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import fuelprint.core.Ids;
 import fuelprint.core.WallTime;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,14 +40,47 @@ public class RecordStore implements StoreView {
 
     private final JdbcTemplate jdbc;
     private final ObjectMapper mapper;
+    /** Reads saved bodies; a number a double cannot hold keeps every digit (see {@link ExactNumbers}). */
+    private final ObjectReader bodyReader;
     private final Clock clock;
     private final RowMapper<StoredRecord> rowMapper;
 
     public RecordStore(JdbcTemplate jdbc, ObjectMapper mapper, Clock clock) {
         this.jdbc = jdbc;
         this.mapper = mapper;
+        this.bodyReader = exactReader(mapper);
         this.clock = clock;
         this.rowMapper = this::mapRow;
+    }
+
+    /**
+     * A reader that behaves exactly like the mapper's default for every ordinary number (a decimal a double
+     * reproduces is read as a double, as always), but keeps a BigDecimal with every digit for a number a double
+     * would round (for example 20.0000000000000001) or flush to zero (for example 5e-324 or 1e-400).
+     * Used for command bodies and saved records, so exact checks see what was really written.
+     */
+    public static ObjectReader exactReader(ObjectMapper mapper) {
+        return mapper.reader().with(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
+                .without(JsonNodeFeature.STRIP_TRAILING_BIGDECIMAL_ZEROES).with(ExactNumbers.INSTANCE);
+    }
+
+    /** Node factory: double where a double holds the written value exactly, otherwise the exact BigDecimal. */
+    static final class ExactNumbers extends JsonNodeFactory {
+        private static final long serialVersionUID = 1L;
+        static final ExactNumbers INSTANCE = new ExactNumbers();
+
+        private ExactNumbers() {
+            super(true);
+        }
+
+        @Override
+        public ValueNode numberNode(BigDecimal v) {
+            double d = v.doubleValue();
+            if (Double.isFinite(d) && (d != 0 || v.signum() == 0) && new BigDecimal(Double.toString(d)).compareTo(v) == 0) {
+                return DoubleNode.valueOf(d);
+            }
+            return DecimalNode.valueOf(v);
+        }
     }
 
     @Override
@@ -179,7 +220,7 @@ public class RecordStore implements StoreView {
     private StoredRecord mapRow(ResultSet rs, int rowNum) throws SQLException {
         ObjectNode body;
         try {
-            body = (ObjectNode) mapper.readTree(rs.getString("body"));
+            body = (ObjectNode) bodyReader.readTree(rs.getString("body"));
         } catch (JsonProcessingException e) {
             throw new SQLException("Stored record body is not JSON", e);
         }

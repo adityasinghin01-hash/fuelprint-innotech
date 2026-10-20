@@ -172,8 +172,8 @@ class CompatRankerTest {
         WorldProfile.Source s02 = k.source("S02");
         Enu a = new Enu(0, 100, 35);
         Enu b = new Enu(0, 100, 3);
-        InletTrack moving = new InletTrack(List.of(new InletTrack.Sample(0, b), new InletTrack.Sample(100, b),
-                new InletTrack.Sample(110, a)));
+        InletTrack moving = new InletTrack(List.of(new InletTrack.Sample(0, b), new InletTrack.Sample(200, b),
+                new InletTrack.Sample(210, a)));
         double viaTrack = ResponseModel.TEACHING.windowMean(Gas.SO2, moving, 300, 330,
                 p -> k.engine.kernel().unit(Gas.SO2, s02.east(), s02.north(), s02.heightM(), p, 270, 3));
         double hovering = k.engine.kernel().unit(Gas.SO2, s02.east(), s02.north(), s02.heightM(), a, 270, 3);

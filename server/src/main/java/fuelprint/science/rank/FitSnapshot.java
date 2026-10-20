@@ -11,7 +11,12 @@ import java.util.Set;
  * designs. Public-input only.
  */
 public record FitSnapshot(List<String> inputWindowIds, WindNow wind, double cutoff, int entries, Set<Gas> gases,
-                          List<Surviving> surviving) {
+                          List<Surviving> surviving, boolean finiteAgeMeasurements) {
+
+    public FitSnapshot(List<String> ids, WindNow wind, double cutoff, int entries, Set<Gas> gases,
+                       List<Surviving> surviving) {
+        this(ids,wind,cutoff,entries,gases,surviving,false);
+    }
 
     public FitSnapshot {
         inputWindowIds = List.copyOf(inputWindowIds);

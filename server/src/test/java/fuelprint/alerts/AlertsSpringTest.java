@@ -14,7 +14,7 @@ import java.nio.file.Path;
  * The default alerts test context: its own data folder, the test doubles of {@link AlertsTestConfig},
  * LOG_ONLY gateway with the default cap, and no midnight timer.
  */
-@SpringBootTest
+@SpringBootTest(properties="fp.ai.enabled=false")
 @ActiveProfiles("real")
 @AutoConfigureMockMvc
 @Import(AlertsTestConfig.class)

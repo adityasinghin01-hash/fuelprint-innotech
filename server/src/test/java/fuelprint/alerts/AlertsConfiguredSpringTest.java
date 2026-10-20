@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
  * Base for alerts tests that need their own {@code sms.json}: the subclass gives the file's text and
  * registers it with a {@code @DynamicPropertySource} that calls {@link #configure}.
  */
-@SpringBootTest
+@SpringBootTest(properties="fp.ai.enabled=false")
 @ActiveProfiles("real")
 @AutoConfigureMockMvc
 @Import(AlertsTestConfig.class)

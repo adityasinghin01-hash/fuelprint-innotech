@@ -20,6 +20,7 @@ import fuelprint.api.Window;
 import fuelprint.science.rank.Gas;
 import fuelprint.science.rank.NoiseModel;
 import fuelprint.science.rank.WorldProfile;
+import fuelprint.science.sensor.SyntheticNoiseProfile;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +42,8 @@ import org.springframework.stereotype.Component;
  * seconds; the detector keeps its own history, so the core may hand it only the newest readings.
  * Ranking receives separate non-overlapping 30-second means of valid data after a background is available;
  * these are not conditioned on the alarm threshold. Their uncertainty uses the declared synthetic AR(1)
- * electrical allocation. Shared-background covariance is still a limitation of the current ranker.
+ * electrical allocation and the actual background/collection covariance. The ranker adds the shared ambient
+ * background process and correlations across instruments/gases to the published electrical allocation.
  */
 @Component
 @Profile("!stub")
@@ -225,9 +227,16 @@ public class TeachDetector implements Detector {
             st.averagingSum += v;
             if (st.averagingCount == BACKGROUND_SECONDS) {
                 Background reference = st.averagingBackground;
+                List<Double> collectionTimes = java.util.stream.LongStream.rangeClosed(s - BACKGROUND_SECONDS + 1, s)
+                        .mapToObj(time -> (double) time).toList();
+                List<Double> backgroundTimes = java.util.stream.LongStream.rangeClosed(reference.startS + 1, reference.endS)
+                        .mapToObj(time -> (double) time).toList();
+                double variance = SyntheticNoiseProfile.meanCovariance(CHANNEL, collectionTimes, collectionTimes)
+                        + SyntheticNoiseProfile.meanCovariance(CHANNEL, backgroundTimes, backgroundTimes)
+                        - 2 * SyntheticNoiseProfile.meanCovariance(CHANNEL, collectionTimes, backgroundTimes);
                 windows.add(new Window(newWindowId(),
                         r.sensorOrVehicleId(), CHANNEL, s - BACKGROUND_SECONDS, s, BACKGROUND_SECONDS,
-                        st.averagingSum / BACKGROUND_SECONDS - reference.mean, WINDOW_UNCERTAINTY,
+                        st.averagingSum / BACKGROUND_SECONDS - reference.mean, Math.sqrt(variance),
                         reference.windowId));
                 st.averagingCount = 0;
                 st.averagingSum = 0;

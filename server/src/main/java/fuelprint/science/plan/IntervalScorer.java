@@ -7,6 +7,7 @@ import fuelprint.science.rank.FitSnapshot;
 import fuelprint.science.rank.Gas;
 import fuelprint.science.rank.InletTrack;
 import fuelprint.science.rank.NoiseModel;
+import fuelprint.science.rank.Whitening;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
@@ -72,88 +73,85 @@ public final class IntervalScorer {
      */
     public static Optional<Box> outerBox(FitEngine engine, FitSnapshot snapshot, FitSnapshot.Surviving s, Enu target,
                                          List<Gas> gases) {
+        return outerBox(engine,snapshot,s,target,gases,null);
+    }
+
+    public static Optional<Box> outerBox(FitEngine engine, FitSnapshot snapshot, FitSnapshot.Surviving s, Enu target,
+                                         List<Gas> gases, ProspectiveMeasurement measurement) {
+        return outerBox(engine,snapshot,s,target,gases,measurement,() -> false);
+    }
+
+    public static Optional<Box> outerBox(FitEngine engine, FitSnapshot snapshot, FitSnapshot.Surviving s, Enu target,
+                                         List<Gas> gases, ProspectiveMeasurement measurement,
+                                         java.util.function.BooleanSupplier expired) {
+        if (snapshot.finiteAgeMeasurements() && measurement == null) return Optional.empty();
         Explanation e = s.explanation();
         if (s.admitted().isEmpty()) {
             return Optional.empty();
         }
         Box box = null;
         InletTrack track = InletTrack.fixed(target);
+        if (expired.getAsBoolean()) return Optional.empty();
+        Whitening prospectiveNoise;
+        try {
+            prospectiveNoise = measurement == null ? Whitening.diagonal(gases.stream()
+                    .mapToDouble(gas -> NoiseModel.enhancementStd(engine.world(),gas)).toArray())
+                    : Whitening.of(measurement.covariance(gases));
+        } catch (Whitening.UnusableCovariance | IllegalArgumentException unavailable) {
+            return Optional.empty();
+        }
         for (FitEngine.MemberFit m : s.admitted()) {
+            if (expired.getAsBoolean()) return Optional.empty();
             if (!m.fullRank(e.sources().size())) {
                 return Optional.empty();
             }
-            int p = e.sources().size();
-            // Unconstrained least-squares centre per gas: the exact quadratic SSE(x) = SSE_ls + |D(x - x_ls)|^2,
-            // so the ellipsoid around it contains every non-negative member fit within the cutoff.
-            double sseLs = 0;
-            double[][] centres = new double[gases.size()][];
-            double[][][] normals = new double[gases.size()][][];
-            for (int k = 0; k < gases.size(); k++) {
-                FitEngine.GasFit gf = m.gases().get(gases.get(k));
-                if (gf == null) {
-                    return Optional.empty();
-                }
-                if (p == 0) {
-                    sseLs += gf.sse();
-                    continue;
-                }
-                Optional<double[][]> g = inverseNormal(gf.whitenedDesign());
-                if (g.isEmpty()) {
-                    return Optional.empty();
-                }
-                double[][] d = gf.whitenedDesign();
-                double[] y = gf.whitenedData();
+            int sourceCount = e.sources().size();
+            int p = sourceCount * m.joint().gases().size();
+            double[] centre = new double[p];
+            double[][] normal = new double[p][p];
+            double sseLs = m.sse();
+            if (p > 0) {
+                double[][] d = m.joint().whitenedDesign();
+                double[] y = m.joint().whitenedData();
+                Optional<double[][]> inverse = inverseNormal(d);
+                if (inverse.isEmpty()) return Optional.empty();
+                normal = inverse.get();
                 double[] dty = new double[p];
-                for (int i = 0; i < d.length; i++) {
-                    for (int j = 0; j < p; j++) {
-                        dty[j] += d[i][j] * y[i];
-                    }
+                for (int i=0;i<d.length;i++) for(int j=0;j<p;j++) dty[j] += d[i][j]*y[i];
+                for(int i=0;i<p;i++) for(int j=0;j<p;j++) centre[i] += normal[i][j]*dty[j];
+                sseLs=0;
+                for(int i=0;i<d.length;i++) {
+                    double residual=y[i];
+                    for(int j=0;j<p;j++) residual-=d[i][j]*centre[j];
+                    sseLs+=residual*residual;
                 }
-                double[] x = new double[p];
-                for (int i = 0; i < p; i++) {
-                    for (int j = 0; j < p; j++) {
-                        x[i] += g.get()[i][j] * dty[j];
-                    }
-                }
-                for (int i = 0; i < d.length; i++) {
-                    double r = y[i];
-                    for (int j = 0; j < p; j++) {
-                        r -= d[i][j] * x[j];
-                    }
-                    sseLs += r * r;
-                }
-                centres[k] = x;
-                normals[k] = g.get();
             }
-            double radius2 = snapshot.entries() * snapshot.cutoff() - sseLs;
-            if (!(radius2 >= 0)) {
-                return Optional.empty();
+            double radius2 = snapshot.entries()*snapshot.cutoff()-sseLs;
+            if (!(radius2 >= 0)) return Optional.empty();
+            double[] lo=new double[gases.size()], hi=new double[gases.size()];
+            double[][] rawRows=new double[gases.size()][p];
+            for(int k=0;k<gases.size() && p>0;k++) {
+                Gas gas=gases.get(k);
+                int gasIndex=m.joint().gases().indexOf(gas);
+                if(gasIndex<0) return Optional.empty();
+                try {
+                    for(int j=0;j<sourceCount;j++) rawRows[k][gasIndex*sourceCount+j]=(measurement == null
+                            ? engine.unitResponse(gas,e.sources().get(j),m.member(),snapshot.wind(),track,0,30)
+                            : measurement.unit(engine,gas,e.sources().get(j),m.member(),snapshot.wind(),expired));
+                } catch (FitEngine.BudgetExceeded timeout) { return Optional.empty(); }
             }
-            double[] lo = new double[gases.size()];
-            double[] hi = new double[gases.size()];
-            for (int k = 0; k < gases.size() && p > 0; k++) {
-                Gas gas = gases.get(k);
-                double sigma = NoiseModel.enhancementStd(engine.world(), gas);
-                double[] w = new double[p];
-                for (int j = 0; j < p; j++) {
-                    w[j] = engine.unitResponse(gas, e.sources().get(j), m.member(), snapshot.wind(), track, 0, 30)
-                            / sigma;
+            double[][] rows=prospectiveNoise.whitenColumns(rawRows);
+            for(int k=0;k<gases.size() && p>0;k++) {
+                double[] w=rows[k];
+                double prediction=0,quad=0;
+                for(int i=0;i<p;i++) {
+                    prediction+=w[i]*centre[i];
+                    for(int j=0;j<p;j++) quad+=w[i]*normal[i][j]*w[j];
                 }
-                double centre = 0;
-                double quad = 0;
-                for (int i = 0; i < p; i++) {
-                    centre += w[i] * centres[k][i];
-                    for (int j = 0; j < p; j++) {
-                        quad += w[i] * normals[k][i][j] * w[j];
-                    }
-                }
-                double half = Math.sqrt(radius2 * Math.max(0, quad));
-                if (!Double.isFinite(centre) || !Double.isFinite(half)) {
-                    return Optional.empty();
-                }
-                // Responses and amplitudes are non-negative, so no prediction is below 0.
-                lo[k] = Math.max(0, centre - half);
-                hi[k] = centre + half;
+                double half=Math.sqrt(radius2*Math.max(0,quad));
+                if(!Double.isFinite(prediction)||!Double.isFinite(half)) return Optional.empty();
+                lo[k]=measurement == null ? Math.max(0,prediction-half) : prediction-half;
+                hi[k]=prediction+half;
             }
             Box b = new Box(lo, hi);
             box = box == null ? b : box.union(b);

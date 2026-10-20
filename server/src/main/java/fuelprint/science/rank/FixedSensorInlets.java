@@ -34,7 +34,7 @@ public final class FixedSensorInlets implements InletTrack.Source {
             }
             Enu pose = new Enu(inlet.path("east").asDouble(), inlet.path("north").asDouble(),
                     inlet.path("up").asDouble());
-            return Optional.of(InletTrack.fixed(pose));
+            return Optional.of(InletTrack.recordedFixed(pose));
         });
     }
 }

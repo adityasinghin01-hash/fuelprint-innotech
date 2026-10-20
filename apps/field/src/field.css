@@ -1,0 +1,19 @@
+.field-shell { max-width: 1500px; margin: auto; padding: clamp(16px, 3vw, 40px); }
+.field-shell header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--fp-border); padding-bottom: 20px; }
+.field-shell h1 { font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -.04em; margin: 0; }
+.eyebrow { font-size: .75rem; letter-spacing: .12em; color: var(--fp-muted); }
+.field-shell nav { display: flex; gap: 20px; }
+.field-shell a { color: var(--fp-accent); min-height: 44px; display: inline-flex; align-items: center; }
+.field-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.field-controls .fp-explain { flex-basis: 100%; }
+.field-stage { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); margin: 24px 0; gap: 20px; }
+.field-canvas { height: 500px; min-width: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--fp-border); background: #152a25; position: relative; }
+.field-canvas canvas { display: block; width: 100%; height: 100%; }
+.frame-details { overflow-wrap: anywhere; background: var(--fp-surface); padding: 20px; border: 1px solid var(--fp-border); border-radius: 12px; }
+.table-scroll { overflow-x: auto; }
+.field-shell table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; background: var(--fp-surface); }
+.field-shell th, .field-shell td { padding: 12px; text-align: left; border-bottom: 1px solid var(--fp-border); }
+.field-shell caption { text-align: left; padding: 12px 0; color: var(--fp-muted); }
+@media(max-width: 850px) { .field-stage { grid-template-columns: 1fr; }.field-canvas { height: 360px; } }
+.estate-label { color: #f4f2ec; background: #16211de6; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+.field-stage figcaption { color: var(--fp-muted); font-size: .85rem; padding-top: 8px; }

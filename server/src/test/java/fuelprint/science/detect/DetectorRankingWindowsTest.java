@@ -61,6 +61,35 @@ class DetectorRankingWindowsTest {
         assertThat(enhancements.get(0).endS()).isEqualTo(75);
     }
 
+    @Test
+    void adjacentFixedMeansReportTheirActualElectricalContrastVariance() {
+        TeachDetector detector=new TeachDetector();
+        List<Window> windows=new ArrayList<>();
+        for(int t=1;t<=60;t++) windows.addAll(detector.windows(input(t,t<=30?5:80)));
+        Window collection=windows.stream().filter(w->w.meanEnhancement()!=null).findFirst().orElseThrow();
+        Window bg=windows.stream().filter(w->w.id().equals(collection.backgroundWindowId())).findFirst().orElseThrow();
+        double expected=0;
+        for(int shock=0;shock<=60;shock++) {
+            double electrical=shock==0?5/Math.sqrt(1-.8*.8):0;
+            double contrast=0;
+            for(int second=1;second<=60;second++) {
+                electrical=.8*electrical+(shock==second?5:0);
+                contrast+=(second<=30?-1.0/30:1.0/30)*electrical;
+            }
+            expected+=contrast*contrast;
+        }
+        assertThat(collection.stdUncertainty()*collection.stdUncertainty())
+                .isCloseTo(expected,org.assertj.core.data.Offset.offset(1e-10));
+        Window otherBg=new Window("other-bg","other",bg.channel(),bg.startS(),bg.endS(),30,null,bg.stdUncertainty(),null);
+        Window other=new Window("other-col","other",collection.channel(),collection.startS(),collection.endS(),30,
+                collection.meanEnhancement(),collection.stdUncertainty(),otherBg.id());
+        var track=InletTrack.fixed(new Enu(120,100,3));
+        double[][] c=WindowCovariance.of(List.of(new WindowSelection.Entry(collection,Gas.SO2,track,bg),
+                new WindowSelection.Entry(other,Gas.SO2,track,otherBg)));
+        // Common ambient noise cancels from diagonal-minus-cross; different instruments' electrical noise is independent.
+        assertThat(c[0][0]-c[0][1]).isCloseTo(expected,org.assertj.core.data.Offset.offset(1e-10));
+    }
+
     private static DetectorInput input(int t, double value) {
         return new DetectorInput("run", t, List.of(new Reading("N2", "SO2_ppb", value, value,
                 "ppb", t, List.of("OK"), Origin.SYNTHETIC_TEACHING)), List.of(), new WindNow(270, 3));

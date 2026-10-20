@@ -75,18 +75,19 @@ class InletHistoryTest extends FieldSpringTest {
     }
 
     @Test
-    void unknownUntilRecordedAndForTheWrongRunOrVehicleOrIncompleteCoverage() {
+    void initialDepotIsRecordedAndWrongRunVehicleOrIncompleteCoverageRemainUnknown() {
         InletHistory history = history();
-        assertThat(history.track(runId, world.droneId(), 0, 0)).isEmpty();
+        assertThat(history.track(runId, world.droneId(), 0, 0)).hasValueSatisfying(initial ->
+                assertThat(initial).containsExactly(new InletSample(0, world.vehicles().get(0).inlet())));
         world.onStep(10, DT);
         world.onStep(11, DT);
         assertThat(history.track("other-run", world.droneId(), 10, 11)).isEmpty();
         assertThat(history.track(runId, "other-vehicle", 10, 11)).isEmpty();
         assertThat(history.track(null, world.droneId(), 10, 11)).isEmpty();
         assertThat(history.track(runId, null, 10, 11)).isEmpty();
-        assertThat(history.track(runId, world.droneId(), 9.99, 11)).isEmpty();
+        assertThat(history.track(runId, world.droneId(), -0.01, 11)).isEmpty();
         assertThat(history.track(runId, world.droneId(), 10, 11.01)).isEmpty();
-        assertThat(history.track(runId, world.droneId(), 9, 12)).isEmpty();
+        assertThat(history.track(runId, world.droneId(), -1, 12)).isEmpty();
     }
 
     @Test

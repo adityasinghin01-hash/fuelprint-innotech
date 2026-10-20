@@ -26,6 +26,15 @@ public final class Drone {
         this.energyWh = energyWh;
     }
 
+    /** Independent state for a prospective flight; changes to this copy cannot move the live drone. */
+    public static Drone copyOf(fuelprint.api.VehicleState state) {
+        Drone copy = new Drone(state.vehicleId(), state.label(),
+                new Vec3(state.pose().east(), state.pose().north(), state.pose().up()), state.energyWh());
+        copy.velocity = new Vec3(state.velocity().east(), state.velocity().north(), state.velocity().up());
+        copy.yawDeg = state.pose().yawDeg();
+        return copy;
+    }
+
     public String id() {
         return id;
     }

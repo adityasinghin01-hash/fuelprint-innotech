@@ -168,4 +168,32 @@ class SensorFieldTest {
         List<ReadingBatch> batches = run(f, w, 30);
         assertThat(pick(batches, "id-drone", "SO2_ppb", 25.0).quality()).containsExactly("OK");
     }
+    private List<Double> labelledRawValues(String uuid, String label) {
+        ScienceWorld world = emptyWorld();
+        SensorField sensors = new SensorField(world);
+        sensors.reset(1001, ZonedDateTime.of(2026, 12, 5, 2, 0, 0, 0, BackgroundProfile.IST), false);
+        List<Double> values = new ArrayList<>();
+        List<InletPose> pose = List.of(new InletPose(uuid, label, new Enu(120, 100, 3)));
+        for (int second = 1; second <= 30; second++) {
+            world.step(1);
+            sensors.observe(second, pose).readings().stream().filter(r -> !r.channel().contains("flow"))
+                    .map(Reading::rawValue).forEach(values::add);
+        }
+        return values;
+    }
+
+    @Test
+    void randomRecordUuidsCannotChangePresetReadingsForTheSameStableInlet() {
+        assertThat(labelledRawValues("67d7f92d-2f62-43d0-bede-ab08090d5ac3", "N2"))
+                .isEqualTo(labelledRawValues("969f6d2a-824e-4ccd-8df1-985d47b201e0", "N2"));
+        assertThat(labelledRawValues("c2e702b1-31a6-4a22-a1cc-3d94c7d6050f", "DRONE-1"))
+                .isEqualTo(labelledRawValues("1713309f-a4a0-4a7e-8bbf-14c3beb4c4bb", "DRONE-1"));
+    }
+
+    @Test
+    void distinctStableInletLabelsStillHaveDistinctInstrumentNoise() {
+        assertThat(labelledRawValues("same-record-id", "N2"))
+                .isNotEqualTo(labelledRawValues("same-record-id", "N3"));
+    }
+
 }

@@ -1,4 +1,6 @@
-// SKELETON ONLY (Owners: Antara (backend) and Aditya (screens CA01 to CA06).) Replace the placeholder page with the real screens.
+import { CasesWorkbench } from './components/CasesWorkbench';
+import './cases.css';
+// Minimal case workflow over accepted server commands.
 import {
   AutomationLog, Explain, LiveBadge, LiveProvider, StaleBanner, StationLogin, useLive, useSession, useSnapshot,
   valueOrUnknown,
@@ -25,7 +27,7 @@ function Frame() {
   return (
     <>
       <header style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', padding: '0.5rem 1rem', flexWrap: 'wrap' }}>
-        <strong>FuelPrint Cases</strong>
+        <strong>FuelPrint Cases</strong><a href="/operations/">Operations</a><a href="/field/">Field</a>
         <LiveBadge status={live.status} />
         <span data-testid="run-state">
           Run: {run ? `${run.preset_id} (${run.state})` : 'none yet'}
@@ -46,7 +48,7 @@ function Frame() {
       <StaleBanner status={live.status} />
       <main style={{ padding: '1rem' }}>
         <Routes>
-          <Route path="/" element={<Placeholder />} />
+          <Route path="/" element={<><Placeholder /><CasesWorkbench /></>} />
           <Route path="*" element={<p>This page does not exist yet. <Link to="/">Back</Link></p>} />
         </Routes>
         {session.status === 'ready' && !session.session?.signed_in ? (

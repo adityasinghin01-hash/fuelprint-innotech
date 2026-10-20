@@ -67,13 +67,20 @@ public final class IntervalPlanner {
     private final RoadNetwork roads;
     private final LongSupplier nanoClock;
     private final long budgetNanos;
+    private final List<fuelprint.api.ProspectiveInlets> forecasts;
 
     public IntervalPlanner(FitEngine engine, LongSupplier nanoClock, long budgetNanos) {
+        this(engine,nanoClock,budgetNanos,List.of());
+    }
+
+    public IntervalPlanner(FitEngine engine, LongSupplier nanoClock, long budgetNanos,
+                           List<fuelprint.api.ProspectiveInlets> forecasts) {
         this.engine = engine;
         this.world = engine.world();
         this.roads = RoadNetwork.of(world);
         this.nanoClock = nanoClock;
         this.budgetNanos = budgetNanos;
+        this.forecasts = List.copyOf(forecasts);
     }
 
     static List<Nominated> nominate(Enu vanPosition) {
@@ -101,8 +108,10 @@ public final class IntervalPlanner {
         List<Scored> scored = new ArrayList<>();
         boolean pending = false;
         for (Nominated a : nominated) {
+            if (nanoClock.getAsLong() > deadline) pending=true;
             Optional<VehicleState> v = a.vehicleClass().equals(DRONE) ? drone : van;
             String reason = null;
+            ProspectiveMeasurement measurement = null;
             double travelS = 0;
             double procedureS = procedureSeconds(a.kind(), v.map(VehicleState::stage).orElse(null));
             if (v.isEmpty() || v.get().pose() == null || a.target() == null) {
@@ -118,12 +127,23 @@ public final class IntervalPlanner {
             if (reason == null && unsafe(a)) {
                 reason = "UNSAFE";
             }
+            if (reason == null && a.kind().equals(DISCRIMINATE)
+                    && snapshot.filter(FitSnapshot::finiteAgeMeasurements).isPresent()) {
+                for (fuelprint.api.ProspectiveInlets source : forecasts) {
+                    if (pending || nanoClock.getAsLong() > deadline) { pending=true; break; }
+                    measurement = source.forecast(context, v.get(), a.target(), () -> nanoClock.getAsLong()>deadline)
+                            .map(ProspectiveMeasurement::from).orElse(null);
+                    if (measurement != null) break;
+                }
+                if (measurement == null) reason = "PROSPECTIVE_INLET_HISTORY_UNAVAILABLE";
+            }
             Double energy = null;
             if (reason == null) {
                 Double available = v.get().energyWh();
                 double reserve = world.vehicle("reserve_Wh");
                 double travelWh = 2 * travelS * movingW(a.vehicleClass()) / 3600.0;
-                double totalWh = travelWh + procedureS * stationaryW(a.vehicleClass()) / 3600.0;
+                double totalWh = measurement == null ? travelWh + procedureS * stationaryW(a.vehicleClass()) / 3600.0
+                        : measurement.energyWh();
                 energy = totalWh;
                 if (available == null) {
                     reason = "ENERGY_UNKNOWN";
@@ -141,14 +161,15 @@ public final class IntervalPlanner {
                 energies.add(null);
                 continue;
             }
-            double minutes = (2 * travelS + procedureS) / 60.0;
+            double minutes = measurement == null ? (2 * travelS + procedureS) / 60.0
+                    : measurement.completeSeconds()/60.0;
             Double score = 0.0;
             if (a.kind().equals(DISCRIMINATE) && fitted) {
                 if (pending || nanoClock.getAsLong() > deadline) {
                     pending = true;
                     score = null;
                 } else {
-                    Optional<Double> s = discrimination(snapshot.orElseThrow(), a.target(), deadline);
+                    Optional<Double> s = discrimination(snapshot.orElseThrow(), a.target(), measurement, deadline);
                     if (s.isEmpty()) {
                         pending = true;
                         score = null;
@@ -197,7 +218,7 @@ public final class IntervalPlanner {
     }
 
     /** Minimum separation over materially different surviving explanations; empty when over budget. */
-    private Optional<Double> discrimination(FitSnapshot snapshot, Enu target, long deadline) {
+    private Optional<Double> discrimination(FitSnapshot snapshot, Enu target, ProspectiveMeasurement measurement, long deadline) {
         List<FitSnapshot.Surviving> surviving = snapshot.surviving();
         if (surviving.size() < 2) {
             return Optional.of(0.0);
@@ -208,7 +229,9 @@ public final class IntervalPlanner {
             if (nanoClock.getAsLong() > deadline) {
                 return Optional.empty();
             }
-            boxes.add(IntervalScorer.outerBox(engine, snapshot, s, target, gases));
+            boxes.add(IntervalScorer.outerBox(engine, snapshot, s, target, gases, measurement,
+                    () -> nanoClock.getAsLong() > deadline));
+            if (nanoClock.getAsLong() > deadline) return Optional.empty();
         }
         double min = Double.POSITIVE_INFINITY;
         for (int i = 0; i < surviving.size(); i++) {

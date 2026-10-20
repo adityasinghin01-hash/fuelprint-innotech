@@ -18,7 +18,8 @@ import java.util.TreeMap;
 public final class WindowSelection {
 
     /** One analysed data entry. */
-    public record Entry(Window window, Gas gas, InletTrack track) {
+    public record Entry(Window window, Gas gas, InletTrack track, Window background) {
+        public Entry(Window window, Gas gas, InletTrack track) { this(window, gas, track, null); }
         public double value() {
             return window.meanEnhancement();
         }
@@ -54,7 +55,8 @@ public final class WindowSelection {
             String reason = null;
             if (gas.isEmpty()) {
                 reason = "CHANNEL_NOT_MODELLED";
-            } else if (Math.abs((w.endS() - w.startS()) - windowS) > EPS || w.validSeconds() < windowS - EPS) {
+            } else if (!Double.isFinite(w.startS()) || !Double.isFinite(w.endS()) || !Double.isFinite(w.validSeconds())
+                    || Math.abs((w.endS() - w.startS()) - windowS) > EPS || w.validSeconds() < windowS - EPS) {
                 reason = "INCOMPLETE_WINDOW";
             } else if (w.meanEnhancement() == null || !Double.isFinite(w.meanEnhancement())) {
                 reason = "NO_VALUE";
@@ -63,18 +65,48 @@ public final class WindowSelection {
                 reason = "UNCERTAINTY_NOT_USABLE";
             }
             Optional<InletTrack> track = Optional.empty();
+            Window background = null;
             if (reason == null) {
                 track = inlets.track(runId, w);
                 if (track.isEmpty()) {
                     reason = "INLET_HISTORY_UNKNOWN";
+                } else if (track.get().measured()) {
+                    background = windows.stream().filter(b -> b.id().equals(w.backgroundWindowId()))
+                            .findFirst().orElse(null);
+                    if (background == null) reason = "BACKGROUND_WINDOW_UNKNOWN";
+                    else if (!w.sensorOrVehicleId().equals(background.sensorOrVehicleId())
+                            || !w.channel().equals(background.channel())) reason = "BACKGROUND_WINDOW_MISMATCH";
+                    else if (!Double.isFinite(background.startS()) || !Double.isFinite(background.endS())
+                            || !Double.isFinite(background.validSeconds())
+                            || Math.abs(background.endS() - background.startS() - windowS) > EPS
+                            || background.validSeconds() < windowS - EPS || background.endS() > w.startS() + EPS
+                            || background.meanEnhancement() != null || background.stdUncertainty() == null
+                            || !Double.isFinite(background.stdUncertainty()) || background.stdUncertainty() <= 0)
+                        reason = "BACKGROUND_WINDOW_UNUSABLE";
+                    else if (track.get().vehicle()) {
+                        Window span = new Window(w.id(), w.sensorOrVehicleId(), w.channel(),
+                                background.startS(), w.endS(), w.validSeconds(), w.meanEnhancement(),
+                                w.stdUncertainty(), w.backgroundWindowId());
+                        track = inlets.track(runId, span);
+                        if (track.isEmpty() || track.get().samples().get(0).simTimeS() > background.startS() + EPS
+                                || track.get().samples().get(track.get().samples().size() - 1).simTimeS() < w.endS() - EPS)
+                            reason = "BACKGROUND_INLET_HISTORY_UNKNOWN";
+                    }
                 }
             }
             if (reason != null) {
                 excluded.add(new Exclusion(w.id(), reason));
                 continue;
             }
+            if (background == null && !track.get().vehicle()) {
+                background = windows.stream().filter(b -> b.id().equals(w.backgroundWindowId())
+                        && b.sensorOrVehicleId().equals(w.sensorOrVehicleId()) && b.channel().equals(w.channel())
+                        && b.meanEnhancement() == null && b.validSeconds() >= windowS - EPS
+                        && Math.abs(b.endS() - b.startS() - windowS) <= EPS && b.endS() <= w.startS() + EPS)
+                        .findFirst().orElse(null);
+            }
             byChannel.computeIfAbsent(w.sensorOrVehicleId() + "|" + w.channel(), k -> new ArrayList<>())
-                    .add(new Entry(w, gas.get(), track.get()));
+                    .add(new Entry(w, gas.get(), track.get(), background));
         }
         List<Entry> chosen = new ArrayList<>();
         for (List<Entry> list : byChannel.values()) {

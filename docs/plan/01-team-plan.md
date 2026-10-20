@@ -5,6 +5,8 @@ subtitle: "KIET InnoTech26 · Category 2, AI Solutions for Automation · for all
 
 # FuelPrint team plan
 
+> **Backend execution update, 19 October 2026:** Aditya Singh/Codex will implement and integrate the remaining Operations/Cases backends against the existing agreement. Screen assignments and human decision roles remain unchanged. Read the [backend update and scenario coverage addendum](../contract-proposals/2026-10-19-operations-cases-coverage.md) before backend edits to coordinate with this work. The original ownership table below is historical context for the original division of work.
+
 ## What changed in version 2 (read this first)
 
 - **FuelPrint is now a full AI and automation system.** Seven AI pieces and an automatic chain from the first sulphur rise to a sealed case. People sign only five decisions. Details below and in `contracts/AGREEMENT.md` sections 11 and 12.

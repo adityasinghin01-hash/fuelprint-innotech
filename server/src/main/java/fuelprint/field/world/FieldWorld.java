@@ -526,6 +526,7 @@ public class FieldWorld implements VehicleSource, WorldStepListener, Observation
             inletRunId = newRunId;
             drone.placeAt(profile.depot());
             drone.setEnergyWh(profile.usableWh());
+            recordInlet(0);
             todo = drain();
         }
         run(todo);

@@ -1,12 +1,15 @@
 package fuelprint.field;
 
 import java.util.Optional;
+import java.util.List;
 
 import fuelprint.api.AutomationSettings;
 import fuelprint.api.CaptureInput;
 import fuelprint.api.CaptureRules;
 import fuelprint.api.ChannelVerdict;
 import fuelprint.api.ClockControl;
+import fuelprint.api.Window;
+import fuelprint.api.MissionAuthority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -19,7 +22,8 @@ import org.springframework.stereotype.Component;
  * <ul>
  *   <li>no {@link AutomationSettings}: every automatic step is treated as OFF (the safe side);</li>
  *   <li>no {@link ClockControl}: time scale 1, requests are dropped;</li>
- *   <li>no {@link CaptureRules}: the channel is REJECTED with {@code CAPTURE_RULES_UNAVAILABLE} by the caller.</li>
+ *   <li>no {@link CaptureRules}: the channel is REJECTED with {@code CAPTURE_RULES_UNAVAILABLE} by the caller;</li>
+ *   <li>no {@link MissionAuthority}: initial departure is refused with {@code AUTHORITY_UNAVAILABLE}.</li>
  * </ul>
  * Never call these while holding the field world lock (the core may call field while holding its own).
  */
@@ -33,12 +37,29 @@ public class FieldPorts {
     private final ObjectProvider<AutomationSettings> settings;
     private final ObjectProvider<ClockControl> clock;
     private final ObjectProvider<CaptureRules> rules;
+    private final ObjectProvider<MissionAuthority> authority;
 
     public FieldPorts(ObjectProvider<AutomationSettings> settings, ObjectProvider<ClockControl> clock,
-                      ObjectProvider<CaptureRules> rules) {
+                      ObjectProvider<CaptureRules> rules, ObjectProvider<MissionAuthority> authority) {
         this.settings = settings;
         this.clock = clock;
         this.rules = rules;
+        this.authority = authority;
+    }
+
+    /** Current initial-departure authority; missing, failed or empty validation always refuses. */
+    public MissionAuthority.Decision initialDeparture(String runId, String missionId) {
+        try {
+            MissionAuthority current = authority.getIfAvailable();
+            if (current != null) {
+                MissionAuthority.Decision decision = current.checkInitialDeparture(runId, missionId);
+                if (decision != null) return decision;
+            }
+        } catch (RuntimeException e) {
+            log.warn("Mission authority validation unavailable; refusing initial departure ({})", e.getClass().getSimpleName());
+        }
+        return MissionAuthority.Decision.refuse("AUTHORITY_UNAVAILABLE",
+                "Current mission approval could not be checked; initial departure is refused.");
     }
 
     /** True if the automatic step {@code setting} is on; false if there are no settings or they fail. */
@@ -111,4 +132,12 @@ public class FieldPorts {
         CaptureRules current = rules.getIfAvailable();
         return current == null ? Optional.empty() : Optional.ofNullable(current.judge(input));
     }
+    /** Measured windows, or empty for an unavailable/default hook. Exceptions reach the review diagnostic. */
+    public List<Window> windows(CaptureInput input) {
+        CaptureRules current = rules.getIfAvailable();
+        if (current == null) return List.of();
+        List<Window> windows = current.windows(input);
+        return windows == null ? List.of() : List.copyOf(windows);
+    }
+
 }

@@ -1,0 +1,3248 @@
+{
+  "algorithm": "FP-COMPAT-3/4",
+  "response": "GasChannel;dt_s=0.05;SO2_line_delay_s=2.261946710584651,chamber_t90_s=8.0,sensor_t90_s=60.0;CO2_line_delay_s=3.769911184307752,chamber_t90_s=8.0,sensor_t90_s=30.0",
+  "fixed_baseline_cutoff_stress_test": false,
+  "mode": "evaluate",
+  "namespace": "FPEVAL4",
+  "domain": {
+    "directionSdDeg": 0.5,
+    "windTimeScaleS": 200.0,
+    "relativeSpeedSd": 0.01
+  },
+  "requested": 60,
+  "attempt_start_index": 10000,
+  "generator": "PuffWorld20Hz + SensorField20Hz + TeachDetector saved1Hz fixed snapshot300 + actual gas/flow capture stages; constant emissions from0; measured BG never plume-corrected",
+  "route_limit": "Recorded inlet moves on a straight line at at most3m/s from depot(0,0,2) after300 to one of(0,100,35)/(120,100,35), arrival ceiling to whole second; excludes field autopilot acceleration/obstacle route/body-to-inlet offset",
+  "emission_domain": "Uniform support over six singles and fifteen pairs; wind U(240,300)deg/U(2,5)m/s; per-source SO2 logU(.25,50)g/s; CO2=SO2*1000*logU(.5,2); constant from run0",
+  "coverage_domain": "Coverage conditional on the same NO_SIGNAL eligibility gate; all attempts including generation exceptions of unknown eligibility are retained separately. Raw true-support compatibility and final NOT_NEEDED-filtered survivors are distinct.",
+  "rank_rule": "min(m,ceil(.95*(m+1))); every eligible failed fit retained as infinity",
+  "cutoff": 3.0466921686441504,
+  "eligible": 60,
+  "attempt_count": 216,
+  "elapsed_seconds": 303.716685625,
+  "requested_eligible_reached": true,
+  "conditional_eligible_denominator": 60,
+  "all_attempt_denominator": 216,
+  "raw_true_support_covered": 57,
+  "final_true_support_survives": 8,
+  "generation_or_fit_exceptions": 0,
+  "whole_ranker_failures": 0,
+  "eligible_fit_failures": 0,
+  "evidence_status": "CURRENT_V4_INDEPENDENT_EVALUATION",
+  "raw_report_sha256": "da8f0c0a1690e8f08094e2243cba24d15349aa90bb85167d636ee9c63bca289c",
+  "frozen_manifest_sha256": "85764835068f29f9b3216c1c84faa926a7e25bbc47946b513cc1d1c68be7f65c",
+  "seed_intersection_with_calibration": 0,
+  "attempts": [
+    {
+      "seed": 5066625817333737232,
+      "support": "S01+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.231560334030665,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737233,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737234,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737235,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737236,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737237,
+      "support": "S02+S03",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 3.3531185726343837,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": false,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737238,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737239,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737240,
+      "support": "S02+S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737241,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737242,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737243,
+      "support": "S02+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.3611154640993517,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737244,
+      "support": "S02+S03",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.9862107003505971,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737245,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737246,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737247,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737248,
+      "support": "S01+S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737249,
+      "support": "S01+S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737250,
+      "support": "S01+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737251,
+      "support": "S01+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.5641808836740068,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737252,
+      "support": "S01+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.523554309544791,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737253,
+      "support": "S01+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.2890303135053456,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737254,
+      "support": "S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737255,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737256,
+      "support": "S04+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.6874586320314594,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S05",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737257,
+      "support": "S02+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737258,
+      "support": "S01+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.9655304554932524,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737259,
+      "support": "S02+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737260,
+      "support": "S03+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.9636924036667185,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S05",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737261,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737262,
+      "support": "S02+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.6514573512037005,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737263,
+      "support": "S02+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737264,
+      "support": "S04+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737265,
+      "support": "S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737266,
+      "support": "S02+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.7735499841983474,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737267,
+      "support": "S02+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.7603291411508988,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737268,
+      "support": "S04+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737269,
+      "support": "S02+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737270,
+      "support": "S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.0505839224537383,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S04",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737271,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737272,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737273,
+      "support": "S01+S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737274,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737275,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737276,
+      "support": "S03+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8702839555899258,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "S05",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737277,
+      "support": "S01",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737278,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737279,
+      "support": "S01",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737280,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737281,
+      "support": "S01",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737282,
+      "support": "S03+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737283,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737284,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737285,
+      "support": "S04+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737286,
+      "support": "S01+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737287,
+      "support": "S01+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737288,
+      "support": "S04+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737289,
+      "support": "S01+S03",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 7.22941821296728,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": false,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737290,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737291,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737292,
+      "support": "S01+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.241557589267225,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "S05",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737293,
+      "support": "S03+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.6390913870743897,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737294,
+      "support": "S02+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.6047427214033841,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737295,
+      "support": "S04+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737296,
+      "support": "S03+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737297,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737298,
+      "support": "S01+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737299,
+      "support": "S02+S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737300,
+      "support": "S05+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.9055713944047505,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737301,
+      "support": "S02+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8536977702512828,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737302,
+      "support": "S01+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.5357287441263161,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737303,
+      "support": "S02+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737304,
+      "support": "S02+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.2506517931182966,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737305,
+      "support": "S01+S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737306,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737307,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737308,
+      "support": "S03+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.6984203493632756,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737309,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737310,
+      "support": "S01+S03",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.607861034323169,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737311,
+      "support": "S02+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.9133268441079492,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "S03",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737312,
+      "support": "S02+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737313,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737314,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737315,
+      "support": "S02+S03",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.48841775673695115,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737316,
+      "support": "S03+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.2351510033513025,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737317,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737318,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737319,
+      "support": "S01+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737320,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737321,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737322,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737323,
+      "support": "S02+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737324,
+      "support": "S01+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.2732495744936412,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737325,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737326,
+      "support": "S04+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737327,
+      "support": "S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737328,
+      "support": "S02+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.3821480842426452,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737329,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737330,
+      "support": "S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737331,
+      "support": "S01+S02",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8759481264827655,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737332,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737333,
+      "support": "S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737334,
+      "support": "S03+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.1237735276158705,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S05",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737335,
+      "support": "S03+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737336,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737337,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737338,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737339,
+      "support": "S01",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737340,
+      "support": "S02+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737341,
+      "support": "S04+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.006074185767507,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737342,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737343,
+      "support": "S02+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737344,
+      "support": "S02",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.3829396689471902,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737345,
+      "support": "S01+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 2.0333984754893075,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737346,
+      "support": "S02+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737347,
+      "support": "S03+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737348,
+      "support": "S02",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.2705591439276083,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737349,
+      "support": "S02+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737350,
+      "support": "S02+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737351,
+      "support": "S02+S03",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.101515860773934,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737352,
+      "support": "S01+S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737353,
+      "support": "S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737354,
+      "support": "S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737355,
+      "support": "S02+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.9493793480846553,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737356,
+      "support": "S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737357,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737358,
+      "support": "S03+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737359,
+      "support": "S01+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8819939786111236,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737360,
+      "support": "S01+S03",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.9776100592053585,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737361,
+      "support": "S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.7492060478939122,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737362,
+      "support": "S02+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737363,
+      "support": "S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8309016699237586,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S04",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737364,
+      "support": "S03+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737365,
+      "support": "S01+S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737366,
+      "support": "S02",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 5.305615047618785,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": false,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S05",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737367,
+      "support": "S03+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737368,
+      "support": "S01+S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737369,
+      "support": "S01+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737370,
+      "support": "S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737371,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737372,
+      "support": "S01+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8188242287619507,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737373,
+      "support": "S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737374,
+      "support": "S02+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8759876503259,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737375,
+      "support": "S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737376,
+      "support": "S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737377,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737378,
+      "support": "S02+S03",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.1458569711768456,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737379,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737380,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737381,
+      "support": "S02+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737382,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737383,
+      "support": "S02+S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737384,
+      "support": "S02+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737385,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737386,
+      "support": "S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737387,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737388,
+      "support": "S02",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8568433663290259,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737389,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737390,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737391,
+      "support": "S03+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737392,
+      "support": "S01+S03",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 2.2366387553932183,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737393,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737394,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737395,
+      "support": "S01+S05",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.0638820440039376,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737396,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737397,
+      "support": "S03+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737398,
+      "support": "S01+S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737399,
+      "support": "S02+S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737400,
+      "support": "S01+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737401,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737402,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737403,
+      "support": "S02",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.7788215689377131,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "S03",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737404,
+      "support": "S01+S02",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.9070257435161178,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737405,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737406,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737407,
+      "support": "S01+S02",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.5596797595010238,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737408,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737409,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737410,
+      "support": "S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737411,
+      "support": "S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737412,
+      "support": "S01",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 2.1228332593558776,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737413,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737414,
+      "support": "S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737415,
+      "support": "S01",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737416,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737417,
+      "support": "S02+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737418,
+      "support": "S01+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.1174340833022627,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737419,
+      "support": "S01+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737420,
+      "support": "S01+S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737421,
+      "support": "S04+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737422,
+      "support": "S01+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.2427734317148318,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737423,
+      "support": "S01+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737424,
+      "support": "S01+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737425,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737426,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737427,
+      "support": "S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737428,
+      "support": "S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737429,
+      "support": "S01+S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737430,
+      "support": "S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737431,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737432,
+      "support": "S03+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737433,
+      "support": "S03+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737434,
+      "support": "S02+S06",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8492686325806512,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737435,
+      "support": "S01+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737436,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737437,
+      "support": "S05+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737438,
+      "support": "S01+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.9829671599238776,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737439,
+      "support": "S01+S04",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737440,
+      "support": "S04+S05",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737441,
+      "support": "S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737442,
+      "support": "S01+S02",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737443,
+      "support": "S02+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.8880438944258068,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737444,
+      "support": "S03+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 1.4039764234436172,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737445,
+      "support": "S03",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737446,
+      "support": "S04+S06",
+      "eligible": false,
+      "selected_entries": 26,
+      "statistic": null,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "seed": 5066625817333737447,
+      "support": "S02+S04",
+      "eligible": true,
+      "selected_entries": 26,
+      "statistic": 0.6493033261194939,
+      "failure": null,
+      "analysis_failure": null,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "S06",
+        "UNKNOWN"
+      ]
+    }
+  ],
+  "raw_fitting_true_supports_removed_by_not_needed": 49,
+  "coverage_limit": "60 eligible independent synthetic episodes only; raw cutoff compatibility is not final-survivor coverage, physical validation or an SC1-domain guarantee. SC1 ratio25 is outside500..2000. Straight-line calibration routes omit actual autopilot geometry/body offsets."
+}

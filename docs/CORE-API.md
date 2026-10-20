@@ -1,4 +1,4 @@
-# Core API for the other server packages (version 2.1, 18 Oct 2026)
+# Core API for the other server packages (version 2.3, 19 Oct 2026)
 
 AGREEMENT.md fixes what crosses the network. This file fixes the Java hooks between the core and the other server packages (science, field, alerts, ops, cases), so several jobs can build at the same time and still fit. Only Aditya Singh (through Claude) changes it. The interfaces named here live in `fuelprint.api` (built in P1/P1b); the implementations named "core" live in `fuelprint.core` (built in P3).
 
@@ -104,3 +104,61 @@ The default profile is `stub`, with `@Profile("stub")` service implementations r
 - `fuelprint.core` never imports `fuelprint.science`, `fuelprint.field`, `fuelprint.alerts`, `fuelprint.ops`, `fuelprint.cases` or `fuelprint.ai`. It only sees their beans through `fuelprint.api` interfaces.
 - Packages never import each other's internals; they talk through `fuelprint.api`, records and events.
 - Nothing outside `fuelprint.science` imports `fuelprint.science.truth`.
+
+## 10. Reviewed capture windows (contract 2.2)
+
+```java
+public interface CaptureRules {
+    ChannelVerdict judge(CaptureInput input);
+    default List<Window> windows(CaptureInput input) { return List.of(); }
+}
+```
+
+`CaptureRules.windows(input)` computes a background window and a complete 30-second collection window for one channel from the attempt's recorded stages, gas readings and branch-flow readings. It does not save records or make the human review decision. Both windows use server UUID v4 IDs. All contributing readings must have the same instrument, gas and origin. Unknown background, insufficient valid consecutive collection, missing or invalid flow, and unsupported channels produce no usable collection window and an explicit diagnostic reason in the capture review result.
+
+The field `review_capture` handler calls this function only for a channel whose automatic pre-check and human decision are both VALID. It obtains the raw input from the saved reading records belonging to the mission vehicle and the attempt's stage intervals. It saves the returned windows with the screening record in the same command transaction. Repeating a command returns its existing receipt and creates no new windows. REJECTED, LIMITED, interrupted and unreviewed capture channels remain available as raw readings, attempts and screening records, but are not admitted as usable capture windows by this amendment.
+
+For a vehicle collection window, `mean_enhancement` is the measured collection mean minus the measured BACKGROUND-stage mean. It is a temporal measurement contrast, not a claim that the background was plume-free. The collection window cites its saved background through `background_window_id`. Its uncertainty includes both averaging operations and their correlation under the declared synthetic noise model.
+
+Science predicts this same collection-minus-background contrast, propagating the gas-specific transport, chamber and sensor response through the recorded inlet history. It must not compare a temporal contrast against an absolute steady concentration. Missing background records or required inlet history exclude the window with a reason. Analyses using vehicle contrasts declare the possible plume content of the background and the finite-history initialization assumption in `limitations[]`.
+
+
+Input and Window signatures are unchanged. The default method returns no windows so existing implementations remain compatible. Fixed-box detector windows keep their existing meaning. One-second readings are right endpoints: a 30-sample window at integer times T through T+29 is represented by (T-1,T+29]. Selection from BACKGROUND/COLLECT stage records uses each stage's start-inclusive, end-exclusive interval. The inverse model uses the same discrete sample times.
+
+## 11. Hypothetical mission forecasts (contract 2.3)
+
+Owner-approved on 19 October 2026 in [the shared-hook proposal](contract-proposals/2026-10-19-prospective-inlets.md).
+
+```java
+public interface ProspectiveInlets {
+    Optional<Forecast> forecast(PlanContext context, VehicleState vehicle, Enu target,
+                               java.util.function.BooleanSupplier budgetExpired);
+    record Forecast(List<InletSample> samples, List<Stage> stages,
+                    double completeSeconds, double energyWh) {}
+}
+```
+
+Field implements this optional port; science obtains implementations through Spring. Field forecasts an independent copy with the same autopilot, kinematics, geometry and inlet offsets as actual flight. It never moves the live vehicle or writes records. Returned sample/stage lists are immutable copies. Samples through the current simulation time come from recorded history for the same run and vehicle; future samples are hypothetical. Actual `InletHistory` remains observations only.
+
+Science propagates the forecast through its gas response and background/collection contrast model, including joint gas covariance. Stage intervals use [start,end). Duration and energy include the complete procedure and return, rather than travel alone. Missing history, no safe path, unsupported vehicles, insufficient run duration or cancellation returns empty; the planner records an unavailable forecast reason and never substitutes an instant steady measurement.
+
+The planner checks its two-second budget before invoking the hook, field checks cancellation inside trajectory generation, and science checks inside response propagation. An expired plan is PENDING with no recommended action. Forecasts assume immediate autopilot execution and valid minimum-duration sampling stages. Approval delays, visitor deviations, later wind changes and later instrument faults remain uncertain. Attribution always uses recorded trajectories and measured gas/flow values. No network command, automatic approval or change to human mission/capture decisions is introduced.
+
+## 12. Initial mission departure authority (internal Java integration)
+
+The reviewed backend workflow adds a read-only port in `fuelprint.api`:
+
+```java
+public interface MissionAuthority {
+    Decision checkInitialDeparture(String runId, String missionId);
+    record Decision(boolean allowed, String reasonCode, String reasonText) {}
+}
+```
+
+Operations implements it using the same current run, simulation expiry and dependency checks as supervisor approval. It reads committed public records, current clock and wind; it neither approves nor expires a mission and writes no records. The concrete Decision constructor accepts either permission with both reason fields null, or refusal with nonblank code and text.
+
+Field calls this port on the serialized command thread before the initial APPROVED-to-LEASED grant in `acquire_lease`, human/automatic `start_autopilot`, and initial `take_over`. A missing, ambiguous, failing or null-returning validator refuses departure with AUTHORITY_UNAVAILABLE. Changed dependencies or expired authority return the specific refusal from Operations. A refusal saves no lease or departure revision. A mission revision check alone cannot detect analysis, wind or time changes that leave the mission revision unchanged.
+
+Automatic EXPIRED persistence still uses the ordinary `expire_mission` command. Correctness does not depend on expiry overtaking an already queued departure. Already-started handover/resume and safety RETURN retain their existing lifecycle. Isolated Field tests may explicitly substitute the port; genuine Operations/Field integrations use the real validator. There is no production fallback for missions missing approval fields, new network message, changed human role or scientific calculation in this port.
+
+This describes the local reviewed implementation. No commit/publication or shared-branch integration is implied. The concrete Operations storage/evidence/mission encoding handoff is recorded separately in `docs/contract-proposals/2026-10-19-backend-integration-decisions.md`; its proposed board metrics remain unimplemented and unaccepted as shared definitions.

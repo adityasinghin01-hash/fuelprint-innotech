@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fuelprint.api.SessionService;
+import fuelprint.core.store.RecordStore;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,9 @@ public class CommandController {
     public CommandController(CommandBus bus, ObjectProvider<SessionService> sessions, ObjectMapper mapper) {
         this.bus = bus;
         this.sessions = sessions;
-        this.reader = mapper.reader().with(StreamReadFeature.STRICT_DUPLICATE_DETECTION);
+        // Numbers keep every digit the sender wrote when a double cannot hold them (see RecordStore.exactReader);
+        // every ordinary number is read as a double exactly as before.
+        this.reader = RecordStore.exactReader(mapper).with(StreamReadFeature.STRICT_DUPLICATE_DETECTION);
     }
 
     @PostMapping(path = "/api/commands", produces = MediaType.APPLICATION_JSON_VALUE)

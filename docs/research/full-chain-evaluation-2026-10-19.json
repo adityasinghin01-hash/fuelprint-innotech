@@ -1,0 +1,4421 @@
+{
+  "algorithm": "FP-COMPAT-3/3",
+  "response": "GasChannel;dt_s=0.05;SO2_line_delay_s=2.261946710584651,chamber_t90_s=8.0,sensor_t90_s=60.0;CO2_line_delay_s=3.769911184307752,chamber_t90_s=8.0,sensor_t90_s=30.0",
+  "mode": "evaluate",
+  "namespace": "FPEVAL",
+  "domain": {
+    "directionSdDeg": 0.5,
+    "windTimeScaleS": 200.0,
+    "relativeSpeedSd": 0.01
+  },
+  "requested": 60,
+  "generator": "PuffWorld20Hz + SensorField20Hz + TeachDetector saved1Hz fixed snapshot300 + actual gas/flow capture stages; constant emissions from0; measured BG never plume-corrected",
+  "route_limit": "Recorded inlet moves on a straight line at at most3m/s from depot(0,0,2) after300 to one of(0,100,35)/(120,100,35), arrival ceiling to whole second; excludes field autopilot acceleration/obstacle route/body-to-inlet offset",
+  "emission_domain": "Uniform support over six singles and fifteen pairs; wind U(240,300)deg/U(2,5)m/s; per-source SO2 logU(.25,50)g/s; CO2=SO2*1000*logU(.5,2); constant from run0",
+  "coverage_domain": "Coverage conditional on the same NO_SIGNAL eligibility gate; all attempts including generation exceptions of unknown eligibility are retained separately. Raw true-support compatibility and final NOT_NEEDED-filtered survivors are distinct.",
+  "rank_rule": "min(m,ceil(.95*(m+1))); every eligible failed fit retained as infinity",
+  "cutoff": 2.94416425495192,
+  "eligible": 60,
+  "attempt_count": 206,
+  "elapsed_seconds": 416.535354584,
+  "requested_eligible_reached": true,
+  "conditional_eligible_denominator": 60,
+  "all_attempt_denominator": 206,
+  "raw_true_support_covered": 58,
+  "final_true_support_survives": 10,
+  "generation_or_fit_exceptions": 0,
+  "whole_ranker_failures": 0,
+  "eligible_fit_failures": 0,
+  "attempts": [
+    {
+      "seed": 5066625817551831040,
+      "support": "S01+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.081725375,
+      "simulation_seconds": 0.764633375
+    },
+    {
+      "seed": 5066625817551831041,
+      "support": "S02+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.016666375,
+      "simulation_seconds": 0.3511655
+    },
+    {
+      "seed": 5066625817551831042,
+      "support": "S04+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.0091965,
+      "simulation_seconds": 0.222608042
+    },
+    {
+      "seed": 5066625817551831043,
+      "support": "S03+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.010580375,
+      "simulation_seconds": 0.179821625
+    },
+    {
+      "seed": 5066625817551831044,
+      "support": "S01+S05",
+      "eligible": true,
+      "statistic": 0.9768167264693676,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 0,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 6.086291,
+      "simulation_seconds": 0.287828458
+    },
+    {
+      "seed": 5066625817551831045,
+      "support": "S01+S02",
+      "eligible": true,
+      "statistic": 1.6080152134719807,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 3,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01+S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01+S02"
+      ],
+      "fit_seconds": 11.097826292,
+      "simulation_seconds": 0.398479875
+    },
+    {
+      "seed": 5066625817551831046,
+      "support": "S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.009072833,
+      "simulation_seconds": 0.1366235
+    },
+    {
+      "seed": 5066625817551831047,
+      "support": "S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.009489667,
+      "simulation_seconds": 0.144942667
+    },
+    {
+      "seed": 5066625817551831048,
+      "support": "S01+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.011220916,
+      "simulation_seconds": 0.279709958
+    },
+    {
+      "seed": 5066625817551831049,
+      "support": "S01+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003666042,
+      "simulation_seconds": 0.201527292
+    },
+    {
+      "seed": 5066625817551831050,
+      "support": "S02+S03",
+      "eligible": true,
+      "statistic": 0.892633438944874,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 2,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 6.732026667,
+      "simulation_seconds": 0.265662125
+    },
+    {
+      "seed": 5066625817551831051,
+      "support": "S05+S06",
+      "eligible": true,
+      "statistic": 1.7023550002145895,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 12,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S05",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S05",
+        "S01+S05",
+        "S02+S05",
+        "S03+S05",
+        "S04+S05",
+        "S05+S06"
+      ],
+      "fit_seconds": 6.108109542,
+      "simulation_seconds": 0.253167375
+    },
+    {
+      "seed": 5066625817551831052,
+      "support": "S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003973541,
+      "simulation_seconds": 0.102228667
+    },
+    {
+      "seed": 5066625817551831053,
+      "support": "S01+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004102625,
+      "simulation_seconds": 0.179999041
+    },
+    {
+      "seed": 5066625817551831054,
+      "support": "S04+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004432375,
+      "simulation_seconds": 0.184483166
+    },
+    {
+      "seed": 5066625817551831055,
+      "support": "S02+S04",
+      "eligible": true,
+      "statistic": 0.4976562816861553,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 7,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 4.876932333,
+      "simulation_seconds": 0.198099959
+    },
+    {
+      "seed": 5066625817551831056,
+      "support": "S03+S04",
+      "eligible": true,
+      "statistic": 1.1240771171087705,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 15,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S04",
+        "S01+S04",
+        "S02+S04",
+        "S03+S04",
+        "S04+S05",
+        "S04+S06"
+      ],
+      "fit_seconds": 7.114019167,
+      "simulation_seconds": 0.186472292
+    },
+    {
+      "seed": 5066625817551831057,
+      "support": "S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004617333,
+      "simulation_seconds": 0.081121916
+    },
+    {
+      "seed": 5066625817551831058,
+      "support": "S01+S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003359708,
+      "simulation_seconds": 0.195665708
+    },
+    {
+      "seed": 5066625817551831059,
+      "support": "S01+S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003964542,
+      "simulation_seconds": 0.264612042
+    },
+    {
+      "seed": 5066625817551831060,
+      "support": "S02+S04",
+      "eligible": true,
+      "statistic": 0.6048189196823345,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 11,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S04",
+        "S06",
+        "S01+S04",
+        "S01+S06",
+        "S02+S04",
+        "S02+S06",
+        "S03+S04",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 3.605538417,
+      "simulation_seconds": 0.167943542
+    },
+    {
+      "seed": 5066625817551831061,
+      "support": "S01+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004834417,
+      "simulation_seconds": 0.186257375
+    },
+    {
+      "seed": 5066625817551831062,
+      "support": "S01+S02",
+      "eligible": true,
+      "statistic": 0.5646508746411519,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 8,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S02",
+        "S01+S02",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 6.399565083,
+      "simulation_seconds": 0.236893875
+    },
+    {
+      "seed": 5066625817551831063,
+      "support": "S04+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.006847458,
+      "simulation_seconds": 0.149199083
+    },
+    {
+      "seed": 5066625817551831064,
+      "support": "S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.007588209,
+      "simulation_seconds": 0.083993792
+    },
+    {
+      "seed": 5066625817551831065,
+      "support": "S03+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003742584,
+      "simulation_seconds": 0.174089208
+    },
+    {
+      "seed": 5066625817551831066,
+      "support": "S01+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002819042,
+      "simulation_seconds": 0.180778334
+    },
+    {
+      "seed": 5066625817551831067,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002763333,
+      "simulation_seconds": 0.0814715
+    },
+    {
+      "seed": 5066625817551831068,
+      "support": "S03+S04",
+      "eligible": true,
+      "statistic": 0.7262836122678882,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 13,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S04",
+        "S01+S04",
+        "S02+S04",
+        "S03+S04",
+        "S04+S05",
+        "S04+S06"
+      ],
+      "fit_seconds": 5.051316625,
+      "simulation_seconds": 0.175542417
+    },
+    {
+      "seed": 5066625817551831069,
+      "support": "S01+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.005908,
+      "simulation_seconds": 0.225998084
+    },
+    {
+      "seed": 5066625817551831070,
+      "support": "S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003560375,
+      "simulation_seconds": 0.1122075
+    },
+    {
+      "seed": 5066625817551831071,
+      "support": "S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004443833,
+      "simulation_seconds": 0.082461125
+    },
+    {
+      "seed": 5066625817551831072,
+      "support": "S04+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004884333,
+      "simulation_seconds": 0.159722917
+    },
+    {
+      "seed": 5066625817551831073,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.00296475,
+      "simulation_seconds": 0.088396125
+    },
+    {
+      "seed": 5066625817551831074,
+      "support": "S01",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002690833,
+      "simulation_seconds": 0.104282625
+    },
+    {
+      "seed": 5066625817551831075,
+      "support": "S01+S05",
+      "eligible": true,
+      "statistic": 2.415608052734662,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 15,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 4.8007425,
+      "simulation_seconds": 0.196152042
+    },
+    {
+      "seed": 5066625817551831076,
+      "support": "S02+S06",
+      "eligible": true,
+      "statistic": 0.5755745546500989,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 12,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 3.488134542,
+      "simulation_seconds": 0.185062958
+    },
+    {
+      "seed": 5066625817551831077,
+      "support": "S02+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.005315709,
+      "simulation_seconds": 0.179937917
+    },
+    {
+      "seed": 5066625817551831078,
+      "support": "S01+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003947,
+      "simulation_seconds": 0.166528333
+    },
+    {
+      "seed": 5066625817551831079,
+      "support": "S01",
+      "eligible": true,
+      "statistic": 0.5585216883732206,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 6,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 4.23857625,
+      "simulation_seconds": 0.127162666
+    },
+    {
+      "seed": 5066625817551831080,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003516625,
+      "simulation_seconds": 0.157467041
+    },
+    {
+      "seed": 5066625817551831081,
+      "support": "S01",
+      "eligible": true,
+      "statistic": 3.751083864652766,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 3,
+      "raw_true_support_covered": false,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 3.789026084,
+      "simulation_seconds": 0.129879167
+    },
+    {
+      "seed": 5066625817551831082,
+      "support": "S02",
+      "eligible": true,
+      "statistic": 0.8659718017709567,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 1,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 5.743456167,
+      "simulation_seconds": 0.14199575
+    },
+    {
+      "seed": 5066625817551831083,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003710459,
+      "simulation_seconds": 0.084828042
+    },
+    {
+      "seed": 5066625817551831084,
+      "support": "S01+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004306042,
+      "simulation_seconds": 0.200884833
+    },
+    {
+      "seed": 5066625817551831085,
+      "support": "S01",
+      "eligible": true,
+      "statistic": 0.9560985462241203,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 6,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 7.319526417,
+      "simulation_seconds": 0.173166292
+    },
+    {
+      "seed": 5066625817551831086,
+      "support": "S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003244167,
+      "simulation_seconds": 0.093968459
+    },
+    {
+      "seed": 5066625817551831087,
+      "support": "S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003091542,
+      "simulation_seconds": 0.213891667
+    },
+    {
+      "seed": 5066625817551831088,
+      "support": "S05+S06",
+      "eligible": true,
+      "statistic": 1.1686253877705304,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 16,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S05",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S05",
+        "S01+S05",
+        "S02+S05",
+        "S03+S05",
+        "S04+S05",
+        "S05+S06"
+      ],
+      "fit_seconds": 4.208545459,
+      "simulation_seconds": 0.15699875
+    },
+    {
+      "seed": 5066625817551831089,
+      "support": "S02",
+      "eligible": true,
+      "statistic": 2.1516122347893925,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 0,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "S03+S05",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S05"
+      ],
+      "fit_seconds": 10.326922541,
+      "simulation_seconds": 0.193296708
+    },
+    {
+      "seed": 5066625817551831090,
+      "support": "S05+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.005268041,
+      "simulation_seconds": 0.153726042
+    },
+    {
+      "seed": 5066625817551831091,
+      "support": "S02+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.030261625,
+      "simulation_seconds": 0.181690625
+    },
+    {
+      "seed": 5066625817551831092,
+      "support": "S01+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004396292,
+      "simulation_seconds": 0.216576875
+    },
+    {
+      "seed": 5066625817551831093,
+      "support": "S01+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003333584,
+      "simulation_seconds": 0.170191083
+    },
+    {
+      "seed": 5066625817551831094,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004605041,
+      "simulation_seconds": 0.09292825
+    },
+    {
+      "seed": 5066625817551831095,
+      "support": "S02+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003010542,
+      "simulation_seconds": 0.16571475
+    },
+    {
+      "seed": 5066625817551831096,
+      "support": "S05+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002739834,
+      "simulation_seconds": 0.129642416
+    },
+    {
+      "seed": 5066625817551831097,
+      "support": "S01+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004147125,
+      "simulation_seconds": 0.202973375
+    },
+    {
+      "seed": 5066625817551831098,
+      "support": "S02+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.00335,
+      "simulation_seconds": 0.177304042
+    },
+    {
+      "seed": 5066625817551831099,
+      "support": "S01+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003356042,
+      "simulation_seconds": 0.185128041
+    },
+    {
+      "seed": 5066625817551831100,
+      "support": "S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004711125,
+      "simulation_seconds": 0.077066542
+    },
+    {
+      "seed": 5066625817551831101,
+      "support": "S02+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.00436925,
+      "simulation_seconds": 0.197012834
+    },
+    {
+      "seed": 5066625817551831102,
+      "support": "S02+S04",
+      "eligible": true,
+      "statistic": 0.7586069318650639,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 10,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 3.060671125,
+      "simulation_seconds": 0.159688834
+    },
+    {
+      "seed": 5066625817551831103,
+      "support": "S01+S02",
+      "eligible": true,
+      "statistic": 0.48355322614129115,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 2,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 8.363977417,
+      "simulation_seconds": 0.29984125
+    },
+    {
+      "seed": 5066625817551831104,
+      "support": "S02+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004716083,
+      "simulation_seconds": 0.228601792
+    },
+    {
+      "seed": 5066625817551831105,
+      "support": "S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002827959,
+      "simulation_seconds": 0.09532425
+    },
+    {
+      "seed": 5066625817551831106,
+      "support": "S02+S06",
+      "eligible": true,
+      "statistic": 0.5704114095611902,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 9,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 3.721831541,
+      "simulation_seconds": 0.177839125
+    },
+    {
+      "seed": 5066625817551831107,
+      "support": "S04+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003874709,
+      "simulation_seconds": 0.146694417
+    },
+    {
+      "seed": 5066625817551831108,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003888208,
+      "simulation_seconds": 0.158534042
+    },
+    {
+      "seed": 5066625817551831109,
+      "support": "S04+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.007147708,
+      "simulation_seconds": 0.1372885
+    },
+    {
+      "seed": 5066625817551831110,
+      "support": "S01",
+      "eligible": true,
+      "statistic": 1.5803152192152696,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 7,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 4.004999291,
+      "simulation_seconds": 0.131943125
+    },
+    {
+      "seed": 5066625817551831111,
+      "support": "S02+S03",
+      "eligible": true,
+      "statistic": 1.1931267926819413,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 9,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 4.880789834,
+      "simulation_seconds": 0.19903275
+    },
+    {
+      "seed": 5066625817551831112,
+      "support": "S02+S06",
+      "eligible": true,
+      "statistic": 1.5546855633286571,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 9,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 3.28449,
+      "simulation_seconds": 0.169229375
+    },
+    {
+      "seed": 5066625817551831113,
+      "support": "S02+S05",
+      "eligible": true,
+      "statistic": 2.201859839623254,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 9,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S02",
+        "S01+S02",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 7.689673417,
+      "simulation_seconds": 0.252333459
+    },
+    {
+      "seed": 5066625817551831114,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.007273792,
+      "simulation_seconds": 0.159913209
+    },
+    {
+      "seed": 5066625817551831115,
+      "support": "S02+S05",
+      "eligible": true,
+      "statistic": 0.811989852401502,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 6,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 5.869666708,
+      "simulation_seconds": 0.253723959
+    },
+    {
+      "seed": 5066625817551831116,
+      "support": "S01+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002530625,
+      "simulation_seconds": 0.197680791
+    },
+    {
+      "seed": 5066625817551831117,
+      "support": "S05+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003545958,
+      "simulation_seconds": 0.146780166
+    },
+    {
+      "seed": 5066625817551831118,
+      "support": "S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002180458,
+      "simulation_seconds": 0.086330042
+    },
+    {
+      "seed": 5066625817551831119,
+      "support": "S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003747,
+      "simulation_seconds": 0.150528625
+    },
+    {
+      "seed": 5066625817551831120,
+      "support": "S02+S06",
+      "eligible": true,
+      "statistic": 0.8641208637491782,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 5,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 3.783595125,
+      "simulation_seconds": 0.169422542
+    },
+    {
+      "seed": 5066625817551831121,
+      "support": "S01+S05",
+      "eligible": true,
+      "statistic": 0.8024973525614514,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 9,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 6.235779291,
+      "simulation_seconds": 0.235021167
+    },
+    {
+      "seed": 5066625817551831122,
+      "support": "S01+S02",
+      "eligible": true,
+      "statistic": 1.1678019604362027,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 8,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S02",
+        "S01+S02",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 7.012161584,
+      "simulation_seconds": 0.266568625
+    },
+    {
+      "seed": 5066625817551831123,
+      "support": "S01+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002451458,
+      "simulation_seconds": 0.176935084
+    },
+    {
+      "seed": 5066625817551831124,
+      "support": "S01+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002445333,
+      "simulation_seconds": 0.179051541
+    },
+    {
+      "seed": 5066625817551831125,
+      "support": "S04+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003690583,
+      "simulation_seconds": 0.142025917
+    },
+    {
+      "seed": 5066625817551831126,
+      "support": "S02+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002972542,
+      "simulation_seconds": 0.212975333
+    },
+    {
+      "seed": 5066625817551831127,
+      "support": "S01+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002393958,
+      "simulation_seconds": 0.221360125
+    },
+    {
+      "seed": 5066625817551831128,
+      "support": "S02+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002425916,
+      "simulation_seconds": 0.167442125
+    },
+    {
+      "seed": 5066625817551831129,
+      "support": "S03+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002702542,
+      "simulation_seconds": 0.135218209
+    },
+    {
+      "seed": 5066625817551831130,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002586875,
+      "simulation_seconds": 0.099705625
+    },
+    {
+      "seed": 5066625817551831131,
+      "support": "S01+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002724333,
+      "simulation_seconds": 0.1471115
+    },
+    {
+      "seed": 5066625817551831132,
+      "support": "S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004704125,
+      "simulation_seconds": 0.088199875
+    },
+    {
+      "seed": 5066625817551831133,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002932458,
+      "simulation_seconds": 0.1820235
+    },
+    {
+      "seed": 5066625817551831134,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002411333,
+      "simulation_seconds": 0.083322792
+    },
+    {
+      "seed": 5066625817551831135,
+      "support": "S02",
+      "eligible": true,
+      "statistic": 1.4578811580449804,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 5,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S02",
+        "S01+S02",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 4.280551959,
+      "simulation_seconds": 0.118933125
+    },
+    {
+      "seed": 5066625817551831136,
+      "support": "S01+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.005599167,
+      "simulation_seconds": 0.251488417
+    },
+    {
+      "seed": 5066625817551831137,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002759291,
+      "simulation_seconds": 0.082235625
+    },
+    {
+      "seed": 5066625817551831138,
+      "support": "S05+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002534542,
+      "simulation_seconds": 0.257086791
+    },
+    {
+      "seed": 5066625817551831139,
+      "support": "S01+S04",
+      "eligible": true,
+      "statistic": 0.9194701371014165,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 4,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 9.492816666,
+      "simulation_seconds": 0.291102208
+    },
+    {
+      "seed": 5066625817551831140,
+      "support": "S02+S05",
+      "eligible": true,
+      "statistic": 0.9659211057082189,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 2,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 3.993411583,
+      "simulation_seconds": 0.19414025
+    },
+    {
+      "seed": 5066625817551831141,
+      "support": "S01+S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002726791,
+      "simulation_seconds": 0.156369833
+    },
+    {
+      "seed": 5066625817551831142,
+      "support": "S01+S03",
+      "eligible": true,
+      "statistic": 0.6161470647450401,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 9,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 4.084057166,
+      "simulation_seconds": 0.177948458
+    },
+    {
+      "seed": 5066625817551831143,
+      "support": "S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.007130958,
+      "simulation_seconds": 0.074176708
+    },
+    {
+      "seed": 5066625817551831144,
+      "support": "S03+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002966,
+      "simulation_seconds": 0.1591635
+    },
+    {
+      "seed": 5066625817551831145,
+      "support": "S02",
+      "eligible": true,
+      "statistic": 0.7575011892966408,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 3,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S02",
+        "S01+S02",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 8.985197208,
+      "simulation_seconds": 0.196607209
+    },
+    {
+      "seed": 5066625817551831146,
+      "support": "S04+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003513916,
+      "simulation_seconds": 0.145192
+    },
+    {
+      "seed": 5066625817551831147,
+      "support": "S03+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002850041,
+      "simulation_seconds": 0.133571917
+    },
+    {
+      "seed": 5066625817551831148,
+      "support": "S02+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002649042,
+      "simulation_seconds": 0.164247417
+    },
+    {
+      "seed": 5066625817551831149,
+      "support": "S03+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.0027235,
+      "simulation_seconds": 0.292284208
+    },
+    {
+      "seed": 5066625817551831150,
+      "support": "S03+S04",
+      "eligible": true,
+      "statistic": 0.862342631651865,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 9,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S04",
+        "S06",
+        "S01+S04",
+        "S01+S06",
+        "S02+S04",
+        "S02+S06",
+        "S03+S04",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 3.869165,
+      "simulation_seconds": 0.153467917
+    },
+    {
+      "seed": 5066625817551831151,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002718875,
+      "simulation_seconds": 0.085032375
+    },
+    {
+      "seed": 5066625817551831152,
+      "support": "S03+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.00267025,
+      "simulation_seconds": 0.164000291
+    },
+    {
+      "seed": 5066625817551831153,
+      "support": "S02+S06",
+      "eligible": true,
+      "statistic": 0.8633956359583416,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 6,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S06"
+      ],
+      "fit_seconds": 6.150756417,
+      "simulation_seconds": 0.21787625
+    },
+    {
+      "seed": 5066625817551831154,
+      "support": "S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002192958,
+      "simulation_seconds": 0.089654833
+    },
+    {
+      "seed": 5066625817551831155,
+      "support": "S01+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002546125,
+      "simulation_seconds": 0.192447833
+    },
+    {
+      "seed": 5066625817551831156,
+      "support": "S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002453375,
+      "simulation_seconds": 0.076231917
+    },
+    {
+      "seed": 5066625817551831157,
+      "support": "S03+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002058167,
+      "simulation_seconds": 0.139443333
+    },
+    {
+      "seed": 5066625817551831158,
+      "support": "S02+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002512,
+      "simulation_seconds": 0.161872958
+    },
+    {
+      "seed": 5066625817551831159,
+      "support": "S01+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.00270925,
+      "simulation_seconds": 0.188305125
+    },
+    {
+      "seed": 5066625817551831160,
+      "support": "S01+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002413333,
+      "simulation_seconds": 0.177776459
+    },
+    {
+      "seed": 5066625817551831161,
+      "support": "S01+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002552584,
+      "simulation_seconds": 0.194231209
+    },
+    {
+      "seed": 5066625817551831162,
+      "support": "S04+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002815334,
+      "simulation_seconds": 0.193792792
+    },
+    {
+      "seed": 5066625817551831163,
+      "support": "S02+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002599667,
+      "simulation_seconds": 0.198310833
+    },
+    {
+      "seed": 5066625817551831164,
+      "support": "S04+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002404375,
+      "simulation_seconds": 0.129700166
+    },
+    {
+      "seed": 5066625817551831165,
+      "support": "S04+S05",
+      "eligible": true,
+      "statistic": 0.5640368837878635,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 17,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S05",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S05",
+        "S01+S05",
+        "S02+S05",
+        "S03+S05",
+        "S04+S05",
+        "S05+S06"
+      ],
+      "fit_seconds": 5.12367925,
+      "simulation_seconds": 0.169312917
+    },
+    {
+      "seed": 5066625817551831166,
+      "support": "S02+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002744292,
+      "simulation_seconds": 0.231791125
+    },
+    {
+      "seed": 5066625817551831167,
+      "support": "S02+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004759708,
+      "simulation_seconds": 0.168124959
+    },
+    {
+      "seed": 5066625817551831168,
+      "support": "S01",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.00381075,
+      "simulation_seconds": 0.126937417
+    },
+    {
+      "seed": 5066625817551831169,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002517208,
+      "simulation_seconds": 0.093656708
+    },
+    {
+      "seed": 5066625817551831170,
+      "support": "S02+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002553541,
+      "simulation_seconds": 0.176058334
+    },
+    {
+      "seed": 5066625817551831171,
+      "support": "S04+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002672125,
+      "simulation_seconds": 0.132260084
+    },
+    {
+      "seed": 5066625817551831172,
+      "support": "S02+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002533333,
+      "simulation_seconds": 0.216723167
+    },
+    {
+      "seed": 5066625817551831173,
+      "support": "S02+S05",
+      "eligible": true,
+      "statistic": 1.0130977482610335,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 6,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 10.210679334,
+      "simulation_seconds": 0.273605625
+    },
+    {
+      "seed": 5066625817551831174,
+      "support": "S02+S05",
+      "eligible": true,
+      "statistic": 13.394146787599222,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 8,
+      "raw_true_support_covered": false,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 5.679967875,
+      "simulation_seconds": 0.223964
+    },
+    {
+      "seed": 5066625817551831175,
+      "support": "S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.006728083,
+      "simulation_seconds": 0.106826125
+    },
+    {
+      "seed": 5066625817551831176,
+      "support": "S01",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.00620825,
+      "simulation_seconds": 0.114481417
+    },
+    {
+      "seed": 5066625817551831177,
+      "support": "S04+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003366917,
+      "simulation_seconds": 0.146172958
+    },
+    {
+      "seed": 5066625817551831178,
+      "support": "S02+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002547083,
+      "simulation_seconds": 0.166572333
+    },
+    {
+      "seed": 5066625817551831179,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002340667,
+      "simulation_seconds": 0.141189417
+    },
+    {
+      "seed": 5066625817551831180,
+      "support": "S01+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.0026455,
+      "simulation_seconds": 0.200413666
+    },
+    {
+      "seed": 5066625817551831181,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002536791,
+      "simulation_seconds": 0.086831083
+    },
+    {
+      "seed": 5066625817551831182,
+      "support": "S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002478416,
+      "simulation_seconds": 0.0906335
+    },
+    {
+      "seed": 5066625817551831183,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002493709,
+      "simulation_seconds": 0.151023708
+    },
+    {
+      "seed": 5066625817551831184,
+      "support": "S01",
+      "eligible": true,
+      "statistic": 0.7183016499822686,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 3,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S01+S02",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06"
+      ],
+      "fit_seconds": 7.683234584,
+      "simulation_seconds": 0.189879333
+    },
+    {
+      "seed": 5066625817551831185,
+      "support": "S02+S04",
+      "eligible": true,
+      "statistic": 0.784327154910359,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 7,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S02",
+        "S01+S02",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 4.068185541,
+      "simulation_seconds": 0.186267666
+    },
+    {
+      "seed": 5066625817551831186,
+      "support": "S02+S06",
+      "eligible": true,
+      "statistic": 0.8449957920690383,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 6,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S06",
+        "S01+S06",
+        "S02+S06",
+        "S03+S06",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 8.463400542,
+      "simulation_seconds": 0.235756125
+    },
+    {
+      "seed": 5066625817551831187,
+      "support": "S03+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002647375,
+      "simulation_seconds": 0.13539875
+    },
+    {
+      "seed": 5066625817551831188,
+      "support": "S03+S04",
+      "eligible": true,
+      "statistic": 0.9177869328697443,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 17,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S04",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S04",
+        "S01+S04",
+        "S02+S04",
+        "S03+S04",
+        "S04+S05",
+        "S04+S06"
+      ],
+      "fit_seconds": 3.729887875,
+      "simulation_seconds": 0.151911834
+    },
+    {
+      "seed": 5066625817551831189,
+      "support": "S05+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002410917,
+      "simulation_seconds": 0.163428458
+    },
+    {
+      "seed": 5066625817551831190,
+      "support": "S02+S06",
+      "eligible": true,
+      "statistic": 0.8620062139923342,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 2,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S02",
+        "S01+S02",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 9.885354541,
+      "simulation_seconds": 0.276905542
+    },
+    {
+      "seed": 5066625817551831191,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.00272825,
+      "simulation_seconds": 0.162615666
+    },
+    {
+      "seed": 5066625817551831192,
+      "support": "S02+S03",
+      "eligible": true,
+      "statistic": 1.3848445538233258,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 19,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S02",
+        "S01+S02",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 9.949051459,
+      "simulation_seconds": 0.263984875
+    },
+    {
+      "seed": 5066625817551831193,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003230833,
+      "simulation_seconds": 0.170892917
+    },
+    {
+      "seed": 5066625817551831194,
+      "support": "S04+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004014458,
+      "simulation_seconds": 0.138283209
+    },
+    {
+      "seed": 5066625817551831195,
+      "support": "S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.00328825,
+      "simulation_seconds": 0.078177333
+    },
+    {
+      "seed": 5066625817551831196,
+      "support": "S05+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004277792,
+      "simulation_seconds": 0.129553583
+    },
+    {
+      "seed": 5066625817551831197,
+      "support": "S01+S04",
+      "eligible": true,
+      "statistic": 0.9112361577147161,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 8,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S01+S02",
+        "S01+S04",
+        "S01+S05"
+      ],
+      "fit_seconds": 8.28853425,
+      "simulation_seconds": 0.261014333
+    },
+    {
+      "seed": 5066625817551831198,
+      "support": "S02+S04",
+      "eligible": true,
+      "statistic": 0.9018381564766199,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 3,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 7.125919,
+      "simulation_seconds": 0.222193416
+    },
+    {
+      "seed": 5066625817551831199,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002825,
+      "simulation_seconds": 0.168755875
+    },
+    {
+      "seed": 5066625817551831200,
+      "support": "S01+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002203459,
+      "simulation_seconds": 0.243490334
+    },
+    {
+      "seed": 5066625817551831201,
+      "support": "S01+S05",
+      "eligible": true,
+      "statistic": 2.5169169714776967,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 15,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": true,
+      "final_survivors": [
+        "S01+S05",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01+S05"
+      ],
+      "fit_seconds": 10.707988417,
+      "simulation_seconds": 0.288045417
+    },
+    {
+      "seed": 5066625817551831202,
+      "support": "S01",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002687542,
+      "simulation_seconds": 0.1697385
+    },
+    {
+      "seed": 5066625817551831203,
+      "support": "S02+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002343375,
+      "simulation_seconds": 0.219576625
+    },
+    {
+      "seed": 5066625817551831204,
+      "support": "S05+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003021167,
+      "simulation_seconds": 0.165339417
+    },
+    {
+      "seed": 5066625817551831205,
+      "support": "S01+S02",
+      "eligible": true,
+      "statistic": 0.817564476194115,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 2,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 9.140152417,
+      "simulation_seconds": 0.329072083
+    },
+    {
+      "seed": 5066625817551831206,
+      "support": "S03+S04",
+      "eligible": true,
+      "statistic": 1.2290174162611889,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 7,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 2.996114625,
+      "simulation_seconds": 0.146334
+    },
+    {
+      "seed": 5066625817551831207,
+      "support": "S01",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002844625,
+      "simulation_seconds": 0.123700459
+    },
+    {
+      "seed": 5066625817551831208,
+      "support": "S03+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002556084,
+      "simulation_seconds": 0.145226542
+    },
+    {
+      "seed": 5066625817551831209,
+      "support": "S02+S05",
+      "eligible": true,
+      "statistic": 0.7784269290955882,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 20,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S05",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S05",
+        "S01+S05",
+        "S02+S05",
+        "S03+S05",
+        "S04+S05",
+        "S05+S06"
+      ],
+      "fit_seconds": 7.328320875,
+      "simulation_seconds": 0.232832291
+    },
+    {
+      "seed": 5066625817551831210,
+      "support": "S02+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003671208,
+      "simulation_seconds": 0.227613833
+    },
+    {
+      "seed": 5066625817551831211,
+      "support": "S01+S03",
+      "eligible": true,
+      "statistic": 0.936039460353225,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 21,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 3.756092625,
+      "simulation_seconds": 0.165926584
+    },
+    {
+      "seed": 5066625817551831212,
+      "support": "S01+S05",
+      "eligible": true,
+      "statistic": 1.1064487890179024,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 17,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S05",
+        "S01+S06",
+        "S02+S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S05",
+        "S01+S05",
+        "S01+S06",
+        "S02+S05",
+        "S02+S06",
+        "S03+S05",
+        "S04+S05",
+        "S05+S06"
+      ],
+      "fit_seconds": 7.795939625,
+      "simulation_seconds": 0.263573834
+    },
+    {
+      "seed": 5066625817551831213,
+      "support": "S02+S05",
+      "eligible": true,
+      "statistic": 0.5655310967154592,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 6,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 4.606162,
+      "simulation_seconds": 0.20014025
+    },
+    {
+      "seed": 5066625817551831214,
+      "support": "S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003671208,
+      "simulation_seconds": 0.096613708
+    },
+    {
+      "seed": 5066625817551831215,
+      "support": "S02+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003499875,
+      "simulation_seconds": 0.174729084
+    },
+    {
+      "seed": 5066625817551831216,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002537041,
+      "simulation_seconds": 0.150575833
+    },
+    {
+      "seed": 5066625817551831217,
+      "support": "S05+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002749333,
+      "simulation_seconds": 0.134758125
+    },
+    {
+      "seed": 5066625817551831218,
+      "support": "S02+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002861,
+      "simulation_seconds": 0.1863215
+    },
+    {
+      "seed": 5066625817551831219,
+      "support": "S01+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.013006541,
+      "simulation_seconds": 0.320497042
+    },
+    {
+      "seed": 5066625817551831220,
+      "support": "S01+S03",
+      "eligible": true,
+      "statistic": 0.9572790280321478,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 19,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05"
+      ],
+      "fit_seconds": 5.528822625,
+      "simulation_seconds": 0.226042208
+    },
+    {
+      "seed": 5066625817551831221,
+      "support": "S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002706417,
+      "simulation_seconds": 0.093436917
+    },
+    {
+      "seed": 5066625817551831222,
+      "support": "S03+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002537,
+      "simulation_seconds": 0.137353625
+    },
+    {
+      "seed": 5066625817551831223,
+      "support": "S01+S06",
+      "eligible": true,
+      "statistic": 0.8830014757658013,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 0,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 4.186497333,
+      "simulation_seconds": 0.193101917
+    },
+    {
+      "seed": 5066625817551831224,
+      "support": "S01+S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003449208,
+      "simulation_seconds": 0.281646375
+    },
+    {
+      "seed": 5066625817551831225,
+      "support": "S01+S02",
+      "eligible": true,
+      "statistic": 0.5589471888236994,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 1,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S01",
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S01",
+        "S02",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 7.689840625,
+      "simulation_seconds": 0.270479542
+    },
+    {
+      "seed": 5066625817551831226,
+      "support": "S02+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003649167,
+      "simulation_seconds": 0.177955667
+    },
+    {
+      "seed": 5066625817551831227,
+      "support": "S01+S06",
+      "eligible": true,
+      "statistic": 0.6294644209189001,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 1,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 4.468865167,
+      "simulation_seconds": 0.191064583
+    },
+    {
+      "seed": 5066625817551831228,
+      "support": "S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003061,
+      "simulation_seconds": 0.080021209
+    },
+    {
+      "seed": 5066625817551831229,
+      "support": "S01+S04",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002939875,
+      "simulation_seconds": 0.20005925
+    },
+    {
+      "seed": 5066625817551831230,
+      "support": "S02+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002460375,
+      "simulation_seconds": 0.171183042
+    },
+    {
+      "seed": 5066625817551831231,
+      "support": "S01+S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002948917,
+      "simulation_seconds": 0.241190833
+    },
+    {
+      "seed": 5066625817551831232,
+      "support": "S01+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.004903833,
+      "simulation_seconds": 0.257955459
+    },
+    {
+      "seed": 5066625817551831233,
+      "support": "S01+S02",
+      "eligible": true,
+      "statistic": 0.9899294792456701,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 0,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 5.119846,
+      "simulation_seconds": 0.28392525
+    },
+    {
+      "seed": 5066625817551831234,
+      "support": "S03+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003210458,
+      "simulation_seconds": 0.198168292
+    },
+    {
+      "seed": 5066625817551831235,
+      "support": "S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002826375,
+      "simulation_seconds": 0.129773833
+    },
+    {
+      "seed": 5066625817551831236,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.0028825,
+      "simulation_seconds": 0.105049375
+    },
+    {
+      "seed": 5066625817551831237,
+      "support": "S03",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003450333,
+      "simulation_seconds": 0.104660541
+    },
+    {
+      "seed": 5066625817551831238,
+      "support": "S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.003456458,
+      "simulation_seconds": 0.095474458
+    },
+    {
+      "seed": 5066625817551831239,
+      "support": "S02+S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002873208,
+      "simulation_seconds": 0.229272459
+    },
+    {
+      "seed": 5066625817551831240,
+      "support": "S02",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002386792,
+      "simulation_seconds": 0.174405792
+    },
+    {
+      "seed": 5066625817551831241,
+      "support": "S02+S05",
+      "eligible": true,
+      "statistic": 1.3034027942395439,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 10,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "S02",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "S02",
+        "S01+S02",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06"
+      ],
+      "fit_seconds": 11.861102667,
+      "simulation_seconds": 0.347397
+    },
+    {
+      "seed": 5066625817551831242,
+      "support": "S01",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002860208,
+      "simulation_seconds": 0.151368167
+    },
+    {
+      "seed": 5066625817551831243,
+      "support": "S05",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002562042,
+      "simulation_seconds": 0.139448541
+    },
+    {
+      "seed": 5066625817551831244,
+      "support": "S03+S06",
+      "eligible": false,
+      "statistic": null,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": null,
+      "raw_true_support_covered": null,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [],
+      "fit_seconds": 0.002708042,
+      "simulation_seconds": 0.163835458
+    },
+    {
+      "seed": 5066625817551831245,
+      "support": "S02+S04",
+      "eligible": true,
+      "statistic": 0.8727283896227854,
+      "failure": null,
+      "selected_entries": 26,
+      "member_failures": 5,
+      "raw_true_support_covered": true,
+      "final_true_support_survives": false,
+      "final_survivors": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "UNKNOWN"
+      ],
+      "raw_cutoff_compatible": [
+        "BACKGROUND",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S01+S02",
+        "S01+S03",
+        "S01+S04",
+        "S01+S05",
+        "S01+S06",
+        "S02+S03",
+        "S02+S04",
+        "S02+S05",
+        "S02+S06",
+        "S03+S04",
+        "S03+S05",
+        "S03+S06",
+        "S04+S05",
+        "S04+S06",
+        "S05+S06"
+      ],
+      "fit_seconds": 9.545683792,
+      "simulation_seconds": 0.265738417
+    }
+  ],
+  "evidence_status": "HISTORICAL_V3_NOT_CURRENT_QUALIFICATION"
+}

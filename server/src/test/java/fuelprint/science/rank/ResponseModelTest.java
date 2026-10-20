@@ -43,10 +43,11 @@ class ResponseModelTest {
         double sum = 0;
         for (int tick = 1; tick <= 1200; tick++) {
             double time = tick * dt;
-            sum += channel.advance(time >= 10 ? 100 : 0, 1, dt, false, rng).value();
+            double value = channel.advance(time >= 10 ? 100 : 0, 1, dt, false, rng).value();
+            if (tick % 20 == 0) sum += value;
         }
         double predicted = ResponseModel.TEACHING.windowMean(gas, track, 0, 60,
                 p -> p.east() >= 1 ? 100 : 0);
-        assertThat(predicted).isCloseTo(sum / 1200, offset(1e-8));
+        assertThat(predicted).isCloseTo(sum / 60, offset(1e-8));
     }
 }

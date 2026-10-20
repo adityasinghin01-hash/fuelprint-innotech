@@ -7,6 +7,8 @@ import fuelprint.api.Proposal;
 import fuelprint.science.rank.ScienceRanker;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The real {@link Planner} bean (FP-PLAN-INTERVAL-1). Uses the immutable fit snapshot the ranker kept for the
@@ -21,9 +23,18 @@ public class SciencePlanner implements Planner {
     private final IntervalPlanner planner;
 
     public SciencePlanner(ScienceRanker ranker) {
+        this(ranker, java.util.List.of());
+    }
+
+    @Autowired
+    public SciencePlanner(ScienceRanker ranker, ObjectProvider<fuelprint.api.ProspectiveInlets> sources) {
+        this(ranker, sources.orderedStream().toList());
+    }
+
+    private SciencePlanner(ScienceRanker ranker, java.util.List<fuelprint.api.ProspectiveInlets> sources) {
         this.ranker = ranker;
         this.planner = new IntervalPlanner(ranker.engine().engine(), System::nanoTime,
-                IntervalPlanner.DEFAULT_BUDGET_NANOS);
+                IntervalPlanner.DEFAULT_BUDGET_NANOS, sources);
     }
 
     @Override

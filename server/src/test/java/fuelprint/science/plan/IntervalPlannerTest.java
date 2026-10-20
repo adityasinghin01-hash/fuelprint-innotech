@@ -89,11 +89,11 @@ class IntervalPlannerTest {
         Proposal p = result.proposal();
         assertThat(result.status()).isEqualTo(IntervalPlanner.Status.COMPLETE);
         assertThat(p.result()).isEqualTo(ProposalResult.BEST_ACTION);
-        assertThat(p.bestActionId()).isEqualTo("A-GND-0-100");
-        ProposalAction best = byId(p).get("A-GND-0-100");
+        assertThat(p.bestActionId()).isEqualTo("A-AER-0-100");
+        ProposalAction best = byId(p).get("A-AER-0-100");
         assertThat(best.score()).isPositive();
         assertThat(best.completeMinutes()).isPositive();
-        assertThat(best.vehicle()).isEqualTo("VAN");
+        assertThat(best.vehicle()).isEqualTo("DRONE");
         // Places that cannot separate the two, and background / QC, score 0 and never claim discrimination.
         assertThat(byId(p).get("A-GND-120-100").score()).isZero();
         assertThat(byId(p).get("A-BKG-DEPOT").score()).isZero();
@@ -220,7 +220,7 @@ class IntervalPlannerTest {
         SciencePlanner planner = new SciencePlanner(ranker);
         Analysis a = ranker.analyze(k.input());
         Proposal p = planner.plan(a, context(WIND, vehicles(64.0, 64.0)));
-        assertThat(p.bestActionId()).isEqualTo("A-GND-0-100");
+        assertThat(p.bestActionId()).isEqualTo("A-AER-0-100");
         assertThat(p.analysisId()).isEqualTo("analysis-1");
     }
 
@@ -230,5 +230,31 @@ class IntervalPlannerTest {
         assertThat(roads.distance(0, -350, 0, 100)).hasValueSatisfying(d -> assertThat(d).isCloseTo(450, within(1e-9)));
         assertThat(roads.distance(0, -350, 120, 100)).hasValueSatisfying(d -> assertThat(d).isCloseTo(570, within(1e-9)));
         assertThat(roads.distance(0, -350, 280, 140)).isEmpty();
+    }
+    @Test
+    void realMeasurementSnapshotsNeverFallbackToAnInstantlySettledTargetWhenForecastIsMissing() {
+        KernelWindows k=s02AtN2AndN3();
+        var fitted=k.analyze();
+        var old=fitted.snapshot();
+        var actual=new fuelprint.science.rank.FitSnapshot(old.inputWindowIds(),old.wind(),old.cutoff(),old.entries(),
+                old.gases(),old.surviving(),true);
+        var result=planner(k).plan(fitted.analysis(),context(WIND,vehicles(64.0,64.0)),Optional.of(actual));
+        assertThat(result.proposal().result()).isEqualTo(ProposalResult.NO_USEFUL_MEASUREMENT);
+        assertThat(result.proposal().actions()).filteredOn(a -> a.kind().equals(IntervalPlanner.DISCRIMINATE)
+                && a.target().equals(new Enu(0,100,35)))
+                .allSatisfy(a -> assertThat(a.rejectionReason()).isEqualTo("PROSPECTIVE_INLET_HISTORY_UNAVAILABLE"));
+    }
+    @Test void anExpiredPlanCannotStartAnyTrajectoryForecast() {
+        KernelWindows k=s02AtN2AndN3(); var fitted=k.analyze(); var old=fitted.snapshot();
+        var actual=new fuelprint.science.rank.FitSnapshot(old.inputWindowIds(),old.wind(),old.cutoff(),old.entries(),
+                old.gases(),old.surviving(),true);
+        var calls=new java.util.concurrent.atomic.AtomicInteger();
+        fuelprint.api.ProspectiveInlets forecast=(context,vehicle,target,expired)->{calls.incrementAndGet();return Optional.empty();};
+        AtomicLong now=new AtomicLong();
+        var planner=new IntervalPlanner(k.engine,()->now.getAndAdd(1_500_000_000L),IntervalPlanner.DEFAULT_BUDGET_NANOS,List.of(forecast));
+        var result=planner.plan(fitted.analysis(),context(WIND,vehicles(64.0,64.0)),Optional.of(actual));
+        assertThat(result.status()).isEqualTo(IntervalPlanner.Status.PENDING_BUDGET_EXCEEDED);
+        assertThat(result.proposal().result()).isEqualTo(ProposalResult.PENDING);
+        assertThat(calls.get()).isZero();
     }
 }

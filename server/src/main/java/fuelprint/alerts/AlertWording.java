@@ -9,6 +9,7 @@ import fuelprint.api.WordingPurpose;
 import fuelprint.api.WordingRequest;
 import fuelprint.api.WordingService;
 import fuelprint.core.store.StoreView;
+import fuelprint.core.command.HandlerRegistry;
 import fuelprint.core.store.StoredRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,11 @@ class AlertWording {
 
     private final ObjectProvider<WordingService> service;
 
-    AlertWording(ObjectProvider<WordingService> service) {
+    private final ObjectProvider<HandlerRegistry> handlers;
+
+    AlertWording(ObjectProvider<WordingService> service,ObjectProvider<HandlerRegistry> handlers) {
         this.service = service;
+        this.handlers = handlers;
     }
 
     /** The template as the chosen text (used for TEST messages and for suppressed notifications). */
@@ -43,7 +47,38 @@ class AlertWording {
         return new Chosen(template, "TEMPLATE", null, reason);
     }
 
-    Chosen choose(Ref cause, WordingPurpose purpose, String template, StoreView store, String runId) {
+    private Chosen saved(Ref cause, WordingPurpose purpose, String template, StoreView store, String runId) {
+        // The after-commit adapter saves ordinary wording before requesting this send.
+        // Use its exact checked text so notification.wording_id describes the actual SMS.
+        for (StoredRecord record : store.list(AlertRecords.WORDING, runId)) {
+            JsonNode body = record.body(), target = body.path("target");
+            if (purpose.name().equals(body.path("purpose").asText())
+                    && cause.type().equals(target.path("type").asText())
+                    && cause.id().equals(target.path("id").asText())
+                    && target.path("revision").isIntegralNumber()
+                    && cause.revision() == target.path("revision").asLong(-1)
+                    && body.path("text").isTextual()
+                    && AlertTexts.failures(body.path("text").textValue(), template).isEmpty()
+                    && ("TEMPLATE".equals(body.path("source").asText()) || "LLM".equals(body.path("source").asText()))) {
+                return new Chosen(body.path("text").textValue(), body.path("source").textValue(), record.id(),
+                        body.path("fallback_reason").asText(null));
+            }
+        }
+        return null;
+    }
+
+    boolean requiresSavedWording() {
+        HandlerRegistry registry=handlers.getIfAvailable();
+        return registry!=null && registry.find("write_wording").isPresent();
+    }
+
+    boolean hasSavedWording(Ref cause,WordingPurpose purpose,String template,StoreView store,String runId) {
+        return saved(cause,purpose,template,store,runId)!=null;
+    }
+
+    Chosen choose(Ref cause,WordingPurpose purpose,String template,StoreView store,String runId) {
+        Chosen existing=saved(cause,purpose,template,store,runId);
+        if(existing!=null)return existing;
         WordingService wordings = service.getIfAvailable();
         if (wordings == null) {
             return template(template, "NO_WORDING_SERVICE");

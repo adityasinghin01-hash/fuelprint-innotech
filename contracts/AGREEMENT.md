@@ -1,4 +1,4 @@
-# The FuelPrint agreement (fp/1, version 2.1)
+# The FuelPrint agreement (fp/1, version 2.3)
 
 This file is the contract between the parts of FuelPrint: the shared core, the science engine, the AI pieces, the alerts, Operations, Cases and Field. Every part builds against this file and nothing else, which is how the groups can work at the same time without waiting for each other.
 
@@ -22,6 +22,19 @@ FuelPrint is entered in **AI Solutions for Automation**, so version 2 makes the 
 - Science sends `WorldCapacityReached`; core sends `complete_run` automatically. The run completes, leases are revoked and the drone stops.
 - A planner that uses its 2 s budget returns `PENDING`: "still working it out", with no recommended mission.
 - `Detector.windows()` supplies completed windows for core to save with any trigger. The start-up phone purge can use `expired_only`.
+
+### What changed in version 2.2 (18 Oct 2026, owner-approved)
+
+- Capture rules return measured background and collection windows through a backward-compatible default method.
+- Usable vehicle windows are saved only with a successful human VALID review, in that same command transaction.
+- Vehicle enhancement means collection minus its measured background; the ranker predicts the same temporal contrast, including instrument memory. A target background is never silently assumed plume-free.
+
+### What changed in version 2.3 (19 Oct 2026, owner-approved)
+
+- Aditya Singh approved the shared forecasting interface: "this forecasting interface, you can build it."
+- Field supplies an optional `ProspectiveInlets` forecast through public API types. Science uses it to predict an immediate hypothetical mission, including sampling stages and complete procedure/return time and energy, without moving the live vehicle or saving observations.
+- Forecasts preserve recorded history, distinguish hypothetical future samples, and support cancellation within the planner's two-second budget. Missing or unavailable forecasts never become instant steady measurements.
+- This approval does not change scenario outcomes, pair filtering, human-only decisions or the scenario/freeze gate. The initial product direction is a hardware-and-physics demonstration in 3D; gameplay is deferred. This backend continuation does not build the 3D environment.
 
 Exact numbers that this file does not repeat live in `contracts/reference/`:
 
@@ -352,12 +365,23 @@ public interface Detector {
 }
 public interface Ranker       { Analysis analyze(AnalysisInput input); }
 public interface Planner      { Proposal plan(Analysis analysis, PlanContext context); }
-public interface CaptureRules { ChannelVerdict judge(CaptureInput input); }
+public interface CaptureRules {
+    ChannelVerdict judge(CaptureInput input);
+    default List<Window> windows(CaptureInput input) { return List.of(); }
+}
 
 // field implements this; science's ranker reads vehicle inlet tracks through it
 public record InletSample(double simTimeS, Enu inlet) {}
 public interface InletHistory {
     Optional<List<InletSample>> track(String runId, String sensorOrVehicleId, double startS, double endS);
+}
+
+// field optionally forecasts hypothetical missions; science consumes public samples/stages
+public interface ProspectiveInlets {
+    Optional<Forecast> forecast(PlanContext context, VehicleState vehicle, Enu target,
+                               java.util.function.BooleanSupplier budgetExpired);
+    record Forecast(List<InletSample> samples, List<Stage> stages,
+                    double completeSeconds, double energyWh) {}
 }
 
 // science publishes this Spring event; core listens through the api type
@@ -379,7 +403,18 @@ The input and output types of these interfaces (`DetectorInput`, `AnalysisInput`
 
 `Detector.windows(input)` returns windows completed by now. Once per simulated second, core calls it before `evaluate(input)` and saves those windows in the same transaction as any trigger, so the trigger can cite them.
 
+`CaptureRules.windows(input)` computes a background window and a complete 30-second collection window for one channel from the attempt's recorded stages, gas readings and branch-flow readings. It does not save records or make the human review decision. Both windows use server UUID v4 IDs. All contributing readings must have the same instrument, gas and origin. Unknown background, insufficient valid consecutive collection, missing or invalid flow, and unsupported channels produce no usable collection window and an explicit diagnostic reason in the capture review result.
+
+The field `review_capture` handler calls this function only for a channel whose automatic pre-check and human decision are both VALID. It obtains the raw input from the saved reading records belonging to the mission vehicle and the attempt's stage intervals. It saves the returned windows with the screening record in the same command transaction. Repeating a command returns its existing receipt and creates no new windows. REJECTED, LIMITED, interrupted and unreviewed capture channels remain available as raw readings, attempts and screening records, but are not admitted as usable capture windows by this amendment.
+
+For a vehicle collection window, `mean_enhancement` is the measured collection mean minus the measured BACKGROUND-stage mean. It is a temporal measurement contrast, not a claim that the background was plume-free. The collection window cites its saved background through `background_window_id`. Its uncertainty includes both averaging operations and their correlation under the declared synthetic noise model.
+
+Science predicts this same collection-minus-background contrast, propagating the gas-specific transport, chamber and sensor response through the recorded inlet history. It must not compare a temporal contrast against an absolute steady concentration. Missing background records or required inlet history exclude the window with a reason. Analyses using vehicle contrasts declare the possible plume content of the background and the finite-history initialization assumption in `limitations[]`.
+
+
 `InletHistory` returns recorded samples oldest first, covering the requested window with any needed boundary samples. An empty Optional means unknown; a present list has at least one sample. Science never guesses a vehicle's position when its track is unknown.
+
+`ProspectiveInlets` forecasts immediate autopilot execution on a copy of the vehicle. It never moves live state or saves records. Samples through the current simulation time come from that run/vehicle's recorded history; subsequent samples are hypothetical. BACKGROUND/COLLECT stages use [start,end) intervals. The immutable result includes the complete procedure and return time/energy. Missing history, no safe path, an unsupported vehicle, insufficient remaining run duration or cancellation returns empty; science records an unavailable forecast reason and never substitutes an instant steady measurement. The planner checks its budget before the hook, field checks cancellation during trajectory generation, and science checks during response propagation. Budget expiry returns PENDING with no recommendation. Approval delays, visitor deviations, future wind changes and instrument faults remain uncertain; attribution always uses actual recorded measurements. Human mission approval and capture review remain required.
 
 When science publishes `WorldCapacityReached`, core submits `complete_run` through `AutomationBus`, with `run_id` and reason WORLD_CAPACITY. After commit, core publishes `RunEnded(runId, COMPLETED)`. Field stops the drone and revokes its leases.
 

@@ -1,6 +1,6 @@
-# Proposed capture-window amendment — awaiting owner approval
+# Approved capture-window amendment — contract 2.2
 
-This is a proposal, not the active contract. Do not implement dependent changes until approved.
+Owner approved this amendment on 18 Oct 2026 at approximately 21:47 IST. It is now incorporated into AGREEMENT.md and CORE-API.md; dependent implementation is authorized.
 
 ## Evidence and purpose
 

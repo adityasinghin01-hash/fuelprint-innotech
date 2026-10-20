@@ -5,6 +5,8 @@ subtitle: "For Aditya Singhal and Abhivansh · step by step, with the Codex prom
 
 # Operations guide
 
+> **Backend execution update, 19 October 2026:** Aditya Singh/Codex is implementing the backend steps in this guide; Aditya Singhal/Abhivansh retain their screen assignments and review integration. Coordinate backend edits through Aditya Singh. Read the [backend update and scenario coverage addendum](../contract-proposals/2026-10-19-operations-cases-coverage.md); the agreement remains the source of API behavior.
+
 ## What changed in version 2 for you
 
 - **Automatic steps go through `AutomationBus`.** Your event listeners no longer save records themselves. They submit a command as the `automation` actor: `open_investigation`, `run_analysis`, `propose_mission`, `expire_mission`.

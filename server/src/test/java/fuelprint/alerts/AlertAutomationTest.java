@@ -499,8 +499,9 @@ class AlertAutomationTest extends AlertsSpringTest {
     @Test
     void aWordingServiceThatThrowsOrIsMissingFallsBackToo() {
         signUp(GUEST_1, NUMBER_A, "AREA-E");
-        AlertWording wording = new AlertWording(new org.springframework.beans.factory.support.DefaultListableBeanFactory()
-                .getBeanProvider(fuelprint.api.WordingService.class));
+        var absent = new org.springframework.beans.factory.support.DefaultListableBeanFactory();
+        AlertWording wording = new AlertWording(absent.getBeanProvider(fuelprint.api.WordingService.class),
+                absent.getBeanProvider(fuelprint.core.command.HandlerRegistry.class));
         var chosen = wording.choose(new fuelprint.api.Ref("investigation", uuid(), 1), WordingPurpose.SMS_SMOKE_WARNING,
                 "FuelPrint DEMO (simulated): x", store, RUN_ID);
         assertThat(chosen.text()).isEqualTo("FuelPrint DEMO (simulated): x");

@@ -21,8 +21,9 @@ class ScienceRankerHistoryTest {
         List<String> requests = new ArrayList<>();
         InletHistory history = (run, vehicle, start, end) -> {
             requests.add(run + "/" + vehicle + "/" + start + "/" + end);
-            return Optional.of(List.of(new InletSample(start, KernelWindows.AERIAL),
-                    new InletSample(end, KernelWindows.AERIAL)));
+            return Optional.of(List.of(new InletSample(start, new Enu(-500, -500, 3)),
+                    new InletSample(420, new Enu(-500, -500, 3)),
+                    new InletSample(450, KernelWindows.AERIAL), new InletSample(end, KernelWindows.AERIAL)));
         };
         try (var context = new AnnotationConfigApplicationContext()) {
             context.getEnvironment().setActiveProfiles("real");
@@ -33,11 +34,25 @@ class ScienceRankerHistoryTest {
             KernelWindows windows = new KernelWindows().s02AtN2();
             assertThat(surviving(ranker.analyze(windows.input()))).containsExactlyInAnyOrder("S01", "S02");
             assertThat(requests).isEmpty();
-            windows.s02AtAerial();
-            Analysis result = ranker.analyze(windows.input());
+            List<Window> observations = new ArrayList<>(windows.windows());
+            for (Gas gas : Gas.values()) {
+                String bg = "BG-" + gas;
+                observations.add(new Window(bg, "DRONE", gas.channel(), 360, 390, 30, null, 4.2, null));
+                var track = new InletTrack(List.of(new InletTrack.Sample(0, new Enu(-500, -500, 3)),
+                        new InletTrack.Sample(420, new Enu(-500, -500, 3)),
+                        new InletTrack.Sample(450, KernelWindows.AERIAL),
+                        new InletTrack.Sample(530, KernelWindows.AERIAL)), true);
+                double response = windows.engine.unitWindow(gas, "S02", Member.all().get(13),
+                        KernelWindows.WIND, track, 360, 390, 500, 530);
+                double q = gas == Gas.SO2 ? KernelWindows.Q_SO2 : 1000 * KernelWindows.Q_SO2;
+                observations.add(new Window("DRONE-" + gas + "-0", "DRONE", gas.channel(), 500, 530,
+                        30, q * response, NoiseModel.enhancementStd(windows.world, gas), bg));
+            }
+            Analysis result = ranker.analyze(new AnalysisInput("run-1", "inv-1", 600, observations, KernelWindows.WIND));
             assertThat(surviving(result)).containsExactly("S02");
             assertThat(result.inputWindowIds()).contains("DRONE-SO2-0", "DRONE-CO2-0");
-            assertThat(requests).containsExactly("run-1/DRONE/320.0/530.0", "run-1/DRONE/320.0/530.0");
+            assertThat(requests).containsExactly("run-1/DRONE/0.0/530.0", "run-1/DRONE/0.0/530.0",
+                    "run-1/DRONE/0.0/530.0", "run-1/DRONE/0.0/530.0");
         }
     }
 

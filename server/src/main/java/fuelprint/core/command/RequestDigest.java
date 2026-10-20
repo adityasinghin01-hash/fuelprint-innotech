@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fuelprint.core.Ids;
+import fuelprint.api.ContactText;
 
 /**
  * Compares a resent command with the stored one without keeping private values.
@@ -71,7 +72,13 @@ final class RequestDigest {
         List<String> names = new ArrayList<>();
         stored.fieldNames().forEachRemaining(names::add);
         for (String name : names) {
-            if (allPrivate || privateFields.contains(name)) {
+            if (ContactText.contains(name)) {
+                stored.remove(name);
+                String safeName = "_private_field_";
+                while (stored.has(safeName) || payload.has(safeName)) safeName += "_";
+                stored.put(safeName, PRIVATE_MARK);
+                hasPrivate = true;
+            } else if (allPrivate || privateFields.contains(name) || ContactText.isContactFieldName(name) || ContactText.contains(payload.get(name))) {
                 stored.put(name, PRIVATE_MARK);
                 hasPrivate = true;
             }

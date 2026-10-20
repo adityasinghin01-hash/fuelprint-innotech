@@ -1,0 +1,251 @@
+{
+  "algorithm": "FP-COMPAT-3/4",
+  "cutoff": 3.0466921686441504,
+  "scenarios": [
+    {
+      "file": "SC1-NIGHT-PLUME-auto-false.json",
+      "sha256": "ee707181553bfe7e04bb202cf8e72244678caba42489555c7fa4cdc651d09062",
+      "preset": "SC1-NIGHT-PLUME",
+      "automation_on": false,
+      "initial": "PROVISIONAL_SINGLE",
+      "initial_sources": [
+        "S02"
+      ],
+      "after_qc": "PROVISIONAL_SINGLE",
+      "after_qc_sources": [
+        "S02"
+      ],
+      "planner_result": "NO_USEFUL_MEASUREMENT",
+      "initial_analysis_seconds": 1.338763708,
+      "after_qc_analysis_seconds": 3.877033458,
+      "planner_seconds": 0.308951291,
+      "channels": [
+        {
+          "channel": "SO2_ppb",
+          "valid_seconds": 30.0,
+          "volume_L": 0.24999999999999997,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 691.0936993588725,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        },
+        {
+          "channel": "CO2_ppm",
+          "valid_seconds": 30.0,
+          "volume_L": 0.15000000000000005,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 7.4525402006602235,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        }
+      ]
+    },
+    {
+      "file": "SC1-NIGHT-PLUME-auto-true.json",
+      "sha256": "939a3d568c1f4b7ea07b585eff243f0bf1240878093daf8c92883f0ad03fd68a",
+      "preset": "SC1-NIGHT-PLUME",
+      "automation_on": true,
+      "initial": "PROVISIONAL_SINGLE",
+      "initial_sources": [
+        "S02"
+      ],
+      "after_qc": "PROVISIONAL_SINGLE",
+      "after_qc_sources": [
+        "S02"
+      ],
+      "planner_result": "NO_USEFUL_MEASUREMENT",
+      "initial_analysis_seconds": 1.018799542,
+      "after_qc_analysis_seconds": 3.7459795,
+      "planner_seconds": 0.102348542,
+      "channels": [
+        {
+          "channel": "SO2_ppb",
+          "valid_seconds": 30.0,
+          "volume_L": 0.24999999999999997,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 691.6477600078783,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        },
+        {
+          "channel": "CO2_ppm",
+          "valid_seconds": 30.0,
+          "volume_L": 0.15000000000000005,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 11.849099401139824,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        }
+      ]
+    },
+    {
+      "file": "SC2-BLOCKED-INLET-auto-false.json",
+      "sha256": "99ef6f3060a89f131432a35fbb129b6a7a628a7d0c31fd7eeebae2a11319ff3a",
+      "preset": "SC2-BLOCKED-INLET",
+      "automation_on": false,
+      "initial": "PROVISIONAL_SINGLE",
+      "initial_sources": [
+        "S02"
+      ],
+      "after_qc": "PROVISIONAL_SINGLE",
+      "after_qc_sources": [
+        "S02"
+      ],
+      "planner_result": "NO_USEFUL_MEASUREMENT",
+      "initial_analysis_seconds": 2.14359175,
+      "after_qc_analysis_seconds": 4.133179667,
+      "planner_seconds": 0.208586917,
+      "channels": [
+        {
+          "channel": "SO2_ppb",
+          "valid_seconds": 10.0,
+          "volume_L": 0.08333333333333333,
+          "status": "REJECTED",
+          "reasons": [
+            "FLOW_FAULT",
+            "FLOW_QUALITY_INVALID",
+            "FEWER_THAN_30_CONSECUTIVE_VALID_SECONDS"
+          ],
+          "mean_enhancement": 690.1974663167898,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        },
+        {
+          "channel": "CO2_ppm",
+          "valid_seconds": 60.0,
+          "volume_L": 0.30000000000000016,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 7.250546476012914,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        }
+      ]
+    },
+    {
+      "file": "SC2-BLOCKED-INLET-auto-true.json",
+      "sha256": "87ca545bfdc98f8b351d4b0b1aa66584593fc5c5dcf8b2b05b7148d363da2344",
+      "preset": "SC2-BLOCKED-INLET",
+      "automation_on": true,
+      "initial": "PROVISIONAL_SINGLE",
+      "initial_sources": [
+        "S02"
+      ],
+      "after_qc": "PROVISIONAL_SINGLE",
+      "after_qc_sources": [
+        "S02"
+      ],
+      "planner_result": "NO_USEFUL_MEASUREMENT",
+      "initial_analysis_seconds": 1.826680167,
+      "after_qc_analysis_seconds": 4.081777667,
+      "planner_seconds": 0.275937459,
+      "channels": [
+        {
+          "channel": "SO2_ppb",
+          "valid_seconds": 10.0,
+          "volume_L": 0.08333333333333333,
+          "status": "REJECTED",
+          "reasons": [
+            "FLOW_FAULT",
+            "FLOW_QUALITY_INVALID",
+            "FEWER_THAN_30_CONSECUTIVE_VALID_SECONDS"
+          ],
+          "mean_enhancement": 702.8682506139849,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        },
+        {
+          "channel": "CO2_ppm",
+          "valid_seconds": 60.0,
+          "volume_L": 0.30000000000000016,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 8.573813356486085,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        }
+      ]
+    },
+    {
+      "file": "SC3-ABOVE-THE-BOXES-auto-false.json",
+      "sha256": "bacc9953b9076a04bbb05d7ae758d321aac8d51ff2145ed163f23e34c1479056",
+      "preset": "SC3-ABOVE-THE-BOXES",
+      "automation_on": false,
+      "initial": "NO_SIGNAL",
+      "initial_sources": [],
+      "after_qc": "PROVISIONAL_SINGLE",
+      "after_qc_sources": [
+        "S03"
+      ],
+      "planner_result": "NO_USEFUL_MEASUREMENT",
+      "initial_analysis_seconds": 0.017369916,
+      "after_qc_analysis_seconds": 9.16001725,
+      "planner_seconds": 0.002052292,
+      "channels": [
+        {
+          "channel": "SO2_ppb",
+          "valid_seconds": 30.0,
+          "volume_L": 0.24999999999999997,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 280.8536471204378,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        },
+        {
+          "channel": "CO2_ppm",
+          "valid_seconds": 30.0,
+          "volume_L": 0.15000000000000005,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 2.4946519549108643,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        }
+      ]
+    },
+    {
+      "file": "SC3-ABOVE-THE-BOXES-auto-true.json",
+      "sha256": "d7d17a55d754dcf1662b0f9cf6429d814057a1b09e4e23426f4ba91e1351a26c",
+      "preset": "SC3-ABOVE-THE-BOXES",
+      "automation_on": true,
+      "initial": "NO_SIGNAL",
+      "initial_sources": [],
+      "after_qc": "PROVISIONAL_SINGLE",
+      "after_qc_sources": [
+        "S03"
+      ],
+      "planner_result": "NO_USEFUL_MEASUREMENT",
+      "initial_analysis_seconds": 0.025651916,
+      "after_qc_analysis_seconds": 9.406988083,
+      "planner_seconds": 0.002060375,
+      "channels": [
+        {
+          "channel": "SO2_ppb",
+          "valid_seconds": 30.0,
+          "volume_L": 0.24999999999999997,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 278.15891505039656,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        },
+        {
+          "channel": "CO2_ppm",
+          "valid_seconds": 30.0,
+          "volume_L": 0.15000000000000005,
+          "status": "VALID",
+          "reasons": [],
+          "mean_enhancement": 4.155560602287892,
+          "mean_enhancement_note": null,
+          "checked_by": "CAPTURE_RULES"
+        }
+      ]
+    }
+  ],
+  "scope": "Real core/science/field capture lifecycle, human QC and automation settings. Test-only analyst APPROVED mission creation; ops/cases workflow unbuilt. Same sim300 fixed snapshot retained. Wall timings on this Mac under fullsuite, not production percentiles. UNKNOWN always present."
+}

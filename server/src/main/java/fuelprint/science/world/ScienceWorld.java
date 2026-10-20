@@ -94,4 +94,9 @@ public class ScienceWorld implements WorldClock {
     public synchronized boolean capacityReached() {
         return world != null && world.capacityReached().isPresent();
     }
+
+    /** Loads the already configured constant emissions without a scenario schedule. Science-internal. */
+    public synchronized void load(String runId, PuffWorld world) {
+        load(runId, world, new EmissionPlan(java.util.List.of()));
+    }
 }

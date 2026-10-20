@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fuelprint.api.AutomationSettings;
+import fuelprint.api.MissionAuthority;
 import fuelprint.api.CaptureInput;
 import fuelprint.api.CaptureRules;
 import fuelprint.api.ChannelStatus;
@@ -73,6 +74,21 @@ public class FieldTestConfig {
     @Primary
     public FakeCaptureRules fakeCaptureRules() {
         return new FakeCaptureRules();
+    }
+
+    /** Explicit isolation double: these legacy Field tests seed APPROVED missions without Ops authority. */
+    @Bean
+    @Primary
+    public FakeMissionAuthority fixtureMissionAuthority() { return new FakeMissionAuthority(); }
+
+    public static class FakeMissionAuthority implements MissionAuthority {
+        public volatile Decision decision = Decision.permit();
+        public volatile boolean fail;
+        public void reset() { decision = Decision.permit(); fail = false; }
+        @Override public Decision checkInitialDeparture(String runId, String missionId) {
+            if (fail) throw new IllegalStateException("Isolated Field authority fixture failed");
+            return decision;
+        }
     }
 
     @Bean
@@ -184,11 +200,21 @@ public class FieldTestConfig {
      */
     public static class FakeCaptureRules implements CaptureRules {
         public volatile boolean enabled = true;
+        public volatile boolean realWindows;
+        public volatile boolean failWindows;
         public final List<CaptureInput> calls = Collections.synchronizedList(new ArrayList<>());
 
         public void reset() {
             enabled = true;
+            realWindows = false;
+            failWindows = false;
             calls.clear();
+        }
+
+        @Override
+        public List<fuelprint.api.Window> windows(CaptureInput input) {
+            if (failWindows) throw new IllegalStateException("Test hook failure");
+            return realWindows ? new fuelprint.science.sensor.TeachCaptureRules().windows(input) : List.of();
         }
 
         @Override

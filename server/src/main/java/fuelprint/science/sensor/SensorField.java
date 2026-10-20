@@ -128,9 +128,10 @@ public class SensorField implements ObservationProvider, CollectionHook {
         double[] amb;
         if (in == null || simTimeS - in.lastTimeS > 5.0) {
             amb = ambientNow(w, simTimeS, p);
-            long inletSeed = seed * 1_000_003L + p.label().hashCode() * 7919L + p.sensorOrVehicleId().hashCode();
+            long inletSeed = seed * 1_000_003L + p.label().hashCode() * 7919L;
             in = new Inlet(p.sensorOrVehicleId(), p.label(), inletSeed, amb[0], amb[1], simTimeS,
-                    new Inlet.NoiseSettings(0.8, 5.0, 2.0));
+                    new Inlet.NoiseSettings(SyntheticNoiseProfile.RHO,
+                            SyntheticNoiseProfile.innovationSd(SO2), SyntheticNoiseProfile.innovationSd(CO2)));
             in.lastSecond = second;
             inlets.put(p.sensorOrVehicleId(), in);
             in.pmRaw = pmRaw(in, amb[2]);

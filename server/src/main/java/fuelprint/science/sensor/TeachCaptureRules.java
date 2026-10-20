@@ -36,6 +36,11 @@ public class TeachCaptureRules implements CaptureRules {
     public static final int MIN_VALID_SECONDS = 30;
 
     @Override
+    public List<fuelprint.api.Window> windows(CaptureInput input) {
+        return CaptureAveraging.windows(input);
+    }
+
+    @Override
     public ChannelVerdict judge(CaptureInput in) {
         String channel = in.channel();
         double t90 = SensorField.CO2.equals(channel) ? 30.0 : 60.0;
@@ -46,6 +51,14 @@ public class TeachCaptureRules implements CaptureRules {
         Stage collect = last(in.stages(), "COLLECT");
         if (collect == null) {
             return new ChannelVerdict(channel, null, null, ChannelStatus.REJECTED, List.of("NO_COLLECT_STAGE"));
+        }
+        // Field adds this position flag only to its live capture input, not to the core's raw reading record.
+        // Reject it here so a later review cannot silently reconstruct an unflagged background from raw data.
+        Stage background = last(in.stages(), "BACKGROUND");
+        if (background != null && background.endS() != null && in.readings().stream().anyMatch(r ->
+                channel.equals(r.channel()) && r.simTimeS() >= background.startS() - 1e-6
+                        && r.simTimeS() < background.endS() - 1e-6 && r.quality().contains("OUT_OF_POSITION"))) {
+            reasons.add("BACKGROUND_OUT_OF_POSITION");
         }
         // Settle
         Stage settle = last(in.stages(), "SETTLE");

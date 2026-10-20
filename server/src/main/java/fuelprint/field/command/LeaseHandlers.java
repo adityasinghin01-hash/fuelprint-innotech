@@ -23,6 +23,8 @@ import fuelprint.core.store.RecordKey;
 import fuelprint.core.store.StoreView;
 import fuelprint.core.store.StoredRecord;
 import fuelprint.field.FieldTime;
+import fuelprint.field.FieldPorts;
+import fuelprint.api.MissionAuthority;
 import fuelprint.field.world.FieldWorld;
 import fuelprint.field.world.MissionView;
 import org.springframework.context.annotation.Profile;
@@ -61,6 +63,13 @@ public final class LeaseHandlers {
         return mission;
     }
 
+    /** Recheck only initial mission authority; started flight, handover and safety return retain their rules. */
+    static Rejection initialDeparture(Command command, StoredRecord mission, FieldPorts ports) {
+        if (!MissionView.APPROVED.equals(state(mission))) return null;
+        MissionAuthority.Decision authority = ports.initialDeparture(command.runId(), mission.id());
+        return authority.allowed() ? null : new Rejection(authority.reasonCode(), authority.reasonText());
+    }
+
     static Pilot personKind(Session session) {
         return session.roles().contains(Role.VISITOR) && !session.roles().contains(Role.FIELD_OPERATOR)
                 && !session.roles().contains(Role.SUPERVISOR) ? Pilot.VISITOR : Pilot.OPERATOR;
@@ -77,9 +86,12 @@ public final class LeaseHandlers {
         private final FieldWorld world;
         private final FieldTime time;
 
-        public AcquireLease(FieldWorld world, FieldTime time) {
+        private final FieldPorts ports;
+
+        public AcquireLease(FieldWorld world, FieldTime time, FieldPorts ports) {
             this.world = world;
             this.time = time;
+            this.ports = ports;
         }
 
         @Override
@@ -126,6 +138,8 @@ public final class LeaseHandlers {
                     return reject("NOT_YOUR_TURN", "Someone is ahead of you in the queue.");
                 }
             }
+            Rejection authority = initialDeparture(command, mission, ports);
+            if (authority != null) return authority;
             LeaseMoves moves = new LeaseMoves(world, store, mission)
                     .endCurrent(lease.isPresent() ? FieldRecords.LEASE_REVOKED : FieldRecords.LEASE_EXPIRED,
                             lease.isPresent() ? "HANDED_OVER" : "EXPIRED")
@@ -246,9 +260,12 @@ public final class LeaseHandlers {
         private final FieldWorld world;
         private final FieldTime time;
 
-        public TakeOver(FieldWorld world, FieldTime time) {
+        private final FieldPorts ports;
+
+        public TakeOver(FieldWorld world, FieldTime time, FieldPorts ports) {
             this.world = world;
             this.time = time;
+            this.ports = ports;
         }
 
         @Override
@@ -282,6 +299,8 @@ public final class LeaseHandlers {
                 return reject("COLLECTING", "The autopilot is holding still while the sample is collected. "
                         + "Stop the autopilot first if you must take control now.");
             }
+            Rejection authority = initialDeparture(command, mission, ports);
+            if (authority != null) return authority;
             LeaseMoves moves = new LeaseMoves(world, store, mission)
                     .endCurrent(FieldRecords.LEASE_REVOKED, "TAKEN_OVER")
                     .grant(session.actorLabel(), Pilot.OPERATOR, "MISSION", time.now());

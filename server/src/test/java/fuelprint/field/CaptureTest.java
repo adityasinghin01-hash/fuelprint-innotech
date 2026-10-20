@@ -16,6 +16,7 @@ import fuelprint.core.command.AutomationBus;
 import fuelprint.core.command.Command;
 import fuelprint.core.command.Receipt;
 import fuelprint.core.store.StoredRecord;
+import fuelprint.core.store.RecordChange;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -191,6 +192,27 @@ class CaptureTest extends FieldSpringTest {
         assertThat(body.path("state").asText()).isEqualTo("FAILED");
     }
 
+    /** Isolated Field fixture: real capture/interrupt handling, controlled faulty observation feed and authority double. */
+    @Test void flowFaultThenResetInterruptsCaptureWithoutPublishingUsableEvidence() {
+        feed=this::blockedSo2AtCollectSecond10;
+        settings.set(AutomationSettings.AUTO_CAPTURE,true);
+        String mission=approvedMission();
+        assertThat(send(OPERATOR,"start_autopilot",missionVehicle(mission)).applied()).isTrue();
+        tickUntil(()->world.captureSnapshot().map(s->s.counts().get("SO2_ppb")!=null
+                &&s.counts().get("SO2_ppb").reasons().contains("FLOW_FAULT")).orElse(false),6000,"flow fault observed during capture");
+        var attempt=onlyAttempt();assertThat(attempt.body().path("state").asText()).isEqualTo("COLLECTING");
+        events.publishEvent(new fuelprint.api.RunEnded(runId,fuelprint.api.RunEnded.Reason.RESET));settle();
+        assertThat(record("attempt",attempt.id()).body().path("state").asText()).isEqualTo("INTERRUPTED");
+        assertThat(missionState(mission)).isEqualTo("INTERRUPTED");
+        assertThat(world.captureRunning()).isFalse();assertThat(world.lease()).isEmpty();assertThat(speed()).isZero();
+        assertThat(records("screening_record")).isEmpty();assertThat(records("window")).isEmpty();
+        var rejected=send(QC,"review_capture",review(attempt.id(),"VALID","VALID"));
+        assertThat(rejected.applied()).isFalse();assertThat(records("screening_record")).isEmpty();
+        var revisions=store.revisions("attempt",attempt.id());
+        events.publishEvent(new fuelprint.api.RunEnded(runId,fuelprint.api.RunEnded.Reason.RESET));settle();
+        assertThat(store.revisions("attempt",attempt.id())).isEqualTo(revisions);
+    }
+
     @Test
     void returningHomeMidCaptureInterruptsTheAttemptAndRejectsItsChannels() {
         settings.set(AutomationSettings.AUTO_CAPTURE, true);
@@ -339,4 +361,116 @@ class CaptureTest extends FieldSpringTest {
         Receipt fresh = send(QC, "review_capture", review(attempt.id(), "VALID", "VALID"), attempt.revision());
         assertThat(fresh.applied()).isTrue();
     }
+    /** Public saved reading fixtures: canonical snake_case, never the expired in-memory snapshot. */
+    void saveCaptureReadings(StoredRecord attempt) {
+        for (String stageName : List.of("BACKGROUND", "COLLECT")) {
+            JsonNode interval = stage(attempt.body(), stageName);
+            for (double t = interval.path("start_s").asDouble(); t < interval.path("end_s").asDouble() - 1e-6; t++) {
+                for (String channel : List.of("SO2_ppb", "CO2_ppm", "SO2_flow_L_min", "CO2_flow_L_min")) {
+                    double value = channel.contains("flow") ? (channel.startsWith("SO2") ? .5 : .3)
+                            : (stageName.equals("BACKGROUND") ? 10 : 45);
+                    ObjectNode fields = payload().put("sensor_or_vehicle_id", world.droneId()).put("channel", channel)
+                            .put("value", value).put("raw_value", value).put("unit", channel.contains("flow") ? "L_min" : "ppb")
+                            .put("sim_time_s", t).put("origin", "SYNTHETIC_TEACHING");
+                    fields.putArray("quality").add("OK");
+                    store.save(RecordChange.create("reading", UUID.randomUUID().toString(), runId, fields), "test", null);
+                    // An unrelated vehicle's broken record at exactly the same time must not contaminate input.
+                    fields.put("sensor_or_vehicle_id", "unrelated-vehicle").putNull("value");
+                    store.save(RecordChange.create("reading", UUID.randomUUID().toString(), runId, fields), "test", null);
+                }
+            }
+        }
+    }
+
+    @Test
+    void humanValidReviewPersistsMeasuredWindowsAndScreeningsInOneReceiptAfterSnapshotIsGone() {
+        rules.realWindows = true;
+        flyAndCapture();
+        StoredRecord attempt = onlyAttempt();
+        assertThat(world.captureSnapshot(attempt.id())).isEmpty();
+        assertThat(records("window")).isEmpty();
+        saveCaptureReadings(attempt);
+        assertThat(send(QC, "review_capture", review(attempt.id(), "VALID", "VALID"), attempt.revision() - 1).reasonCode())
+                .isEqualTo("STALE_REVISION");
+        assertThat(records("window")).isEmpty();
+        Command command = new Command(Command.SCHEMA_VERSION, UUID.randomUUID().toString(), "review_capture", runId,
+                attempt.revision(), review(attempt.id(), "VALID", "VALID"));
+        Receipt first = bus.send(command, QC);
+        Receipt repeated = bus.send(command, QC);
+        settle();
+        assertThat(first.applied()).as(first.reasonText()).isTrue();
+        assertThat(repeated).isEqualTo(first);
+        assertThat(first.recordRefs()).hasSize(6);
+        assertThat(records("window")).hasSize(4);
+        assertThat(records("window").stream().filter(r -> !r.body().path("background_window_id").isNull()))
+                .hasSize(2).allSatisfy(r -> {
+                    assertThat(r.body().path("mean_enhancement").asDouble()).isEqualTo(35);
+                    assertThat(r.body().path("valid_seconds").asDouble()).isEqualTo(30);
+                    assertThat(r.body().path("sensor_or_vehicle_id").asText()).isEqualTo(world.droneId());
+                    assertThat(record("window", r.body().path("background_window_id").asText()).body().path("mean_enhancement").isNull()).isTrue();
+                });
+        assertThat(records("screening_record")).hasSize(2).allSatisfy(r ->
+                assertThat(r.body().path("summary").path("mean_enhancement_" + (r.body().path("channel").asText().startsWith("SO2") ? "ppb" : "ppm")).asDouble()).isEqualTo(35));
+    }
+
+    @Test
+    void downgradedAndFailedChannelsNeverProduceUsableWindows() {
+        rules.realWindows = true;
+        feed = this::blockedSo2AtCollectSecond10;
+        flyAndCapture();
+        StoredRecord attempt = onlyAttempt();
+        saveCaptureReadings(attempt);
+        assertThat(send(QC, "review_capture", review(attempt.id(), "VALID", "VALID")).reasonCode()).isEqualTo("CHANNEL_FAILED_RULE");
+        assertThat(records("window")).isEmpty();
+        assertThat(send(QC, "review_capture", review(attempt.id(), "REJECTED", "LIMITED")).applied()).isTrue();
+        assertThat(records("window")).isEmpty();
+    }
+
+    @Test
+    void interruptedAttemptCannotAdmitPreviouslyValidAutomaticChannels() {
+        rules.realWindows = true;
+        settings.set(AutomationSettings.AUTO_CAPTURE, true);
+        String mission = approvedMission();
+        assertThat(send(OPERATOR, "start_autopilot", missionVehicle(mission)).applied()).isTrue();
+        tickUntil(() -> !records("attempt").isEmpty() && "VALID".equals(channel(onlyAttempt().body(), "SO2_ppb").path("status").asText()),
+                3000, "automatic collection verdict");
+        assertThat(send(SUPERVISOR, "return_to_depot", payload().put("vehicle_id", world.droneId()).put("reason", "OPERATOR")).applied()).isTrue();
+        StoredRecord attempt = onlyAttempt();
+        assertThat(attempt.body().path("state").asText()).isEqualTo("INTERRUPTED");
+        saveCaptureReadings(attempt);
+        assertThat(send(QC, "review_capture", review(attempt.id(), "VALID", "VALID")).applied()).isTrue();
+        assertThat(records("window")).isEmpty();
+        assertThat(records("screening_record")).allSatisfy(r ->
+                assertThat(r.body().path("reasons").toString()).contains("ATTEMPT_INTERRUPTED"));
+    }
+
+    @Test
+    void emptyDefaultWindowHookReportsUnknownEnhancementAndDiagnostic() {
+        flyAndCapture();
+        StoredRecord attempt = onlyAttempt();
+        saveCaptureReadings(attempt);
+        assertThat(send(QC, "review_capture", review(attempt.id(), "VALID", "VALID")).applied()).isTrue();
+        assertThat(records("window")).isEmpty();
+        assertThat(records("screening_record")).allSatisfy(r -> {
+            assertThat(r.body().path("reasons").toString()).contains("CAPTURE_WINDOWS_UNAVAILABLE");
+            String unit = r.body().path("channel").asText().startsWith("SO2") ? "ppb" : "ppm";
+            assertThat(r.body().path("summary").path("mean_enhancement_" + unit).isNull()).isTrue();
+        });
+    }
+
+    @Test
+    void failedWindowHookReportsFailureWithoutSavingEvidenceOrInventingZero() {
+        rules.failWindows = true;
+        flyAndCapture();
+        StoredRecord attempt = onlyAttempt();
+        saveCaptureReadings(attempt);
+        assertThat(send(QC, "review_capture", review(attempt.id(), "VALID", "VALID")).applied()).isTrue();
+        assertThat(records("window")).isEmpty();
+        assertThat(records("screening_record")).allSatisfy(r -> {
+            assertThat(r.body().path("reasons").toString()).contains("CAPTURE_WINDOWS_FAILED");
+            String unit = r.body().path("channel").asText().startsWith("SO2") ? "ppb" : "ppm";
+            assertThat(r.body().path("summary").path("mean_enhancement_" + unit).isNull()).isTrue();
+        });
+    }
+
 }

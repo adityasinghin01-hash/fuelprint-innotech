@@ -12,6 +12,10 @@ FuelPrint is a simulated, AI-driven industrial pollution investigation system fo
 
 ## Ownership: only edit your own folders
 
+### Current execution assignment — 19 October 2026
+
+Aditya Singh explicitly authorized Codex to implement the complete backend ourselves, including the remaining Operations and Cases backends. For this continuation, Codex may also edit `server/src/main/java/fuelprint/ops/**`, `server/src/main/java/fuelprint/cases/**`, their matching tests, and migrations V200–V399. This is a bounded backend execution exception to the original table below; screen assignments and human decision roles do not change. Preserve all inherited work. Independent review happens within this execution; teammate backend delivery/review is not a prerequisite. No external message, commit, merge, push, scenario rewrite, statistical-policy change or freeze is authorized by this exception. The active plan is `docs/superpowers/plans/2026-10-19-complete-backend-plan.md`; the earlier shared proposal remains coordination history.
+
 | Owner | Folders you may edit |
 |---|---|
 | core (Aditya Singh, built by Kiro) | `server/src/main/java/fuelprint/core/**`, `server/src/main/java/fuelprint/api/**`, migrations `V001`–`V099`, `server/pom.xml`, `tools/**` except `tools/train/**` |

@@ -177,4 +177,19 @@ class TeachCaptureRulesTest {
         assertThat(v.status()).isEqualTo(ChannelStatus.LIMITED);
         assertThat(v.reasons()).containsExactly("COLLECTION_IN_PROGRESS");
     }
+    @Test
+    void backgroundPositionFaultCannotBeForgottenWhenCollectionIsOtherwiseValid() {
+        List<Stage> stages = List.of(stage("BACKGROUND", 0, 30), stage("PURGE", 30, 60),
+                stage("SETTLE", 60, 180), stage("COLLECT", 180, 210));
+        List<Reading> raw = new ArrayList<>(readings("SO2_ppb", "SO2_flow_L_min", .5, 0, -1));
+        raw.addAll(readings("SO2_ppb", "SO2_flow_L_min", .5, 180, -1));
+        assertThat(judge("SO2_ppb", stages, raw).status()).isEqualTo(ChannelStatus.VALID);
+        raw.removeIf(r -> r.channel().equals("SO2_ppb") && r.simTimeS() == 10);
+        raw.add(r("SO2_ppb", 10, 40.0, "OK", "OUT_OF_POSITION"));
+        ChannelVerdict verdict = judge("SO2_ppb", stages, raw);
+        assertThat(verdict.status()).isEqualTo(ChannelStatus.REJECTED);
+        assertThat(verdict.reasons()).contains("BACKGROUND_OUT_OF_POSITION");
+        assertThat(verdict.validSeconds()).isEqualTo(30);
+    }
+
 }

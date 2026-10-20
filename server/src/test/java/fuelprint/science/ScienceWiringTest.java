@@ -63,14 +63,21 @@ class ScienceWiringTest extends CoreSpringTest {
         String sensorId = store.list("sensor", runId).stream()
                 .filter(r -> "N2".equals(r.body().path("label").asText())).findFirst().orElseThrow().id();
         try {
+            var background = new fuelprint.api.Window(UUID.randomUUID().toString(), sensorId,
+                    "SO2_ppb", 0, 30, 30, null, 4.2, null);
             var window = new fuelprint.api.Window(UUID.randomUUID().toString(), sensorId,
-                    "SO2_ppb", 30, 60, 30, 75.0, 6.0, null);
+                    "SO2_ppb", 30, 60, 30, 75.0, 6.0, background.id());
+            var missingBackground = ranker.analyze(new fuelprint.api.AnalysisInput(runId, "investigation", 60,
+                    java.util.List.of(window), new fuelprint.api.WindNow(270, 3)));
+            assertThat(missingBackground.inputWindowIds()).isEmpty();
+            assertThat(missingBackground.exclusions()).anyMatch(e -> window.id().equals(e.readingWindow())
+                    && "BACKGROUND_WINDOW_UNKNOWN".equals(e.reason()));
             var analysis = ranker.analyze(new fuelprint.api.AnalysisInput(runId, "investigation", 60,
-                    java.util.List.of(window), new fuelprint.api.WindNow(270, 3)));
+                    java.util.List.of(background, window), new fuelprint.api.WindNow(270, 3)));
             assertThat(analysis.inputWindowIds()).containsExactly(window.id());
-            assertThat(analysis.exclusions()).isEmpty();
+            assertThat(analysis.exclusions()).noneMatch(e -> window.id().equals(e.readingWindow()));
             var otherRun = ranker.analyze(new fuelprint.api.AnalysisInput("other-run", "investigation", 60,
-                    java.util.List.of(window), new fuelprint.api.WindNow(270, 3)));
+                    java.util.List.of(background, window), new fuelprint.api.WindNow(270, 3)));
             assertThat(otherRun.inputWindowIds()).isEmpty();
         } finally {
             loop.stop(runId);

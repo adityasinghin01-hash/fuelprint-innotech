@@ -13,7 +13,10 @@ import java.util.Optional;
  * The recorded public inlet history behind one window: where the inlet actually was, sample by sample.
  * Positions between samples are linearly interpolated; before the first sample the first position holds.
  */
-public record InletTrack(List<Sample> samples) {
+public record InletTrack(List<Sample> samples, boolean vehicle, boolean measured) {
+
+    public InletTrack(List<Sample> samples) { this(samples, false, false); }
+    public InletTrack(List<Sample> samples, boolean vehicle) { this(samples, vehicle, vehicle); }
 
     public record Sample(double simTimeS, Enu inlet) {
     }
@@ -30,6 +33,11 @@ public record InletTrack(List<Sample> samples) {
         return new InletTrack(List.of(new Sample(0.0, inlet)));
     }
 
+    /** A real recorded fixed instrument; its measured background must be supplied with the collection. */
+    public static InletTrack recordedFixed(Enu inlet) {
+        return new InletTrack(List.of(new Sample(0.0, inlet)), false, true);
+    }
+
     public boolean stationary() {
         Enu first = samples.get(0).inlet();
         return samples.stream().allMatch(s -> s.inlet().equals(first));
@@ -39,15 +47,19 @@ public record InletTrack(List<Sample> samples) {
         if (t <= samples.get(0).simTimeS()) {
             return samples.get(0).inlet();
         }
-        for (int i = 1; i < samples.size(); i++) {
-            Sample b = samples.get(i);
-            if (t <= b.simTimeS()) {
-                Sample a = samples.get(i - 1);
+        int low = 1, high = samples.size() - 1;
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            if (samples.get(mid).simTimeS() < t) low = mid + 1;
+            else high = mid - 1;
+        }
+        if (low < samples.size()) {
+                Sample b = samples.get(low);
+                Sample a = samples.get(low - 1);
                 double f = (t - a.simTimeS()) / (b.simTimeS() - a.simTimeS());
                 return new Enu(a.inlet().east() + f * (b.inlet().east() - a.inlet().east()),
                         a.inlet().north() + f * (b.inlet().north() - a.inlet().north()),
                         a.inlet().up() + f * (b.inlet().up() - a.inlet().up()));
-            }
         }
         return samples.get(samples.size() - 1).inlet();
     }
@@ -70,10 +82,10 @@ public record InletTrack(List<Sample> samples) {
     /** Adapter for the public field history API. Missing (or empty) history remains unknown. */
     public static Source history(InletHistory history) {
         return (runId, window) -> history.track(runId, window.sensorOrVehicleId(),
-                        Math.max(0, window.startS() - ResponseModel.TEACHING.prehistoryS()), window.endS())
+                        0, window.endS())
                 .filter(samples -> !samples.isEmpty())
                 .map(samples -> new InletTrack(samples.stream()
-                        .map(sample -> new Sample(sample.simTimeS(), sample.inlet())).toList()));
+                        .map(sample -> new Sample(sample.simTimeS(), sample.inlet())).toList(), true));
     }
 
     /** Known window id to fixed inlet position (tests, calibration, hovering vehicle captures). */

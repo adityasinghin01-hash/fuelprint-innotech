@@ -135,11 +135,23 @@ export interface AnalysisRecord extends RecordBase {
   history_counts: Record<string, number> | null;
 }
 
+/** Existing public survey record saved by schedule_survey. */
+export interface SurveyRecord extends RecordBase {
+  investigation_id: Uuid;
+  action_id: string;
+  reason: string;
+  anomaly_id: Uuid | null;
+  vehicle_id: Uuid;
+  method_id: string;
+  vehicle_kind: string;
+  target: Enu;
+  channel_ids: string[];
+}
 export interface ProposalAction {
   action_id: string;
   kind: string;
   vehicle: 'DRONE' | 'VAN';
-  target: Enu;
+  target: Enu | null;
   score: number | null;
   complete_minutes: number | null;
   feasible: boolean;
@@ -148,7 +160,7 @@ export interface ProposalAction {
 export interface ProposalRecord extends RecordBase {
   analysis_id: Uuid;
   actions: ProposalAction[];
-  result: 'BEST_ACTION' | 'NO_USEFUL_MEASUREMENT';
+  result: 'BEST_ACTION' | 'NO_USEFUL_MEASUREMENT' | 'PENDING';
   best_action_id: string | null;
   cheaper_action_id: string | null;
 }
@@ -357,6 +369,7 @@ export interface RecordTypes {
   investigation: InvestigationRecord;
   analysis: AnalysisRecord;
   proposal: ProposalRecord;
+  survey: SurveyRecord;
   mission: MissionRecord;
   pairing: PairingRecord;
   lease: LeaseRecord;

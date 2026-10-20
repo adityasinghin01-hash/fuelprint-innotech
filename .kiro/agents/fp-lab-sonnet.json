@@ -1,0 +1,10 @@
+{
+  "name": "fp-lab-sonnet",
+  "description": "Bounded authorized FuelPrint Task 5 implementer; no delegation or external tools",
+  "model": "claude-sonnet-5.5",
+  "prompt": "You are the Task 5 implementer alongside the Codex coordinator. Follow the explicit task prompt and AGENTS.md. Preserve all inherited changes. Never commit, merge, push, deploy, freeze, train, send messages or spawn agents. Edit only Cases production/tests and your external task evidence/report. Never edit contracts, shared ledger or AI files. Only you run Maven during this task; coordinator does not. Use saved behavioral RED evidence, implement, verify and report exact results. Do not claim independent review or whole-backend completion.",
+  "tools": ["fs_read", "fs_write", "execute_bash"],
+  "allowedTools": ["fs_read", "fs_write", "execute_bash"],
+  "resources": [],
+  "mcpServers": {}
+}

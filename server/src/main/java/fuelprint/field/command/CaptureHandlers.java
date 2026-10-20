@@ -9,6 +9,7 @@ import static fuelprint.field.command.FieldRecords.reject;
 import static fuelprint.field.command.FieldRecords.state;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -18,6 +19,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -26,6 +29,8 @@ import fuelprint.api.CaptureInput;
 import fuelprint.api.ChannelStatus;
 import fuelprint.api.ChannelVerdict;
 import fuelprint.api.Stage;
+import fuelprint.api.Reading;
+import fuelprint.api.Window;
 import fuelprint.core.Ids;
 import fuelprint.core.command.Command;
 import fuelprint.core.command.CommandHandler;
@@ -363,9 +368,13 @@ public final class CaptureHandlers {
         static final List<String> ORDER = List.of("VALID", "LIMITED", "REJECTED");
 
         private final FieldWorld world;
+        private final FieldPorts ports;
+        private final ObjectMapper mapper;
 
-        public ReviewCapture(FieldWorld world) {
+        public ReviewCapture(FieldWorld world, FieldPorts ports, ObjectMapper mapper) {
             this.world = world;
+            this.ports = ports;
+            this.mapper = mapper;
         }
 
         @Override
@@ -438,15 +447,88 @@ public final class CaptureHandlers {
                 if (!decision.equals(preStatus)) {
                     reasons.add("REVIEWER_DOWNGRADED");
                 }
+                Double enhancement = null;
+                if ("INTERRUPTED".equals(state(attempt))) {
+                    reasons.add("ATTEMPT_INTERRUPTED");
+                } else if ("COMPLETE".equals(state(attempt)) && "VALID".equals(preStatus) && "VALID".equals(decision)) {
+                    try {
+                        CaptureInput input = savedInput(store, attempt, channel);
+                        List<Window> windows = ports.windows(input);
+                        if (!completePair(windows, channel, missionVehicle(store, attempt))) {
+                            reasons.add("CAPTURE_WINDOWS_UNAVAILABLE");
+                        } else {
+                            for (Window window : windows) {
+                                ObjectNode fields = mapper.valueToTree(window);
+                                fields.remove("id");
+                                result.save(RecordChange.create("window", window.id(), attempt.runId(), fields),
+                                        "WINDOW_SAVED", world.simTimeS());
+                                if (window.backgroundWindowId() != null) enhancement = window.meanEnhancement();
+                            }
+                        }
+                    } catch (RuntimeException | JsonProcessingException e) {
+                        log.warn("Capture windows failed for {} of attempt {}", channel, attempt.id(), e);
+                        reasons.add("CAPTURE_WINDOWS_FAILED");
+                    }
+                }
                 result.save(RecordChange.create(SCREENING, Ids.newId(), attempt.runId(),
-                        screening(attempt, channel, decision, reasons, pre, preStatus, session)),
+                        screening(attempt, channel, decision, reasons, pre, preStatus, session, enhancement)),
                         "SCREENING_RECORDED", world.simTimeS());
             }
             return result.build();
         }
 
+        /** Reconstruct exclusively from public records; the completed capture's transient snapshot is gone. */
+        private CaptureInput savedInput(StoreView store, StoredRecord attempt, String channel) throws JsonProcessingException {
+            List<Stage> stages = new ArrayList<>();
+            for (JsonNode stage : attempt.body().path("stages")) stages.add(mapper.treeToValue(stage, Stage.class));
+            String vehicleId = missionVehicle(store, attempt);
+            String flowChannel = switch (channel) {
+                case "SO2_ppb" -> "SO2_flow_L_min";
+                case "CO2_ppm" -> "CO2_flow_L_min";
+                default -> null;
+            };
+            List<Reading> readings = new ArrayList<>();
+            if (vehicleId != null && flowChannel != null) {
+                for (StoredRecord record : store.list("reading", attempt.runId())) {
+                    ObjectNode body = record.body();
+                    if (!vehicleId.equals(body.path("sensor_or_vehicle_id").asText())
+                            || !(channel.equals(body.path("channel").asText()) || flowChannel.equals(body.path("channel").asText()))) continue;
+                    if (!body.path("sim_time_s").isNumber()) throw new IllegalArgumentException("Reading time is unknown");
+                    double time = body.path("sim_time_s").asDouble();
+                    boolean duringAttempt = stages.stream().anyMatch(stage -> stage.endS() != null
+                            && time >= stage.startS() - 1e-6 && time < stage.endS() - 1e-6);
+                    if (duringAttempt) readings.add(mapper.treeToValue(FieldRecords.own(record), Reading.class));
+                }
+            }
+            readings.sort(Comparator.comparingDouble(Reading::simTimeS));
+            return new CaptureInput(attempt.id(), attempt.body().path("method_id").asText(), channel, stages, readings);
+        }
+
+        private static String missionVehicle(StoreView store, StoredRecord attempt) {
+            StoredRecord mission = find(store, MISSION, attempt.body().path("mission_id").asText());
+            return mission == null || !attempt.runId().equals(mission.runId()) ? null : mission.body().path("vehicle_id").asText(null);
+        }
+
+        /** A failed or incomplete optional hook must never produce a partial usable record. */
+        private static boolean completePair(List<Window> windows, String channel, String vehicleId) {
+            if (windows.size() != 2 || vehicleId == null) return false;
+            Window bg = windows.stream().filter(w -> w.backgroundWindowId() == null).findFirst().orElse(null);
+            Window collect = windows.stream().filter(w -> w.backgroundWindowId() != null).findFirst().orElse(null);
+            if (bg == null || collect == null || bg.meanEnhancement() != null || !bg.id().equals(collect.backgroundWindowId())
+                    || bg.id().equals(collect.id()) || collect.meanEnhancement() == null || !Double.isFinite(collect.meanEnhancement())
+                    || collect.validSeconds() != 30) return false;
+            for (Window window : windows) {
+                if (!Ids.isUuid(window.id()) || java.util.UUID.fromString(window.id()).version() != 4
+                        || !vehicleId.equals(window.sensorOrVehicleId()) || !channel.equals(window.channel())
+                        || !Double.isFinite(window.startS()) || !Double.isFinite(window.endS()) || window.endS() <= window.startS()
+                        || !Double.isFinite(window.validSeconds()) || window.validSeconds() <= 0
+                        || window.stdUncertainty() == null || !Double.isFinite(window.stdUncertainty()) || window.stdUncertainty() < 0) return false;
+            }
+            return true;
+        }
+
         private static ObjectNode screening(StoredRecord attempt, String channel, String decision, Set<String> reasons,
-                                            JsonNode pre, String preStatus, Session session) {
+                                            JsonNode pre, String preStatus, Session session, Double enhancement) {
             ObjectNode fields = JsonNodeFactory.instance.objectNode();
             fields.put("attempt_id", attempt.id());
             fields.put("mission_id", attempt.body().path("mission_id").asText());
@@ -460,7 +542,7 @@ public final class CaptureHandlers {
             summary.set("volume_L", pre.path("volume_L").deepCopy());
             int cut = channel.indexOf('_');
             String unit = cut < 0 ? "value" : channel.substring(cut + 1);
-            summary.set("mean_enhancement_" + unit, pre.path("mean_enhancement").deepCopy());
+            putNumber(summary, "mean_enhancement_" + unit, enhancement);
             summary.put("automatic_status", preStatus);
             summary.put("reviewed_by", session.actorLabel());
             return fields;

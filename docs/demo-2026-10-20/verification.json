@@ -1,0 +1,34 @@
+{
+  "status": "CURRENT_CHECKPOINT_TARGETED_CHECKS_PASS_FINAL_INTEGRATION_PENDING",
+  "recorded_utc": "2026-10-20T10:24:32.020400+00:00",
+  "java_targeted": {
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "java_command": "./mvnw -q -Dtest=DemoRankingTest,DemoRankingPersistenceTest,MissingLearnedModelTest test",
+  "apps_command": "cd apps && npm test",
+  "app_summaries": [
+    "Tests  17 passed (17)",
+    "Tests  78 passed | 1 skipped (79)",
+    "Tests  7 passed | 1 skipped (8)",
+    "Tests  11 passed (11)"
+  ],
+  "typecheck_exit": 0,
+  "app_test_exit": 0,
+  "build": "All apps built successfully before the latest capture-review UI; latest source typechecked and tested; production rebuild follows",
+  "warnings": [
+    "React Router future flags",
+    "React act warning in test fixtures",
+    "Lazy Three.js chunk exceeds 500kB"
+  ],
+  "inherited_baseline": "1265 Java PASS on prior accepted backend; not fresh final qualification",
+  "pending": [
+    "Lane B protocol/delta",
+    "Real-mode rehearsal",
+    "Final full changed-candidate qualification",
+    "Independent final review",
+    "Physical-device gates"
+  ]
+}

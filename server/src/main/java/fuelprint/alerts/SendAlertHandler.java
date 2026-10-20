@@ -183,6 +183,9 @@ class SendAlertHandler implements CommandHandler {
         } else {
             WordingPurpose purpose = AlertTexts.SMOKE_WARNING.equals(kind)
                     ? WordingPurpose.SMS_SMOKE_WARNING : WordingPurpose.SMS_BOARD_UPDATE;
+            if (wording.requiresSavedWording() && !wording.hasSavedWording(cause, purpose, template, store, runId)) {
+                return new Rejection("WORDING_PENDING", "Public message text is not ready yet. Please try again shortly.");
+            }
             text = wording.choose(cause, purpose, template, store, runId);
         }
         long deadline = System.nanoTime() + Duration.ofSeconds(SEND_BUDGET_S).toNanos();

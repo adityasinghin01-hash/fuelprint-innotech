@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public final class CompatRanker {
 
-    public static final String ALGORITHM = "FP-COMPAT-3/1";
+    public static final String ALGORITHM = "FP-COMPAT-3/4";
     private static final double SIGNAL_SIGMAS = 3.0;
 
     public record Result(Analysis analysis, FitSnapshot snapshot) {
@@ -63,6 +63,9 @@ public final class CompatRanker {
         List<String> limitations = new ArrayList<>();
         limitations.add("SYNTHETIC_SCOPE_ONLY: valid only inside this synthetic teaching model");
         limitations.add("UNREGISTERED_SOURCE_NOT_EXCLUDED: a source not in the registry is never ruled out");
+        if (entries.stream().anyMatch(e -> e.track().vehicle() && e.background() != null))
+            limitations.add("MEASURED_BACKGROUND_MAY_CONTAIN_PLUME: vehicle enhancement is collection mean minus the measured earlier background mean, a temporal contrast rather than an absolute plume concentration");
+        limitations.add("INITIAL_INLET_POSITION_ASSUMED: before available vehicle history the first recorded position holds; plume response starts at time zero");
         WindNow wind = input.wind();
         if (wind == null || !Double.isFinite(wind.fromDeg()) || !(wind.speedMS() > 0)) {
             limitations.add("WIND_NOT_USABLE: no usable wind in the input");
@@ -84,12 +87,17 @@ public final class CompatRanker {
         }
         limitations.add("STEADY_WIND_ASSUMED: one wind for every analysed window");
         limitations.add("STATIONARITY_NOT_SUPPORTED: emissions are assumed steady over the analysed windows");
-        limitations.add("COVARIANCE_DIAGONAL: windows are treated as independent");
+        limitations.add("COVARIANCE_AVERAGING_OPERATORS: shared measured backgrounds, electrical AR1 and filtered common ambient AR1; gases fitted jointly");
+        limitations.add("DECLARED_UNCERTAINTY_FLOOR: any reported variance above the operator electrical variance contributes additional independent diagonal uncertainty");
+        if (entries.stream().anyMatch(e -> e.background() == null))
+            limitations.add("BACKGROUND_OPERATOR_UNAVAILABLE: windows without a recorded reference use declared diagonal variance");
+        limitations.add("EMISSION_ONSET_ASSUMED_RUN_START: constant emissions from time zero in the finite-age puff hypothesis; other emission histories are not covered");
 
         Map<Object, Double> cache = new HashMap<>();
         Map<String, FitEngine.ExplanationFit> fits = new LinkedHashMap<>();
+        FitEngine.Prepared prepared = engine.prepare(entries);
         for (Explanation e : explanations) {
-            fits.put(e.id(), engine.fit(e, wind, entries, cache));
+            fits.put(e.id(), engine.fit(e, wind, entries, prepared, cache));
         }
         double c = cutoff.value();
         Map<String, Boolean> withinCutoff = new LinkedHashMap<>();
@@ -166,7 +174,8 @@ public final class CompatRanker {
         Analysis analysis = Analysis.physics(ids, outcome, Qualification.SYNTHETIC_SCOPE_ONLY, candidates,
                 sel.exclusions(), limitations, text, algorithmVersion());
         FitSnapshot snapshot = new FitSnapshot(ids, wind, c, entries.size(),
-                entries.stream().map(WindowSelection.Entry::gas).collect(Collectors.toSet()), surviving);
+                entries.stream().map(WindowSelection.Entry::gas).collect(Collectors.toSet()), surviving,
+                entries.stream().anyMatch(e -> e.background() != null));
         return new Result(analysis, snapshot);
     }
 

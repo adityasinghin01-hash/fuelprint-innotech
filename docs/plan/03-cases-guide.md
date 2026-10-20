@@ -5,6 +5,8 @@ subtitle: "For Antara and Aditya · step by step, with the Codex prompts · vers
 
 # Cases guide
 
+> **Backend execution update, 19 October 2026:** Aditya Singh/Codex is implementing the backend steps in this guide; Antara reviews integration and Cases screen assignments remain unchanged. Coordinate backend edits through Aditya Singh. Read the [backend update and scenario coverage addendum](../contract-proposals/2026-10-19-operations-cases-coverage.md); specimen/evidence distinctions, human findings and verification limits remain required.
+
 ## What changed in version 2 for you
 
 - **Sealing and verifying can happen by themselves.** When a finding is saved, the server's `automation` actor seals the export and then verifies it (if `auto_seal` is on). Antara's handlers accept `automation` for `seal_export` and `verify_export`, and a listener submits them. The exporter can still press the buttons.

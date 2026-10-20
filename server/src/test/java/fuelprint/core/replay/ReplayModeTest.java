@@ -31,6 +31,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.annotation.DirtiesContext;
 
 /**
  * Fake mode end to end: SC1, SC2 and SC3 play at 60x as if live, a headless socket client sees ticks with the drone
@@ -39,6 +40,7 @@ import org.springframework.test.context.DynamicPropertySource;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "fp.mode=replay", "fp.replay.speed=60",
         "spring.profiles.active=real"}) // replay mode must still switch the stubs on
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ReplayModeTest {
 
     static final Path DATA = CoreSpringTest.TempFolders.create("fp-replay-test-");

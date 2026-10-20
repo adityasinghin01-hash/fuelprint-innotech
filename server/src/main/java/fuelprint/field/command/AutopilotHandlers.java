@@ -112,6 +112,8 @@ public final class AutopilotHandlers {
             if (view == null || !world.routeFlyable(view)) {
                 return reject("NO_SAFE_ROUTE", "No safe path keeps 2 m from every building and stack.");
             }
+            Rejection authority = LeaseHandlers.initialDeparture(command, mission, ports);
+            if (authority != null) return authority;
             return new LeaseMoves(world, store, mission)
                     .endCurrent(FieldRecords.LEASE_EXPIRED, "EXPIRED")
                     .grant(FieldWorld.AUTOPILOT_HOLDER, Pilot.AUTOPILOT,
