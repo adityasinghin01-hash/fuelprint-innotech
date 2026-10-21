@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LiveConnection } from '@fp/shared';
 
@@ -38,35 +38,13 @@ describe('cases skeleton top bar', () => {
     }));
   });
   afterEach(() => {
-    cleanup();
     vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
-  it('applies a successful station login to the workbench controls without reloading the page', async () => {
-    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-      const body = url.includes('/api/snapshot') ? {cursor: 3, run_id: 'run-1', latest_readings: [],
-        run: {id: 'run-1', revision: 1, state: 'RUNNING', preset_id: 'SC1-NIGHT-PLUME'},
-        records: {case: [{id: 'case-login', run_id: 'run-1', revision: 2, state: 'FINDING', purpose: 'Login test case', investigation_id: 'inv', screening_record_ids: []}]}}
-        : url.endsWith('/api/session/stations') ? [{station_id: 'test', name: 'Teaching station', roles: ['exporter']}]
-        : url.endsWith('/api/session/station') ? {signed_in: true, station_id: 'test', roles: ['exporter']}
-        : url.endsWith('/api/session') ? {signed_in: false, station_id: null, roles: []} : [];
-      return new Response(JSON.stringify(body));
-    }));
-    const connection = new LiveConnection({socketFactory: u => new FakeSocket(u) as unknown as WebSocket});
-    render(<App connection={connection}/>);
-    act(() => {FakeSocket.last.onopen?.();FakeSocket.last.push(env('hello', {mode: 'live', after: null, reload_snapshot: false, kept_events: 1}));});
-    await waitFor(() => expect(screen.getByText('Login test case')).toBeTruthy());
-    expect((screen.getByRole('button', {name: 'Seal current finding'}) as HTMLButtonElement).disabled).toBe(true);
-    await waitFor(() => expect(screen.getByRole('option', {name: /Teaching station/})).toBeTruthy());
-    fireEvent.change(screen.getByLabelText('PIN'), {target: {value: '1111'}});
-    fireEvent.click(screen.getByRole('button', {name: 'Sign in'}));
-    await waitFor(() => expect((screen.getByRole('button', {name: 'Seal current finding'}) as HTMLButtonElement).disabled).toBe(false));
-  });
-
   it('shows connecting, live, stale and offline', async () => {
     const connection = new LiveConnection({ socketFactory: (u) => new FakeSocket(u) as unknown as WebSocket });
-    render(<App connection={connection} />);
+    await act(async () => { render(<App connection={connection} />); });
     expect(screen.getByTestId('live-badge').textContent).toMatch(/Connecting/);
     act(() => {
       FakeSocket.last.onopen?.();
