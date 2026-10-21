@@ -1,0 +1,26 @@
+// Import individual Phosphor modules to keep cold starts and test collection small.
+export { ArrowDown } from '@phosphor-icons/react/dist/csr/ArrowDown';
+export { ArrowRight } from '@phosphor-icons/react/dist/csr/ArrowRight';
+export { ArrowLeft } from '@phosphor-icons/react/dist/csr/ArrowLeft';
+export { ArrowUpRight } from '@phosphor-icons/react/dist/csr/ArrowUpRight';
+export { ArrowCounterClockwise } from '@phosphor-icons/react/dist/csr/ArrowCounterClockwise';
+export { CheckCircle } from '@phosphor-icons/react/dist/csr/CheckCircle';
+export { Circle } from '@phosphor-icons/react/dist/csr/Circle';
+export { Clock } from '@phosphor-icons/react/dist/csr/Clock';
+export { Cube } from '@phosphor-icons/react/dist/csr/Cube';
+export { Fingerprint } from '@phosphor-icons/react/dist/csr/Fingerprint';
+export { Flask } from '@phosphor-icons/react/dist/csr/Flask';
+export { FolderOpen } from '@phosphor-icons/react/dist/csr/FolderOpen';
+export { Leaf } from '@phosphor-icons/react/dist/csr/Leaf';
+export { List } from '@phosphor-icons/react/dist/csr/List';
+export { LockKey } from '@phosphor-icons/react/dist/csr/LockKey';
+export { MagnifyingGlass } from '@phosphor-icons/react/dist/csr/MagnifyingGlass';
+export { Pause } from '@phosphor-icons/react/dist/csr/Pause';
+export { Play } from '@phosphor-icons/react/dist/csr/Play';
+export { Scan } from '@phosphor-icons/react/dist/csr/Scan';
+export { ShieldCheck } from '@phosphor-icons/react/dist/csr/ShieldCheck';
+export { SignIn } from '@phosphor-icons/react/dist/csr/SignIn';
+export { Tree } from '@phosphor-icons/react/dist/csr/Tree';
+export { WarningCircle } from '@phosphor-icons/react/dist/csr/WarningCircle';
+export { Wind } from '@phosphor-icons/react/dist/csr/Wind';
+export { X } from '@phosphor-icons/react/dist/csr/X';
